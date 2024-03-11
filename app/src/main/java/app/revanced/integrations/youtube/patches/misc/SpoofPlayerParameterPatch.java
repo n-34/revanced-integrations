@@ -103,7 +103,7 @@ public class SpoofPlayerParameterPatch {
 
             // Clip's player parameters contain important information such as where the video starts, where it ends, and whether it loops.
             // Clips are 60 seconds or less in length, so no spoofing.
-            if (useOriginalStoryboardRenderer = parameters.length() > 150 || containsAny(parameters, CLIPS_PARAMETERS)) {
+            if (useOriginalStoryboardRenderer = parameters.length() > 150 || parameters.startsWith(CLIPS_PARAMETERS)) {
                 return parameters;
             }
 

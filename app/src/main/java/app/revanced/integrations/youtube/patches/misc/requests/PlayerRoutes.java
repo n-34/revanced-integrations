@@ -12,17 +12,29 @@ import app.revanced.integrations.youtube.requests.Requester;
 import app.revanced.integrations.youtube.requests.Route;
 import app.revanced.integrations.youtube.utils.LogHelper;
 
-final class PlayerRoutes {
-    static final Route.CompiledRoute GET_STORYBOARD_SPEC_RENDERER = new Route(
+public final class PlayerRoutes {
+    public static final Route.CompiledRoute GET_CHANNEL_INFORMATION = new Route(
+            Route.Method.POST,
+            "player" +
+                    "?fields=videoDetails.channelId," +
+                    "videoDetails.author"
+    ).compile();
+
+    public static final Route.CompiledRoute GET_STORYBOARD_SPEC_RENDERER = new Route(
             Route.Method.POST,
             "player" +
                     "?fields=storyboards.playerStoryboardSpecRenderer," +
                     "storyboards.playerLiveStoryboardSpecRenderer," +
-                    "playabilityStatus.status"
+                    "playabilityStatus.status," +
+                    "playabilityStatus.errorScreen"
     ).compile();
-    static final String ANDROID_INNER_TUBE_BODY;
-    static final String TV_EMBED_INNER_TUBE_BODY;
+
+    public static final String WEB_INNER_TUBE_BODY;
+    public static final String ANDROID_INNER_TUBE_BODY;
+    public static final String TV_EMBED_INNER_TUBE_BODY;
+
     private static final String YT_API_URL = "https://www.youtube.com/youtubei/v1/";
+
     /**
      * TCP connection and HTTP read timeout
      */
@@ -73,6 +85,26 @@ final class PlayerRoutes {
         }
 
         TV_EMBED_INNER_TUBE_BODY = tvEmbedInnerTubeBody.toString();
+
+        JSONObject webInnerTubeBody = new JSONObject();
+
+        try {
+            JSONObject context = new JSONObject();
+
+            JSONObject client = new JSONObject();
+            client.put("clientName", "WEB");
+            client.put("clientVersion", "2.20240201.01.00");
+            client.put("clientScreen", "WATCH");
+
+            context.put("client", client);
+
+            webInnerTubeBody.put("context", context);
+            webInnerTubeBody.put("videoId", "%s");
+        } catch (JSONException e) {
+            LogHelper.printException(() -> "Failed to create webInnerTubeBody", e);
+        }
+
+        WEB_INNER_TUBE_BODY = webInnerTubeBody.toString();
     }
 
     private PlayerRoutes() {
@@ -81,7 +113,7 @@ final class PlayerRoutes {
     /**
      * @noinspection SameParameterValue
      */
-    static HttpURLConnection getPlayerResponseConnectionFromRoute(Route.CompiledRoute route) throws IOException {
+    public static HttpURLConnection getPlayerResponseConnectionFromRoute(Route.CompiledRoute route) throws IOException {
         var connection = Requester.getConnectionFromCompiledRoute(YT_API_URL, route);
 
         connection.setRequestProperty(
