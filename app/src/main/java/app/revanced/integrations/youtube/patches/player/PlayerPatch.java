@@ -110,7 +110,9 @@ public class PlayerPatch {
 
         viewGroup.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
             try {
-                final View closeButton = ((LinearLayout) viewGroup.getChildAt(0)).getChildAt(1);
+                if (!(viewGroup.getChildAt(0) instanceof LinearLayout linearLayout))
+                    return;
+                final View closeButton = linearLayout.getChildAt(1);
                 if (closeButton != null) {
                     closeButton.setSoundEffectsEnabled(false);
                     closeButton.performClick();
@@ -119,5 +121,18 @@ public class PlayerPatch {
                 LogHelper.printException(() -> "hideSuggestedVideoOverlay failure", ex);
             }
         });
+    }
+
+    public static void hideSuggestedVideoOverlayAutoPlay(View view) {
+        if (!SettingsEnum.HIDE_SUGGESTED_VIDEO_OVERLAY.getBoolean())
+            return;
+
+        if (!SettingsEnum.HIDE_SUGGESTED_VIDEO_OVERLAY_AUTO_PLAY.getBoolean())
+            return;
+
+        if (view != null) {
+            view.setSoundEffectsEnabled(false);
+            view.performClick();
+        }
     }
 }
