@@ -64,12 +64,8 @@ public final class LayoutComponentsFilter extends Filter {
 
         communityPosts = new StringFilterGroup(
                 null,
-                "post_base_wrapper"
-        );
-
-        final StringFilterGroup customFilter = new CustomFilterGroup(
-                SettingsEnum.CUSTOM_FILTER,
-                SettingsEnum.CUSTOM_FILTER_STRINGS
+                "post_base_wrapper",
+                "image_post_root"
         );
 
         final StringFilterGroup expandableMetadata = new StringFilterGroup(
@@ -148,7 +144,6 @@ public final class LayoutComponentsFilter extends Filter {
                 albumCard,
                 audioTrackButton,
                 communityPosts,
-                customFilter,
                 expandableMetadata,
                 feedSurvey,
                 grayDescription,

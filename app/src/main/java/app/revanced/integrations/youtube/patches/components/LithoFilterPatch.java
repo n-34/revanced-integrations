@@ -1,7 +1,5 @@
 package app.revanced.integrations.youtube.patches.components;
 
-import static app.revanced.integrations.youtube.utils.StringRef.str;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -16,7 +14,6 @@ import java.util.function.Consumer;
 import app.revanced.integrations.youtube.settings.SettingsEnum;
 import app.revanced.integrations.youtube.utils.ByteTrieSearch;
 import app.revanced.integrations.youtube.utils.LogHelper;
-import app.revanced.integrations.youtube.utils.ReVancedUtils;
 import app.revanced.integrations.youtube.utils.StringTrieSearch;
 import app.revanced.integrations.youtube.utils.TrieSearch;
 
@@ -132,25 +129,6 @@ class StringFilterGroup extends FilterGroup<String> {
             }
         }
         return new FilterGroupResult(setting, matchedIndex, matchedLength);
-    }
-}
-
-final class CustomFilterGroup extends StringFilterGroup {
-
-    public CustomFilterGroup(SettingsEnum setting, SettingsEnum filter) {
-        super(setting, getFilterPatterns(filter));
-    }
-
-    private static String[] getFilterPatterns(SettingsEnum setting) {
-        String[] patterns = setting.getString().split("\\s+");
-        for (String pattern : patterns) {
-            if (!StringTrieSearch.isValidPattern(pattern)) {
-                ReVancedUtils.showToastShort(str("revanced_custom_filter_strings_warning"));
-                setting.resetToDefault();
-                return getFilterPatterns(setting);
-            }
-        }
-        return patterns;
     }
 }
 
@@ -375,6 +353,8 @@ public final class LithoFilterPatch {
     private static final StringTrieSearch identifierSearchTree = new StringTrieSearch();
     private static final StringTrieSearch allValueSearchTree = new StringTrieSearch();
 
+    private static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
+
     /**
      * Because litho filtering is multi-threaded and the buffer is passed in from a different injection point,
      * the buffer is saved to a ThreadLocal so each calling thread does not interfere with other threads.
@@ -435,17 +415,20 @@ public final class LithoFilterPatch {
                 return false;
 
             ByteBuffer protobufBuffer = bufferThreadLocal.get();
+            final byte[] bufferArray;
+            // Potentially the buffer may have been null or never set up until now.
+            // Use an empty buffer so the litho id/path filters still work correctly.
             if (protobufBuffer == null) {
-                LogHelper.printException(() -> "Proto buffer is null"); // Should never happen.
-                return false;
+                LogHelper.printDebug(() -> "Proto buffer is null, using an empty buffer array");
+                bufferArray = EMPTY_BYTE_ARRAY;
+            } else if (!protobufBuffer.hasArray()) {
+                LogHelper.printDebug(() -> "Proto buffer does not have an array, using an empty buffer array");
+                bufferArray = EMPTY_BYTE_ARRAY;
+            } else {
+                bufferArray = protobufBuffer.array();
             }
 
-            if (!protobufBuffer.hasArray()) {
-                LogHelper.printDebug(() -> "Proto buffer does not have an array");
-                return false;
-            }
-
-            LithoFilterParameters parameter = new LithoFilterParameters(pathBuilder.toString(), identifier, object.toString(), protobufBuffer.array());
+            LithoFilterParameters parameter = new LithoFilterParameters(pathBuilder.toString(), identifier, object.toString(), bufferArray);
             LogHelper.printDebug(() -> "Searching " + parameter);
 
             if (parameter.identifier != null) {
@@ -509,7 +492,7 @@ public final class LithoFilterPatch {
         @Override
         public String toString() {
             // Estimate the percentage of the buffer that are Strings.
-            StringBuilder builder = new StringBuilder(protoBuffer.length / 2);
+            StringBuilder builder = new StringBuilder(Math.max(100, protoBuffer.length / 2));
             builder.append("\nID: ");
             builder.append(identifier);
             builder.append("\nPath: ");
