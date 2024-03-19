@@ -6,7 +6,7 @@ import app.revanced.integrations.music.settings.SettingsEnum;
 public final class CarouselShelfFilter extends Filter {
 
     public CarouselShelfFilter() {
-        pathFilterGroupList.addAll(
+        identifierFilterGroupList.addAll(
                 new StringFilterGroup(
                         SettingsEnum.HIDE_CAROUSEL_SHELF,
                         "music_grid_item_carousel"

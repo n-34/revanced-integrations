@@ -6,7 +6,7 @@ import app.revanced.integrations.music.settings.SettingsEnum;
 public final class PlaylistCardFilter extends Filter {
 
     public PlaylistCardFilter() {
-        pathFilterGroupList.addAll(
+        identifierFilterGroupList.addAll(
                 new StringFilterGroup(
                         SettingsEnum.HIDE_PLAYLIST_CARD,
                         "music_container_card_shelf"

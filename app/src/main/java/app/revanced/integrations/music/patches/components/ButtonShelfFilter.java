@@ -6,7 +6,7 @@ import app.revanced.integrations.music.settings.SettingsEnum;
 public final class ButtonShelfFilter extends Filter {
 
     public ButtonShelfFilter() {
-        pathFilterGroupList.addAll(
+        identifierFilterGroupList.addAll(
                 new StringFilterGroup(
                         SettingsEnum.HIDE_BUTTON_SHELF,
                         "entry_point_button_shelf"
