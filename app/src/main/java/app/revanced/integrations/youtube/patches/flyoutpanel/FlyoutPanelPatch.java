@@ -9,7 +9,9 @@ import android.widget.TextView;
 import app.revanced.integrations.youtube.patches.components.VideoQualityMenuFilter;
 import app.revanced.integrations.youtube.settings.SettingsEnum;
 import app.revanced.integrations.youtube.utils.LogHelper;
+import app.revanced.integrations.youtube.utils.ResourceUtils;
 import app.revanced.integrations.youtube.utils.ReVancedUtils;
+import app.revanced.integrations.youtube.utils.StringRef;
 
 @SuppressWarnings("unused")
 public class FlyoutPanelPatch {
@@ -30,6 +32,17 @@ public class FlyoutPanelPatch {
                 },
                 1
         );
+    }
+
+    /**
+     * The toggle's strings must follow the language set in the YouTube app.
+     * So use {@link ResourceUtils#string(String)} instead of {@link StringRef#str(String)}.
+     *
+     * @param str identifier.
+     * @return toggle's strings.
+     */
+    public static String getToggleString(String str) {
+        return ResourceUtils.string(str);
     }
 
     /**
