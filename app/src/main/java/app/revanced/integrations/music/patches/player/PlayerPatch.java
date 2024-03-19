@@ -22,6 +22,8 @@ import app.revanced.integrations.music.utils.VideoHelpers;
 
 @SuppressWarnings("unused")
 public class PlayerPatch {
+    private static final int MUSIC_VIDEO_GREY_BACKGROUND_COLOR = -12566464;
+    private static final int MUSIC_VIDEO_ORIGINAL_BACKGROUND_COLOR = -16579837;
 
     public static boolean enableColorMatchPlayer() {
         return SettingsEnum.ENABLE_COLOR_MATCH_PLAYER.getBoolean();
@@ -53,16 +55,19 @@ public class PlayerPatch {
         return SettingsEnum.ENABLE_ZEN_MODE.getBoolean();
     }
 
+    public static int enableZenMode(int originalColor) {
+        return SettingsEnum.ENABLE_ZEN_MODE.getBoolean()
+                && originalColor == MUSIC_VIDEO_ORIGINAL_BACKGROUND_COLOR
+                ? MUSIC_VIDEO_GREY_BACKGROUND_COLOR
+                : originalColor;
+    }
+
+    public static int getShuffleState() {
+        return SettingsEnum.SHUFFLE_SATE.getInt();
+    }
+
     public static int hideFullscreenShareButton(int original) {
         return SettingsEnum.HIDE_FULLSCREEN_SHARE_BUTTON.getBoolean() ? 0 : original;
-    }
-
-    public static boolean rememberRepeatState(boolean original) {
-        return SettingsEnum.REMEMBER_REPEAT_SATE.getBoolean() || original;
-    }
-
-    public static boolean rememberShuffleState() {
-        return SettingsEnum.REMEMBER_SHUFFLE_SATE.getBoolean();
     }
 
     private static void prepareOpenMusic(@NonNull Context context) {
@@ -78,6 +83,14 @@ public class PlayerPatch {
         VideoHelpers.openInMusic(context, songId);
     }
 
+    public static boolean rememberRepeatState(boolean original) {
+        return SettingsEnum.REMEMBER_REPEAT_SATE.getBoolean() || original;
+    }
+
+    public static boolean rememberShuffleState() {
+        return SettingsEnum.REMEMBER_SHUFFLE_SATE.getBoolean();
+    }
+
     public static void replaceCastButton(Activity activity, ViewGroup viewGroup, View originalView) {
         if (!SettingsEnum.REPLACE_PLAYER_CAST_BUTTON.getBoolean()) {
             viewGroup.addView(originalView);
@@ -87,15 +100,9 @@ public class PlayerPatch {
         LinearLayout linearLayout = (LinearLayout) LayoutInflater.from(activity).inflate(identifier("open_music_button", ResourceType.LAYOUT), null);
         ImageView musicButtonView = (ImageView) linearLayout.getChildAt(0);
 
-        musicButtonView.setOnClickListener(
-                imageView -> prepareOpenMusic(imageView.getContext())
-        );
+        musicButtonView.setOnClickListener(imageView -> prepareOpenMusic(imageView.getContext()));
 
         viewGroup.addView(linearLayout);
-    }
-
-    public static int getShuffleState() {
-        return SettingsEnum.SHUFFLE_SATE.getInt();
     }
 
     public static void setShuffleState(int buttonState) {
