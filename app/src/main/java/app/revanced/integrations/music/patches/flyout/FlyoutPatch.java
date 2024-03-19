@@ -1,8 +1,11 @@
 package app.revanced.integrations.music.patches.flyout;
 
+import static app.revanced.integrations.music.utils.ReVancedUtils.clickView;
+import static app.revanced.integrations.music.utils.ReVancedUtils.runOnMainThreadDelayed;
 import static app.revanced.integrations.music.utils.ResourceUtils.identifier;
 import static app.revanced.integrations.music.utils.StringRef.str;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
@@ -16,9 +19,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import app.revanced.integrations.music.patches.video.PlaybackSpeedPatch;
+import app.revanced.integrations.music.patches.video.VideoInformation;
 import app.revanced.integrations.music.settings.SettingsEnum;
 import app.revanced.integrations.music.utils.LogHelper;
-import app.revanced.integrations.music.utils.ReVancedUtils;
 import app.revanced.integrations.music.utils.ResourceType;
 import app.revanced.integrations.music.utils.VideoHelpers;
 
@@ -26,6 +30,9 @@ import app.revanced.integrations.music.utils.VideoHelpers;
 public class FlyoutPatch {
 
     private static final ColorFilter cf = new PorterDuffColorFilter(Color.parseColor("#ffffffff"), PorterDuff.Mode.SRC_ATOP);
+
+    @SuppressLint("StaticFieldLeak")
+    public static View touchOutSideView;
 
     public static int enableCompactDialog(int original) {
         if (!SettingsEnum.ENABLE_COMPACT_DIALOG.getBoolean())
@@ -69,7 +76,7 @@ public class FlyoutPatch {
 
         ViewGroup clickAbleArea = (ViewGroup) textView.getParent();
 
-        ReVancedUtils.runOnMainThreadDelayed(() -> {
+        runOnMainThreadDelayed(() -> {
             textView.setText(str("revanced_flyout_panel_watch_on_youtube"));
             imageView.setImageResource(identifier("yt_outline_youtube_logo_icon_vd_theme_24", ResourceType.DRAWABLE, clickAbleArea.getContext()));
             clickAbleArea.setOnClickListener(viewGroup -> VideoHelpers.openInYouTube(viewGroup.getContext()));
@@ -93,7 +100,13 @@ public class FlyoutPatch {
         final ImageView dislikeButton = (ImageView) flyoutButtonContainers.getChildAt(1);
         final ImageView likeButton = (ImageView) flyoutButtonContainers.getChildAt(2);
 
-        playbackSpeedButton.setOnClickListener(imageView -> VideoHelpers.playbackSpeedDialogListener(imageView.getContext()));
+        final boolean playingMedia = !VideoInformation.getVideoId().isEmpty();
+        playbackSpeedButton.setImageAlpha(playingMedia ? 255 : 0);
+        playbackSpeedButton.setEnabled(playingMedia);
+        playbackSpeedButton.setOnClickListener(imageView -> {
+            clickView(touchOutSideView);
+            PlaybackSpeedPatch.showPlaybackSpeedMenu();
+        });
         playbackSpeedButton.setColorFilter(cf);
 
         final boolean hideLikeDislikeButton = SettingsEnum.HIDE_FLYOUT_PANEL_LIKE_DISLIKE.getBoolean();

@@ -20,9 +20,6 @@ public class CustomPlaybackSpeedPatch {
      */
     private static float[] customPlaybackSpeeds;
 
-    private static String[] customSpeedEntries;
-    private static String[] customSpeedEntryValues;
-
     static {
         loadCustomSpeeds();
     }
@@ -68,21 +65,6 @@ public class CustomPlaybackSpeedPatch {
                 }
                 customPlaybackSpeeds[i] = speed;
             }
-
-            if (customSpeedEntries != null) return;
-
-            customSpeedEntries = new String[customPlaybackSpeeds.length];
-            customSpeedEntryValues = new String[customPlaybackSpeeds.length];
-
-            int i = 0;
-            for (float speed : customPlaybackSpeeds) {
-                String speedString = String.valueOf(speed);
-                customSpeedEntries[i] = speed != 1.0f
-                        ? speedString + "x"
-                        : str("revanced_playback_speed_normal");
-                customSpeedEntryValues[i] = speedString;
-                i++;
-            }
         } catch (Exception ex) {
             LogHelper.printInfo(() -> "parse error", ex);
             resetCustomSpeeds(false);
@@ -95,14 +77,6 @@ public class CustomPlaybackSpeedPatch {
             if (arrayValue == value) return true;
         }
         return false;
-    }
-
-    public static String[] getListEntries() {
-        return customSpeedEntries;
-    }
-
-    public static String[] getListEntryValues() {
-        return customSpeedEntryValues;
     }
 
     public static String getWarningMessage() {

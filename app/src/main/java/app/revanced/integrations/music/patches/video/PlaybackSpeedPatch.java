@@ -17,9 +17,10 @@ public class PlaybackSpeedPatch {
         return selectedSpeed;
     }
 
-    public static void overrideSpeed(final float speedValue) {
-        if (speedValue != selectedSpeed)
-            selectedSpeed = speedValue;
+    /** @noinspection ResultOfMethodCallIgnored*/
+    public static void showPlaybackSpeedMenu() {
+        SettingsEnum.ENABLE_FLYOUT_PANEL_PLAYBACK_SPEED.getBoolean();
+        // Rest of the implementation added by patch.
     }
 
     public static void userChangedSpeed(final float speed) {

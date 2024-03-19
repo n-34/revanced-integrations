@@ -59,6 +59,12 @@ public class ReVancedUtils {
         return context;
     }
 
+    public static void clickView(View view) {
+        if (view == null) return;
+        view.setSoundEffectsEnabled(false);
+        view.performClick();
+    }
+
     public static void hideViewBy0dpUnderCondition(boolean condition, View view) {
         if (!condition) return;
         hideViewByLayoutParams(view);

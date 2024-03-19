@@ -33,9 +33,6 @@ public class InitializationPatch {
             return;
 
         showRestartDialog(mActivity, "revanced_restart_first_run", 1000);
-
-        // set default value
-        SettingsEnum.ENABLE_SAVE_PLAYBACK_SPEED.saveValue(PatchStatus.RememberPlaybackSpeed());
     }
 
     public static void setDeviceInformation(@NonNull Context context) {
