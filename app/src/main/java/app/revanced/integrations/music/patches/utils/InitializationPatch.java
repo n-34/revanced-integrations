@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 
 import app.revanced.integrations.music.settings.SettingsEnum;
 import app.revanced.integrations.music.utils.ReVancedHelper;
+import app.revanced.integrations.music.utils.ReVancedUtils;
 
 @SuppressWarnings("unused")
 public class InitializationPatch {
@@ -26,7 +27,7 @@ public class InitializationPatch {
         if (SettingsEnum.SETTINGS_INITIALIZED.getBoolean())
             return;
 
-        SettingsEnum.SETTINGS_INITIALIZED.saveValue(true);
+        ReVancedUtils.runOnMainThreadDelayed(() -> SettingsEnum.SETTINGS_INITIALIZED.saveValue(true), 1000);
 
         // show dialog
         if (!(context instanceof Activity mActivity))

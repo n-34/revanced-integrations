@@ -31,11 +31,17 @@ public class PlayerPatch {
         return SettingsEnum.ENABLE_FORCE_MINIMIZED_PLAYER.getBoolean() || original;
     }
 
-    public static boolean enableOldPlayerBackground() {
+    public static boolean enableOldPlayerBackground(boolean original) {
+        if (!SettingsEnum.SETTINGS_INITIALIZED.getBoolean()) {
+            return original;
+        }
         return !SettingsEnum.ENABLE_OLD_PLAYER_BACKGROUND.getBoolean();
     }
 
-    public static boolean enableOldPlayerLayout() {
+    public static boolean enableOldPlayerLayout(boolean original) {
+        if (!SettingsEnum.SETTINGS_INITIALIZED.getBoolean()) {
+            return original;
+        }
         return !SettingsEnum.ENABLE_OLD_PLAYER_LAYOUT.getBoolean();
     }
 
