@@ -499,6 +499,11 @@ public final class LithoFilterPatch {
             builder.append("\nPath: ");
             builder.append(path);
 
+            if (SettingsEnum.ENABLE_DEBUG_BUFFER_LOGGING.getBoolean()) {
+                builder.append("\nBufferStrings: ");
+                findAsciiStrings(builder, protoBuffer);
+            }
+
             return builder.toString();
         }
     }

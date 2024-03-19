@@ -111,6 +111,7 @@ public enum SettingsEnum {
 
     // Misc
     ENABLE_DEBUG_LOGGING("revanced_enable_debug_logging", BOOLEAN, FALSE),
+    ENABLE_DEBUG_BUFFER_LOGGING("revanced_enable_debug_buffer_logging", BOOLEAN, FALSE),
     ENABLE_OPUS_CODEC("revanced_enable_opus_codec", BOOLEAN, TRUE, true),
     SANITIZE_SHARING_LINKS("revanced_sanitize_sharing_links", BOOLEAN, TRUE, true),
     SETTINGS_INITIALIZED("revanced_settings_initialized", BOOLEAN, FALSE),
