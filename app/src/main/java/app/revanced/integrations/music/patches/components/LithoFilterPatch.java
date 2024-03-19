@@ -17,6 +17,7 @@ import app.revanced.integrations.music.utils.LogHelper;
 import app.revanced.integrations.music.utils.StringTrieSearch;
 import app.revanced.integrations.music.utils.TrieSearch;
 
+@SuppressWarnings("unused")
 abstract class FilterGroup<T> {
     protected final SettingsEnum setting;
     protected final T[] filters;
@@ -85,7 +86,6 @@ abstract class FilterGroup<T> {
             return setting;
         }
 
-        @SuppressWarnings("unused")
         public boolean isFiltered() {
             return matchedIndex >= 0;
         }
@@ -100,7 +100,6 @@ abstract class FilterGroup<T> {
         /**
          * Length of the matched filter pattern.
          */
-        @SuppressWarnings("unused")
         public int getMatchedLength() {
             return matchedLength;
         }
@@ -215,7 +214,7 @@ class ByteArrayFilterGroup extends FilterGroup<byte[]> {
     }
 }
 
-
+@SuppressWarnings("unused")
 final class ByteArrayAsStringFilterGroup extends ByteArrayFilterGroup {
 
     public ByteArrayAsStringFilterGroup(SettingsEnum setting, String... filters) {
@@ -397,7 +396,6 @@ public final class LithoFilterPatch {
     /**
      * Injection point.  Called off the main thread.
      */
-    @SuppressWarnings("unused")
     public static void setProtoBuffer(@NonNull ByteBuffer protobufBuffer) {
         // Set the buffer to a thread local.  The buffer will remain in memory, even after the call to #filter completes.
         // This is intentional, as it appears the buffer can be set once and then filtered multiple times.

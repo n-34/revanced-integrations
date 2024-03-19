@@ -59,6 +59,7 @@ public enum SettingsEnum {
     ENABLE_COMPACT_DIALOG("revanced_enable_compact_dialog", BOOLEAN, TRUE),
     ENABLE_FLYOUT_PANEL_PLAYBACK_SPEED("revanced_enable_flyout_panel_playback_speed", BOOLEAN, FALSE, true),
 
+    HIDE_FLYOUT_PANEL_3_COLUMN_COMPONENT("revanced_hide_flyout_panel_3_column_component", BOOLEAN, FALSE, true),
     HIDE_FLYOUT_PANEL_ADD_TO_QUEUE("revanced_hide_flyout_panel_add_to_queue", BOOLEAN, FALSE, true),
     HIDE_FLYOUT_PANEL_CAPTIONS("revanced_hide_flyout_panel_captions", BOOLEAN, FALSE, true),
     HIDE_FLYOUT_PANEL_DELETE_PLAYLIST("revanced_hide_flyout_panel_delete_playlist", BOOLEAN, FALSE, true),
