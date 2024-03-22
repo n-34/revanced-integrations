@@ -1,17 +1,16 @@
 @file:Suppress("UnstableApiUsage")
 
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.android.library)
 }
 
 android {
-    namespace = "app.revanced.dummy"
+    namespace = "app.revanced.integrations.stub"
     // noinspection GradleDependency
     compileSdk = 33
-    buildToolsVersion = "33.0.2"
 
     defaultConfig {
+        multiDexEnabled = false
         minSdk = 24
     }
 
@@ -20,7 +19,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }

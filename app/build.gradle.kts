@@ -1,15 +1,23 @@
 @file:Suppress("UnstableApiUsage")
 
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin)
+    publishing
 }
 
 android {
+    namespace = "app.revanced.integrations"
     // noinspection GradleDependency
     compileSdk = 33
-    buildToolsVersion = "33.0.2"
-    namespace = "app.revanced.integrations"
+
+    applicationVariants.all {
+        outputs.all {
+            this as com.android.build.gradle.internal.api.ApkVariantOutputImpl
+
+            outputFileName = "${rootProject.name}-$versionName.apk"
+        }
+    }
 
     defaultConfig {
         applicationId = "app.revanced.integrations"
@@ -17,7 +25,9 @@ android {
         // noinspection EditedTargetSdkVersion, ExpiredTargetSdkVersion
         targetSdk = 31
         multiDexEnabled = false
-        versionName = project.version as String
+        versionName = version as String
+
+        buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
     }
 
     buildFeatures {
@@ -29,30 +39,49 @@ android {
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
-        applicationVariants.all {
-            buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}\"")
-            outputs.all {
-                this as com.android.build.gradle.internal.api.ApkVariantOutputImpl
+    }
 
-                outputFileName = "${rootProject.name}-$versionName.apk"
-            }
-        }
-    }
     compileOptions {
-        sourceCompatibility(JavaVersion.VERSION_17)
-        targetCompatibility(JavaVersion.VERSION_17)
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
+
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17.toString()
     }
 }
 
 dependencies {
-    compileOnly(project(mapOf("path" to ":dummy")))
-    compileOnly("androidx.annotation:annotation:1.7.1")
+    compileOnly(libs.annotation)
+
+    compileOnly(project(":stub"))
 }
 
-tasks.register("publish") { dependsOn("build") }
+tasks {
+    // Because the signing plugin doesn't support signing APKs, do it manually.
+    register("sign") {
+        group = "signing"
+
+        dependsOn(build)
+
+        doLast {
+            val outputDirectory = layout.buildDirectory.dir("outputs/apk/release").get().asFile
+            val integrationsApk = outputDirectory.resolve("${rootProject.name}-$version.apk")
+
+            org.gradle.security.internal.gnupg.GnupgSignatoryFactory().createSignatory(project).sign(
+                integrationsApk.inputStream(),
+                outputDirectory.resolve("${integrationsApk.name}.asc").outputStream(),
+            )
+        }
+    }
+
+    // Needed by gradle-semantic-release-plugin.
+    // Tracking: https://github.com/KengoTODA/gradle-semantic-release-plugin/issues/435
+    publish {
+        dependsOn(build)
+        dependsOn("sign")
+    }
+}
