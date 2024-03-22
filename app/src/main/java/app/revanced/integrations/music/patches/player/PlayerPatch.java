@@ -47,6 +47,18 @@ public class PlayerPatch {
         return !SettingsEnum.ENABLE_OLD_PLAYER_LAYOUT.getBoolean();
     }
 
+    public static boolean enableSwipeToDismissMiniPlayer() {
+        return SettingsEnum.ENABLE_SWIPE_TO_DISMISS_MINI_PLAYER.getBoolean();
+    }
+
+    public static boolean enableSwipeToDismissMiniPlayer(boolean original) {
+        return !SettingsEnum.ENABLE_SWIPE_TO_DISMISS_MINI_PLAYER.getBoolean() && original;
+    }
+
+    public static Object enableSwipeToDismissMiniPlayer(Object object) {
+        return SettingsEnum.ENABLE_SWIPE_TO_DISMISS_MINI_PLAYER.getBoolean() ? null : object;
+    }
+
     public static boolean enableZenMode() {
         return SettingsEnum.ENABLE_ZEN_MODE.getBoolean();
     }
