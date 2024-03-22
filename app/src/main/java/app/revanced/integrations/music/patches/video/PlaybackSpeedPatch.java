@@ -19,7 +19,7 @@ public class PlaybackSpeedPatch {
 
     /** @noinspection ResultOfMethodCallIgnored*/
     public static void showPlaybackSpeedMenu() {
-        SettingsEnum.ENABLE_FLYOUT_PANEL_PLAYBACK_SPEED.getBoolean();
+        // SettingsEnum.ENABLE_FLYOUT_PANEL_PLAYBACK_SPEED.getBoolean();
         // Rest of the implementation added by patch.
     }
 
