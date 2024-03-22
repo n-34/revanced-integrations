@@ -47,10 +47,6 @@ public class PlayerPatch {
         return !SettingsEnum.ENABLE_OLD_PLAYER_LAYOUT.getBoolean();
     }
 
-    public static boolean enableOldStyleMiniPlayer(boolean original) {
-        return !SettingsEnum.ENABLE_OLD_STYLE_MINI_PLAYER.getBoolean() && original;
-    }
-
     public static boolean enableZenMode() {
         return SettingsEnum.ENABLE_ZEN_MODE.getBoolean();
     }
