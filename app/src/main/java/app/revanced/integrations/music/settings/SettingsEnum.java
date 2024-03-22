@@ -88,6 +88,8 @@ public enum SettingsEnum {
     HIDE_FLYOUT_PANEL_VIEW_SONG_CREDIT("revanced_hide_flyout_panel_view_song_credit", BOOLEAN, FALSE, true),
     REPLACE_FLYOUT_PANEL_DISMISS_QUEUE("revanced_replace_flyout_panel_dismiss_queue", BOOLEAN, FALSE, true),
     REPLACE_FLYOUT_PANEL_DISMISS_QUEUE_CONTINUE_WATCH("revanced_replace_flyout_panel_dismiss_queue_continue_watch", BOOLEAN, TRUE),
+    REPLACE_FLYOUT_PANEL_REPORT("revanced_replace_flyout_panel_report", BOOLEAN, TRUE, true),
+    REPLACE_FLYOUT_PANEL_REPORT_ONLY_PLAYER("revanced_replace_flyout_panel_report_only_player", BOOLEAN, TRUE, true),
 
 
     // General
