@@ -12,7 +12,6 @@ import android.graphics.PorterDuffColorFilter;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,6 +19,7 @@ import androidx.annotation.Nullable;
 
 import app.revanced.integrations.music.settings.SettingsEnum;
 import app.revanced.integrations.music.utils.LogHelper;
+import app.revanced.integrations.music.utils.ReVancedUtils;
 import app.revanced.integrations.music.utils.ResourceType;
 import app.revanced.integrations.music.utils.VideoHelpers;
 
@@ -38,7 +38,7 @@ public class FlyoutPatch {
         return Math.max(original, 600);
     }
 
-    public static boolean hideFlyoutPanels(@Nullable Enum<?> flyoutPanelEnum) {
+    public static boolean hideComponents(@Nullable Enum<?> flyoutPanelEnum) {
         if (flyoutPanelEnum == null)
             return false;
 
@@ -53,53 +53,38 @@ public class FlyoutPatch {
         return false;
     }
 
-    /**
-     * This method is called before the original method
-     * So even if we define TextView and ImageView, TextView and ImageView are redefined in the original method
-     * To prevent this, define the TextView and ImageView in a new thread
-     *
-     * @param flyoutPanelEnum Enum in menu
-     * @param textView        TextView in menu
-     * @param imageView       ImageView in menu
-     */
-    public static void replaceDismissQueue(@Nullable Enum<?> flyoutPanelEnum, @NonNull TextView textView, @NonNull ImageView imageView) {
-        if (flyoutPanelEnum == null || !SettingsEnum.REPLACE_FLYOUT_PANEL_DISMISS_QUEUE.getBoolean())
-            return;
-
-        final String flyoutPanelName = flyoutPanelEnum.name();
-
-        if (!flyoutPanelName.equals("DISMISS_QUEUE"))
-            return;
-
-        ViewGroup clickAbleArea = (ViewGroup) textView.getParent();
-
-        runOnMainThreadDelayed(() -> {
-            textView.setText(str("revanced_flyout_panel_watch_on_youtube"));
-            imageView.setImageResource(identifier("yt_outline_youtube_logo_icon_vd_theme_24", ResourceType.DRAWABLE, clickAbleArea.getContext()));
-            clickAbleArea.setOnClickListener(viewGroup -> VideoHelpers.openInYouTube(viewGroup.getContext()));
-            }, 0L
+    public static void hideLikeDislikeContainer(View view) {
+        ReVancedUtils.hideViewBy0dpUnderCondition(
+                SettingsEnum.HIDE_FLYOUT_PANEL_LIKE_DISLIKE.getBoolean(),
+                view
         );
     }
 
-    public static void hideImageView(boolean hidden, @NonNull ImageView imageView) {
-        if (hidden) {
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, 0);
-            imageView.setLayoutParams(layoutParams);
+    public static void replaceComponents(@Nullable Enum<?> flyoutPanelEnum, @NonNull TextView textView, @NonNull ImageView imageView) {
+        if (flyoutPanelEnum == null)
+            return;
+
+        final String enumString = flyoutPanelEnum.name();
+        final boolean isDismissQue = enumString.equals("DISMISS_QUEUE");
+
+        if (isDismissQue) {
+            replaceDismissQueue(textView, imageView);
         }
     }
 
-    public static void setFlyoutButtonContainer(@NonNull View view) {
-        if (!(view instanceof ViewGroup viewGroup))
+    private static void replaceDismissQueue(@NonNull TextView textView, @NonNull ImageView imageView) {
+        if (!SettingsEnum.REPLACE_FLYOUT_PANEL_DISMISS_QUEUE.getBoolean())
             return;
 
-        final ViewGroup flyoutButtonContainers = (ViewGroup) viewGroup.getChildAt(0);
-        final ImageView dislikeButton = (ImageView) flyoutButtonContainers.getChildAt(0);
-        final ImageView likeButton = (ImageView) flyoutButtonContainers.getChildAt(1);
+        if (!(textView.getParent() instanceof ViewGroup clickAbleArea))
+            return;
 
-        final boolean hideLikeDislikeButton = SettingsEnum.HIDE_FLYOUT_PANEL_LIKE_DISLIKE.getBoolean();
-
-        hideImageView(hideLikeDislikeButton, dislikeButton);
-        hideImageView(hideLikeDislikeButton, likeButton);
+        runOnMainThreadDelayed(() -> {
+                    textView.setText(str("revanced_flyout_panel_watch_on_youtube"));
+                    imageView.setImageResource(identifier("yt_outline_youtube_logo_icon_vd_theme_24", ResourceType.DRAWABLE, clickAbleArea.getContext()));
+                    clickAbleArea.setOnClickListener(viewGroup -> VideoHelpers.openInYouTube(viewGroup.getContext()));
+                }, 0L
+        );
     }
 
     private enum FlyoutPanelComponent {
