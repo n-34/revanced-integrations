@@ -138,6 +138,8 @@ public enum SettingsEnum {
     // Player
     ENABLE_COLOR_MATCH_PLAYER("revanced_enable_color_match_player", BOOLEAN, TRUE),
     ENABLE_FORCE_MINIMIZED_PLAYER("revanced_enable_force_minimized_player", BOOLEAN, TRUE),
+    ENABLE_MINI_PLAYER_NEXT_BUTTON("revanced_enable_mini_player_next_button", BOOLEAN, TRUE, true),
+    ENABLE_MINI_PLAYER_PREVIOUS_BUTTON("revanced_enable_mini_player_previous_button", BOOLEAN, FALSE, true),
     ENABLE_OLD_PLAYER_BACKGROUND("revanced_enable_old_player_background", BOOLEAN, FALSE, true),
     ENABLE_OLD_PLAYER_LAYOUT("revanced_enable_old_player_layout", BOOLEAN, FALSE, true),
     ENABLE_SWIPE_TO_DISMISS_MINI_PLAYER("revanced_enable_swipe_to_dismiss_mini_player", BOOLEAN, TRUE, true),

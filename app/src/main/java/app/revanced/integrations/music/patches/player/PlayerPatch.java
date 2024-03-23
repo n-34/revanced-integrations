@@ -1,10 +1,17 @@
 package app.revanced.integrations.music.patches.player;
 
+import static app.revanced.integrations.music.utils.ReVancedUtils.hideViewUnderCondition;
+import static app.revanced.integrations.music.utils.ReVancedUtils.runOnBackgroundThread;
+import static app.revanced.integrations.music.utils.ReVancedUtils.runOnMainThreadDelayed;
+import static app.revanced.integrations.music.utils.ReVancedUtils.showToastShort;
 import static app.revanced.integrations.music.utils.ResourceUtils.identifier;
 import static app.revanced.integrations.music.utils.StringRef.str;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Instrumentation;
 import android.content.Context;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +20,11 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 
+import java.util.Arrays;
+
 import app.revanced.integrations.music.patches.utils.CheckMusicVideoPatch;
 import app.revanced.integrations.music.settings.SettingsEnum;
 import app.revanced.integrations.music.shared.VideoType;
-import app.revanced.integrations.music.utils.ReVancedUtils;
 import app.revanced.integrations.music.utils.ResourceType;
 import app.revanced.integrations.music.utils.VideoHelpers;
 
@@ -24,6 +32,11 @@ import app.revanced.integrations.music.utils.VideoHelpers;
 public class PlayerPatch {
     private static final int MUSIC_VIDEO_GREY_BACKGROUND_COLOR = -12566464;
     private static final int MUSIC_VIDEO_ORIGINAL_BACKGROUND_COLOR = -16579837;
+    private static final Instrumentation instrumentation = new Instrumentation();
+    @SuppressLint("StaticFieldLeak")
+    public static View previousButton;
+    @SuppressLint("StaticFieldLeak")
+    public static View nextButton;
 
     public static boolean enableColorMatchPlayer() {
         return SettingsEnum.ENABLE_COLOR_MATCH_PLAYER.getBoolean();
@@ -31,6 +44,10 @@ public class PlayerPatch {
 
     public static boolean enableForceMinimizedPlayer(boolean original) {
         return SettingsEnum.ENABLE_FORCE_MINIMIZED_PLAYER.getBoolean() || original;
+    }
+
+    public static boolean enableMiniPlayerNextButton(boolean original) {
+        return !SettingsEnum.ENABLE_MINI_PLAYER_NEXT_BUTTON.getBoolean() && original;
     }
 
     public static boolean enableOldPlayerBackground(boolean original) {
@@ -74,18 +91,38 @@ public class PlayerPatch {
         return SettingsEnum.SHUFFLE_SATE.getInt();
     }
 
+    public static View[] getViewArray(View[] oldViewArray) {
+        if (previousButton != null) {
+            if (nextButton != null) {
+                return getViewArray(getViewArray(oldViewArray, previousButton), nextButton);
+            } else {
+                return getViewArray(oldViewArray, previousButton);
+            }
+        } else {
+            return oldViewArray;
+        }
+    }
+
+    private static View[] getViewArray(View[] oldViewArray, View newView) {
+        final int oldViewArrayLength = oldViewArray.length;
+
+        View[] newViewArray = Arrays.copyOf(oldViewArray, oldViewArrayLength + 1);
+        newViewArray[oldViewArrayLength] = newView;
+        return newViewArray;
+    }
+
     public static int hideFullscreenShareButton(int original) {
         return SettingsEnum.HIDE_FULLSCREEN_SHARE_BUTTON.getBoolean() ? 0 : original;
     }
 
     private static void prepareOpenMusic(@NonNull Context context) {
         if (!VideoType.getCurrent().isMusicVideo()) {
-            ReVancedUtils.showToastShort(str("revanced_playlist_dismiss"));
+            showToastShort(str("revanced_playlist_dismiss"));
             return;
         }
         final String songId = CheckMusicVideoPatch.getSongId();
         if (songId.isEmpty()) {
-            ReVancedUtils.showToastShort(str("revanced_playlist_error"));
+            showToastShort(str("revanced_playlist_error"));
             return;
         }
         VideoHelpers.openInMusic(context, songId);
@@ -111,6 +148,30 @@ public class PlayerPatch {
         musicButtonView.setOnClickListener(imageView -> prepareOpenMusic(imageView.getContext()));
 
         viewGroup.addView(linearLayout);
+    }
+
+    public static void setNextButtonOnClickListener(View nextButtonView) {
+        if (nextButtonView == null)
+            return;
+
+        hideViewUnderCondition(
+                !SettingsEnum.ENABLE_MINI_PLAYER_NEXT_BUTTON.getBoolean(),
+                nextButtonView
+        );
+
+        nextButtonView.setOnClickListener(view -> runOnMainThreadDelayed(() -> runOnBackgroundThread(() -> instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_MEDIA_NEXT)), 0));
+    }
+
+    public static void setPreviousButtonOnClickListener(View previousButtonView) {
+        if (previousButtonView == null)
+            return;
+
+        hideViewUnderCondition(
+                !SettingsEnum.ENABLE_MINI_PLAYER_PREVIOUS_BUTTON.getBoolean(),
+                previousButtonView
+        );
+
+        previousButtonView.setOnClickListener(view -> runOnMainThreadDelayed(() -> runOnBackgroundThread(() -> instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_MEDIA_PREVIOUS)), 0));
     }
 
     public static void setShuffleState(int buttonState) {
