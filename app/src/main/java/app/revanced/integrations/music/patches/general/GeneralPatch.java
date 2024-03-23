@@ -85,6 +85,10 @@ public class GeneralPatch {
         }
     }
 
+    public static boolean disableDislikeRedirection() {
+        return SettingsEnum.DISABLE_DISLIKE_REDIRECTION.getBoolean();
+    }
+
     public static boolean enableLandScapeMode(boolean original) {
         try {
             return SettingsEnum.ENABLE_LANDSCAPE_MODE.getBoolean() || original;
