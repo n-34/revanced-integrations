@@ -94,12 +94,10 @@ public class GeneralPatch {
     }
 
     public static String enableOldStyleLibraryShelf(final String browseId) {
-        if (SettingsEnum.ENABLE_OLD_STYLE_LIBRARY_SHELF.getBoolean() || SettingsEnum.SPOOF_APP_VERSION.getBoolean()) {
-            if (browseId.equals("FEmusic_library_landing"))
-                return "FEmusic_liked";
-        }
-
-        return browseId;
+        return SettingsEnum.ENABLE_OLD_STYLE_LIBRARY_SHELF.getBoolean()
+                && browseId.equals("FEmusic_library_landing")
+                ? "FEmusic_liked"
+                : browseId;
     }
 
     public static int hideCastButton(int original) {
