@@ -6,6 +6,7 @@ import static app.revanced.integrations.youtube.utils.StringRef.str;
 
 import java.util.Objects;
 
+import app.revanced.integrations.youtube.patches.utils.PatchStatus;
 import app.revanced.integrations.youtube.settings.SettingsEnum;
 import app.revanced.integrations.youtube.utils.LogHelper;
 
@@ -46,6 +47,9 @@ public class PlaybackSpeedPatch {
         currentPlaybackSpeed = playbackSpeed;
 
         if (!SettingsEnum.ENABLE_SAVE_PLAYBACK_SPEED.getBoolean())
+            return;
+
+        if (!PatchStatus.DefaultPlaybackSpeed())
             return;
 
         SettingsEnum.DEFAULT_PLAYBACK_SPEED.saveValue(playbackSpeed);

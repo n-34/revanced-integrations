@@ -4,52 +4,39 @@ import static app.revanced.integrations.youtube.settings.SettingsUtils.showResta
 import static app.revanced.integrations.youtube.utils.ReVancedUtils.runOnMainThreadDelayed;
 
 import android.app.Activity;
-import android.content.Context;
 
 import androidx.annotation.NonNull;
 
 import app.revanced.integrations.youtube.settings.SettingsEnum;
 import app.revanced.integrations.youtube.utils.ReVancedHelper;
+import app.revanced.integrations.youtube.utils.ReVancedUtils;
 
 @SuppressWarnings("unused")
 public class InitializationPatch {
 
     /**
-     * The new layout is not loaded when the app is first installed.
+     * Some layouts that depend on litho do not load when the app is first installed.
      * (Also reproduced on unPatched YouTube)
      * <p>
-     * Side effects when new layout is not loaded:
-     * - 8X zoom not working in fullscreen
-     * <p>
-     * To fix this, show the reboot dialog when the app is installed for the first time.
-     * <p>
-     * The version of the current integrations is saved to YouTube's SharedPreferences to identify if the app was first installed.
+     * To fix this, show the restart dialog when the app is installed for the first time.
      */
-    public static void initializeReVancedSettings(@NonNull Context context) {
+    public static void onCreate(@NonNull Activity mActivity) {
         ReVancedHelper.setPlayerFlyoutPanelAdditionalSettings();
         if (SettingsEnum.INITIALIZED.getBoolean())
             return;
 
-        // show dialog
-        if (!(context instanceof Activity mActivity))
-            return;
-
         runOnMainThreadDelayed(() -> showRestartDialog(mActivity, "revanced_restart_first_run", 500), 500);
-        runOnMainThreadDelayed(() ->
-                {
-                    // set initialize value
-                    SettingsEnum.INITIALIZED.saveValue(true);
-
-                    // set save playback speed default value
-                    SettingsEnum.ENABLE_SAVE_PLAYBACK_SPEED.saveValue(PatchStatus.DefaultPlaybackSpeed());
-                }, 1000
-        );
+        runOnMainThreadDelayed(() -> SettingsEnum.INITIALIZED.saveValue(true), 1000);
     }
 
-    public static void setDeviceInformation(@NonNull Context context) {
-        ReVancedHelper.setPackageName(context);
-        ReVancedHelper.setApplicationLabel(context);
-        ReVancedHelper.setIsTablet(context);
-        ReVancedHelper.setVersionName(context);
+    public static void setDeviceInformation(@NonNull Activity mActivity) {
+        ReVancedHelper.setPackageName(mActivity);
+        ReVancedHelper.setApplicationLabel(mActivity);
+        ReVancedHelper.setIsTablet(mActivity);
+        ReVancedHelper.setVersionName(mActivity);
+    }
+
+    public static void setMainActivity(@NonNull Activity mActivity) {
+        ReVancedUtils.activity = mActivity;
     }
 }

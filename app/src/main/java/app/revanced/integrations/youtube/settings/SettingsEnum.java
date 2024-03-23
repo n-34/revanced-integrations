@@ -10,7 +10,6 @@ import static app.revanced.integrations.youtube.settings.SettingsEnum.ReturnType
 import static app.revanced.integrations.youtube.settings.SharedPrefCategory.RETURN_YOUTUBE_DISLIKE;
 import static app.revanced.integrations.youtube.settings.SharedPrefCategory.REVANCED;
 import static app.revanced.integrations.youtube.settings.SharedPrefCategory.SPONSOR_BLOCK;
-import static app.revanced.integrations.youtube.settings.SharedPrefCategory.YOUTUBE;
 import static app.revanced.integrations.youtube.utils.StringRef.str;
 
 import android.content.Context;
@@ -264,7 +263,7 @@ public enum SettingsEnum {
     SWITCH_CREATE_NOTIFICATION("revanced_switching_create_notification", BOOLEAN, TRUE, true),
 
     // Settings not exported
-    INITIALIZED("revanced_initialized", BOOLEAN, FALSE, YOUTUBE),
+    INITIALIZED("revanced_initialized", BOOLEAN, FALSE),
 
 
     // Overlay Button
@@ -370,7 +369,7 @@ public enum SettingsEnum {
     DISABLE_HDR_AUTO_BRIGHTNESS("revanced_disable_hdr_auto_brightness", BOOLEAN, TRUE, true,
             parents(ENABLE_SWIPE_BRIGHTNESS)),
     SWIPE_BRIGHTNESS_AUTO("revanced_swipe_brightness_auto", BOOLEAN, TRUE),
-    SWIPE_BRIGHTNESS_VALUE("revanced_swipe_brightness_value", FLOAT, 0.5f),
+    SWIPE_BRIGHTNESS_VALUE("revanced_swipe_brightness_value", FLOAT, -1.0f),
 
 
     // Video
@@ -385,7 +384,7 @@ public enum SettingsEnum {
     CUSTOM_PLAYBACK_SPEEDS("revanced_custom_playback_speeds", STRING,
             "0.25\n0.5\n0.75\n1.0\n1.25\n1.5\n1.75\n2.0\n2.25\n2.5", true,
             parents(ENABLE_CUSTOM_PLAYBACK_SPEED)),
-    ENABLE_SAVE_PLAYBACK_SPEED("revanced_enable_save_playback_speed", BOOLEAN, FALSE),
+    ENABLE_SAVE_PLAYBACK_SPEED("revanced_enable_save_playback_speed", BOOLEAN, TRUE),
     ENABLE_SAVE_VIDEO_QUALITY("revanced_enable_save_video_quality", BOOLEAN, TRUE),
     // Experimental Flags
     ENABLE_DEFAULT_PLAYBACK_SPEED_SHORTS("revanced_enable_default_playback_speed_shorts", BOOLEAN, FALSE),
@@ -654,6 +653,8 @@ public enum SettingsEnum {
             // Not useful to export, no reason to include it.
             case RYD_USER_ID,
                     INITIALIZED,
+                    LOCALE,
+                    SWIPE_BRIGHTNESS_VALUE,
                     SB_HIDE_EXPORT_WARNING,
                     SB_LAST_VIP_CHECK,
                     SB_SEEN_GUIDELINES -> false;

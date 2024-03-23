@@ -1,6 +1,7 @@
 package app.revanced.integrations.youtube.utils;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -48,6 +49,9 @@ public class ReVancedUtils {
                 return t;
             });
     @SuppressLint("StaticFieldLeak")
+    public static Activity activity;
+
+    @SuppressLint("StaticFieldLeak")
     public static Context context;
     @Nullable
     private static Boolean isRightToLeftTextLayout;
@@ -67,6 +71,10 @@ public class ReVancedUtils {
             }
         }
         return null;
+    }
+
+    public static Activity getActivity() {
+        return activity;
     }
 
     public static Context getContext() {

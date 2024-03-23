@@ -24,6 +24,7 @@ import app.revanced.integrations.youtube.patches.video.VideoInformation;
 import app.revanced.integrations.youtube.patches.video.VideoQualityPatch;
 import app.revanced.integrations.youtube.settings.SettingsEnum;
 
+@SuppressWarnings("unused")
 public class VideoHelpers {
 
     /**
