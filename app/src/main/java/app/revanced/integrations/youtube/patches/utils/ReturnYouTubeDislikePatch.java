@@ -12,6 +12,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -447,9 +448,11 @@ public class ReturnYouTubeDislikePatch {
                 removeRollingNumberPatchChanges(view);
                 return original;
             }
+            final boolean isDescriptionPanel = view.getParent() instanceof ViewGroup viewGroupParent
+                    && viewGroupParent.getChildCount() < 2;
             // Called for all instances of RollingNumber, so must check if text is for a dislikes.
             // Text will already have the correct content but it's missing the drawable separators.
-            if (!ReturnYouTubeDislike.isPreviouslyCreatedSegmentedSpan(original.toString())) {
+            if (!ReturnYouTubeDislike.isPreviouslyCreatedSegmentedSpan(original.toString()) || isDescriptionPanel) {
                 // The text is the video view count, upload time, or some other text.
                 removeRollingNumberPatchChanges(view);
                 return original;
