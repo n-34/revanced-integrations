@@ -312,12 +312,12 @@ public enum SettingsEnum {
     // Seekbar
     APPEND_TIME_STAMP_INFORMATION("revanced_append_time_stamp_information", BOOLEAN, TRUE),
     APPEND_TIME_STAMP_INFORMATION_TYPE("revanced_append_time_stamp_information_type", BOOLEAN, TRUE),
-    ENABLE_CUSTOM_SEEKBAR_COLOR("revanced_enable_custom_seekbar_color", BOOLEAN, TRUE, true),
+    ENABLE_CUSTOM_SEEKBAR_COLOR("revanced_enable_custom_seekbar_color", BOOLEAN, FALSE, true),
     ENABLE_CUSTOM_SEEKBAR_COLOR_VALUE("revanced_custom_seekbar_color_value", STRING, "#ff0000", true,
             parents(ENABLE_CUSTOM_SEEKBAR_COLOR)),
     ENABLE_SEEKBAR_TAPPING("revanced_enable_seekbar_tapping", BOOLEAN, TRUE),
     ENABLE_NEW_THUMBNAIL_PREVIEW("revanced_enable_new_thumbnail_preview", BOOLEAN, FALSE, true),
-    HIDE_SEEKBAR("revanced_hide_seekbar", BOOLEAN, FALSE),
+    HIDE_SEEKBAR("revanced_hide_seekbar", BOOLEAN, FALSE, true),
     HIDE_SEEKBAR_THUMBNAIL("revanced_hide_seekbar_thumbnail", BOOLEAN, FALSE),
     HIDE_TIME_STAMP("revanced_hide_time_stamp", BOOLEAN, FALSE, true),
 
@@ -653,7 +653,6 @@ public enum SettingsEnum {
             // Not useful to export, no reason to include it.
             case RYD_USER_ID,
                     INITIALIZED,
-                    LOCALE,
                     SWIPE_BRIGHTNESS_VALUE,
                     SB_HIDE_EXPORT_WARNING,
                     SB_LAST_VIP_CHECK,
