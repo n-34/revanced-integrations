@@ -1,7 +1,10 @@
 package app.revanced.integrations.youtube.returnyoutubedislike;
 
+import static app.revanced.integrations.youtube.utils.ReVancedHelper.isSpoofingToLessThan;
+import static app.revanced.integrations.youtube.utils.ResourceHelper.getResources;
 import static app.revanced.integrations.youtube.utils.StringRef.str;
 
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -88,6 +91,9 @@ public class ReturnYouTubeDislike {
      */
     private static final char MIDDLE_SEPARATOR_CHARACTER = '◎'; // 'bullseye'
 
+    public static final boolean IS_SPOOFING_TO_OLD_SEPARATOR_COLOR =
+            isSpoofingToLessThan("18.10.00");
+
     /**
      * Cached lookup of all video ids.
      */
@@ -120,9 +126,11 @@ public class ReturnYouTubeDislike {
      */
     public static final int leftSeparatorShapePaddingPixels;
     private static final ShapeDrawable leftSeparatorShape;
+    public static final Locale locale;
 
     static {
-        DisplayMetrics dp = Objects.requireNonNull(ReVancedUtils.getContext()).getResources().getDisplayMetrics();
+        final Resources resources = getResources();
+        DisplayMetrics dp = resources.getDisplayMetrics();
 
         leftSeparatorBounds = new Rect(0, 0,
                 (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.2f, dp),
@@ -135,6 +143,8 @@ public class ReturnYouTubeDislike {
 
         leftSeparatorShape = new ShapeDrawable(new RectShape());
         leftSeparatorShape.setBounds(leftSeparatorBounds);
+        // noinspection deprecation
+        locale = resources.getConfiguration().locale;
     }
 
     private final String videoId;
@@ -146,7 +156,7 @@ public class ReturnYouTubeDislike {
     private final Future<RYDVoteData> future;
 
     /**
-     * Time this instance and the future was created.
+     * Time this instance and the fetch future was created.
      */
     private final long timeFetched;
 
@@ -178,10 +188,25 @@ public class ReturnYouTubeDislike {
     @GuardedBy("this")
     private SpannableString replacementLikeDislikeSpan;
 
+    /**
+     * Color of the left and middle separator, based on the color of the right separator.
+     * It's unknown where YT gets the color from, and the values here are approximated by hand.
+     * Ideally, this would be the actual color YT uses at runtime.
+     * <p>
+     * Older versions before the 'Me' library tab use a slightly different color.
+     * If spoofing was previously used and is now turned off,
+     * or an old version was recently upgraded then the old colors are sometimes still used.
+     */
     private static int getSeparatorColor() {
+        if (IS_SPOOFING_TO_OLD_SEPARATOR_COLOR) {
+            return ThemeHelper.getDayNightTheme()
+                    ? 0x29AAAAAA  // transparent dark gray
+                    : 0xFFD9D9D9; // light gray
+        }
+
         return ThemeHelper.getDayNightTheme()
-                ? 0x33FFFFFF  // transparent dark gray
-                : 0xFFD9D9D9; // light gray
+                ? 0x33FFFFFF
+                : 0xFFD9D9D9;
     }
 
     public static ShapeDrawable getLeftSeparatorDrawable() {
@@ -338,8 +363,6 @@ public class ReturnYouTubeDislike {
                 // such as Arabic which formats "1.234" into "۱,۲۳٤"
                 // But YouTube disregards locale specific number characters
                 // and instead shows english number characters everywhere.
-                Locale locale = Objects.requireNonNull(ReVancedUtils.getContext()).getResources().getConfiguration().locale;
-                LogHelper.printDebug(() -> "Locale: " + locale);
                 dislikeCountFormatter = CompactDecimalFormat.getInstance(locale, CompactDecimalFormat.CompactStyle.SHORT);
             }
             return dislikeCountFormatter.format(dislikeCount);
@@ -349,8 +372,6 @@ public class ReturnYouTubeDislike {
     private static String formatDislikePercentage(float dislikePercentage) {
         synchronized (ReturnYouTubeDislike.class) { // number formatter is not thread safe, must synchronize
             if (dislikePercentageFormatter == null) {
-                Locale locale = Objects.requireNonNull(ReVancedUtils.getContext()).getResources().getConfiguration().locale;
-                LogHelper.printDebug(() -> "Locale: " + locale);
                 dislikePercentageFormatter = NumberFormat.getPercentInstance(locale);
             }
             if (dislikePercentage >= 0.01) { // at least 1%
@@ -458,7 +479,7 @@ public class ReturnYouTubeDislike {
     public synchronized Spanned getDislikesSpanForRegularVideo(@NonNull Spanned original,
                                                                boolean isSegmentedButton,
                                                                boolean isRollingNumber) {
-        return waitForFetchAndUpdateReplacementSpan(original, isSegmentedButton, isRollingNumber,false);
+        return waitForFetchAndUpdateReplacementSpan(original, isSegmentedButton, isRollingNumber, false);
     }
 
     /**

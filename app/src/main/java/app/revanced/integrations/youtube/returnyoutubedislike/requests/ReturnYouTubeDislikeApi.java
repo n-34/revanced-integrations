@@ -61,10 +61,29 @@ public class ReturnYouTubeDislikeApi {
     /**
      * If non zero, then the system time of when API calls can resume.
      */
-    private static volatile long timeToResumeAPICalls; // must be volatile, since different threads read/write to this
+    private static volatile long timeToResumeAPICalls;
+
+    /**
+     * If the last API getVotes call failed for any reason (including server requested rate limit).
+     * Used to prevent showing repeat connection toasts when the API is down.
+     */
+    private static volatile boolean lastApiCallFailed;
 
     private ReturnYouTubeDislikeApi() {
     } // utility class
+
+
+    /**
+     * Clears any backoff rate limits in effect.
+     * Should be called if RYD is turned on/off.
+     */
+    public static void resetRateLimits() {
+        if (lastApiCallFailed || timeToResumeAPICalls != 0) {
+            LogHelper.printDebug(() -> "Reset rate limit");
+        }
+        lastApiCallFailed = false;
+        timeToResumeAPICalls = 0;
+    }
 
     /**
      * @return True, if api rate limit is in effect.
@@ -90,21 +109,30 @@ public class ReturnYouTubeDislikeApi {
     }
 
     private static void updateRateLimitAndStats(boolean connectionError, boolean rateLimitHit) {
-        if (rateLimitHit) {
-            if (connectionError)
-                throw new IllegalArgumentException();
-            else
+        if (connectionError && rateLimitHit) {
+            throw new IllegalArgumentException();
+        }
+
+        if (connectionError) {
+            lastApiCallFailed = true;
+        } else if (rateLimitHit) {
+            if (!lastApiCallFailed && SettingsEnum.RYD_TOAST_ON_CONNECTION_ERROR.getBoolean()) {
                 ReVancedUtils.showToastLong(str("revanced_ryd_failure_client_rate_limit_requested"));
+            }
+            lastApiCallFailed = true;
+        } else {
+            lastApiCallFailed = false;
         }
     }
 
-    private static void handleConnectionError(@NonNull String toastMessage, @Nullable Exception ex) {
-        if (SettingsEnum.RYD_TOAST_ON_CONNECTION_ERROR.getBoolean()) {
+    private static void handleConnectionError(@NonNull String toastMessage,
+                                              @Nullable Exception ex) {
+        if (!lastApiCallFailed && SettingsEnum.RYD_TOAST_ON_CONNECTION_ERROR.getBoolean()) {
             ReVancedUtils.showToastShort(toastMessage);
         }
-        if (ex != null) {
-            LogHelper.printInfo(() -> toastMessage, ex);
-        }
+        lastApiCallFailed = true;
+
+        LogHelper.printInfo(() -> toastMessage, ex);
     }
 
     /**
