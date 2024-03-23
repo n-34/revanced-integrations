@@ -2,15 +2,12 @@ package app.revanced.integrations.youtube.patches.utils;
 
 import static app.revanced.integrations.youtube.returnyoutubedislike.ReturnYouTubeDislike.Vote;
 import static app.revanced.integrations.youtube.utils.ReVancedHelper.isSpoofingToLessThan;
-import static app.revanced.integrations.youtube.utils.ResourceUtils.identifier;
 
 import android.graphics.Rect;
 import android.graphics.drawable.ShapeDrawable;
-import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
-import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -30,7 +27,6 @@ import app.revanced.integrations.youtube.settings.SettingsEnum;
 import app.revanced.integrations.youtube.shared.PlayerType;
 import app.revanced.integrations.youtube.utils.LogHelper;
 import app.revanced.integrations.youtube.utils.ReVancedUtils;
-import app.revanced.integrations.youtube.utils.ResourceType;
 
 /**
  * Handles all interaction of UI patch components.
@@ -105,99 +101,6 @@ public class ReturnYouTubeDislikePatch {
     }
 
     //
-    // 17.x non litho regular video player.
-    //
-
-    /**
-     * Resource identifier of old UI dislike button.
-     */
-    private static final int OLD_UI_DISLIKE_BUTTON_RESOURCE_ID
-            = identifier("dislike_button", ResourceType.ID);
-
-    /**
-     * Dislikes text label used by old UI.
-     */
-    @NonNull
-    private static WeakReference<TextView> oldUITextViewRef = new WeakReference<>(null);
-
-    /**
-     * Original old UI 'Dislikes' text before patch modifications.
-     * Required to reset the dislikes when changing videos and RYD is not available.
-     * Set only once during the first load.
-     */
-    private static Spanned oldUIOriginalSpan;
-
-    /**
-     * Replacement span that contains dislike value. Used by {@link #oldUiTextWatcher}.
-     */
-    @Nullable
-    private static Spanned oldUIReplacementSpan;
-
-    /**
-     * Old UI dislikes can be set multiple times by YouTube.
-     * To prevent reverting changes made here, this listener overrides any future changes YouTube makes.
-     */
-    private static final TextWatcher oldUiTextWatcher = new TextWatcher() {
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        }
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-        }
-        public void afterTextChanged(Editable s) {
-            if (oldUIReplacementSpan == null || oldUIReplacementSpan.toString().equals(s.toString())) {
-                return;
-            }
-            s.replace(0, s.length(), oldUIReplacementSpan); // Causes a recursive call back into this listener
-        }
-    };
-
-    private static void updateOldUIDislikesTextView() {
-        ReturnYouTubeDislike videoData = currentVideoData;
-        if (videoData == null) {
-            return;
-        }
-        TextView oldUITextView = oldUITextViewRef.get();
-        if (oldUITextView == null) {
-            return;
-        }
-        oldUIReplacementSpan = videoData.getDislikesSpanForRegularVideo(oldUIOriginalSpan, false, false);
-        if (!oldUIReplacementSpan.equals(oldUITextView.getText())) {
-            oldUITextView.setText(oldUIReplacementSpan);
-        }
-    }
-
-    /**
-     * Injection point.  Called on main thread.
-     * <p>
-     * Used when spoofing to 16.x and 17.x versions.
-     */
-    public static void setOldUILayoutDislikes(int buttonViewResourceId, @Nullable TextView textView) {
-        try {
-            if (!SettingsEnum.RYD_ENABLED.getBoolean()
-                    || buttonViewResourceId != OLD_UI_DISLIKE_BUTTON_RESOURCE_ID
-                    || textView == null) {
-                return;
-            }
-            LogHelper.printDebug(() -> "setOldUILayoutDislikes");
-
-            if (oldUIOriginalSpan == null) {
-                // Use value of the first instance, as it appears TextViews can be recycled
-                // and might contain dislikes previously added by the patch.
-                oldUIOriginalSpan = (Spanned) textView.getText();
-            }
-            oldUITextViewRef = new WeakReference<>(textView);
-            // No way to check if a listener is already attached, so remove and add again.
-            textView.removeTextChangedListener(oldUiTextWatcher);
-            textView.addTextChangedListener(oldUiTextWatcher);
-
-            updateOldUIDislikesTextView();
-
-        } catch (Exception ex) {
-            LogHelper.printException(() -> "setOldUILayoutDislikes failure", ex);
-        }
-    }
-
-
-    //
     // Litho player for both regular videos and Shorts.
     //
 
@@ -248,10 +151,6 @@ public class ReturnYouTubeDislikePatch {
                 }
                 replacement = videoData.getDislikesSpanForRegularVideo((Spanned) original,
                         true, isRollingNumber);
-
-                // When spoofing between 17.09.xx and 17.30.xx the UI is the old layout
-                // but uses litho and the dislikes is "|dislike_button.eml|".
-                // But spoofing to that range gives a broken UI layout so no point checking for that.
             } else if (!isRollingNumber && conversionContextString.contains("|shorts_dislike_button.eml|")) {
                 // Litho Shorts player.
                 if (!SettingsEnum.RYD_SHORTS.getBoolean()) {
@@ -769,11 +668,8 @@ public class ReturnYouTubeDislikePatch {
                 if (v.value == vote) {
                     videoData.sendVote(v);
 
-                    if (isNoneHiddenOrMinimized) {
-                        if (lastLithoShortsVideoData != null) {
-                            lithoShortsShouldUseCurrentData = true;
-                        }
-                        updateOldUIDislikesTextView();
+                    if (isNoneHiddenOrMinimized && lastLithoShortsVideoData != null) {
+                        lithoShortsShouldUseCurrentData = true;
                     }
 
                     return;
