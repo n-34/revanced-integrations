@@ -20,6 +20,10 @@ public class FlyoutPanelPatch {
         return !SettingsEnum.CHANGE_PLAYER_FLYOUT_PANEL_TOGGLE.getBoolean() && original;
     }
 
+    public static boolean enableOldQualityMenu() {
+        return SettingsEnum.ENABLE_OLD_QUALITY_LAYOUT.getBoolean();
+    }
+
     public static void enableOldQualityMenu(ListView listView) {
         if (!SettingsEnum.ENABLE_OLD_QUALITY_LAYOUT.getBoolean())
             return;
@@ -28,7 +32,7 @@ public class FlyoutPanelPatch {
 
         ReVancedUtils.runOnMainThreadDelayed(() -> {
                     listView.setSoundEffectsEnabled(false);
-                    listView.performItemClick(null, 4, 0);
+                    listView.performItemClick(null, 2, 0);
                 },
                 1
         );
