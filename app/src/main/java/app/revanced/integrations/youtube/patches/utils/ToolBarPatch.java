@@ -3,6 +3,7 @@ package app.revanced.integrations.youtube.patches.utils;
 import android.view.View;
 import android.widget.ImageView;
 
+@SuppressWarnings("unused")
 public class ToolBarPatch {
 
     public static void hookToolBar(Enum<?> buttonEnum, ImageView imageView) {

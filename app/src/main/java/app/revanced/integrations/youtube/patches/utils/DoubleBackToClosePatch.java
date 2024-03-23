@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import app.revanced.integrations.youtube.settings.SettingsEnum;
 
+@SuppressWarnings("unused")
 public class DoubleBackToClosePatch {
     /**
      * Time between two back button presses

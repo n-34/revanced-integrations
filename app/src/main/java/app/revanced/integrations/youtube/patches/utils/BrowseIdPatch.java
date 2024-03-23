@@ -8,6 +8,7 @@ import java.util.Objects;
 
 import app.revanced.integrations.youtube.utils.LogHelper;
 
+@SuppressWarnings("unused")
 public class BrowseIdPatch {
     private static final String DEFAULT_BROWSE_ID = "FEwhat_to_watch";
 

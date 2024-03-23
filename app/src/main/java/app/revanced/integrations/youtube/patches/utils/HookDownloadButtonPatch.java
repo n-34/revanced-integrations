@@ -5,6 +5,7 @@ import static app.revanced.integrations.youtube.utils.VideoHelpers.download;
 import app.revanced.integrations.youtube.settings.SettingsEnum;
 import app.revanced.integrations.youtube.utils.ReVancedUtils;
 
+@SuppressWarnings("unused")
 public class HookDownloadButtonPatch {
 
     public static boolean shouldHookDownloadButton() {
