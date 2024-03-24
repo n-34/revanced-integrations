@@ -213,6 +213,8 @@ public enum SettingsEnum {
     HIDE_STORE_TAB("revanced_hide_store_tab", BOOLEAN, TRUE),
 
     // Description
+    ALWAYS_EXPAND_PANEL("revanced_always_expand_panel", BOOLEAN, FALSE, true),
+    DISABLE_DESCRIPTION_INTERACTION("revanced_disable_description_interaction", BOOLEAN, FALSE, true),
     HIDE_CHAPTERS("revanced_hide_chapters", BOOLEAN, FALSE),
     HIDE_INFO_CARDS_SECTION("revanced_hide_info_cards_section", BOOLEAN, FALSE),
     HIDE_GAME_SECTION("revanced_hide_game_section", BOOLEAN, FALSE),

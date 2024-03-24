@@ -2,11 +2,13 @@ package app.revanced.integrations.youtube.patches.general;
 
 import static app.revanced.integrations.youtube.utils.ReVancedUtils.hideViewBy0dpUnderCondition;
 import static app.revanced.integrations.youtube.utils.ReVancedUtils.hideViewUnderCondition;
+import static app.revanced.integrations.youtube.utils.ResourceUtils.identifier;
 import static app.revanced.integrations.youtube.utils.StringRef.str;
 
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -16,6 +18,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
@@ -24,6 +27,7 @@ import java.util.Objects;
 import app.revanced.integrations.youtube.settings.SettingsEnum;
 import app.revanced.integrations.youtube.utils.LogHelper;
 import app.revanced.integrations.youtube.utils.ReVancedUtils;
+import app.revanced.integrations.youtube.utils.ResourceType;
 
 /**
  * @noinspection ALL
@@ -36,15 +40,16 @@ public class GeneralPatch {
             "FAB_CAMERA",       // Create button (Tablet)
             "TAB_ACTIVITY"      // Notification button
     };
+    private static final int resultId = identifier("results", ResourceType.ID);
     private static FrameLayout.LayoutParams layoutParams;
-    @NonNull
-    private static String videoId = "";
-    private static boolean subtitlePrefetched = true;
     private static int minimumHeight = 1;
     private static int paddingLeft = 12;
     private static int paddingTop = 0;
     private static int paddingRight = 12;
     private static int paddingBottom = 0;
+    private static boolean subtitlePrefetched = true;
+    @NonNull
+    private static String videoId = "";
 
     /**
      * Change the start page only when the user starts the app on the launcher.
@@ -128,6 +133,14 @@ public class GeneralPatch {
             return original;
 
         return subtitlePrefetched;
+    }
+
+    public static void disableDescriptionInteraction(TextView textView, boolean original) {
+        if (textView != null) {
+            textView.setTextIsSelectable(
+                    !SettingsEnum.DISABLE_DESCRIPTION_INTERACTION.getBoolean() && original
+            );
+        }
     }
 
     public static boolean enableGradientLoadingScreen() {
@@ -306,6 +319,29 @@ public class GeneralPatch {
         }
         videoId = newlyLoadedVideoId;
         subtitlePrefetched = false;
+    }
+
+    public static void onDescriptionPanelCreate(RecyclerView recyclerView) {
+        if (!SettingsEnum.ALWAYS_EXPAND_PANEL.getBoolean())
+            return;
+
+        recyclerView.getViewTreeObserver().addOnDrawListener(() -> {
+            try {
+                if (recyclerView.getId() != resultId)
+                    return;
+                if (!(recyclerView.getChildAt(1) instanceof ViewGroup viewGroup))
+                    return;
+                if (!(viewGroup.getChildAt(0) instanceof TextView mTextView))
+                    return;
+
+                ReVancedUtils.runOnMainThreadDelayed(() -> {
+                    mTextView.setSoundEffectsEnabled(false);
+                    mTextView.performClick();
+                    }, 200
+                );
+            } catch (Exception ignored) {
+            }
+        });
     }
 
     public static void prefetchSubtitleTrack() {
