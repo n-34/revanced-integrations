@@ -13,8 +13,21 @@ import app.revanced.integrations.youtube.settings.SettingsEnum;
 
 @SuppressWarnings("unused")
 public class ShortsPatch {
+    public static Enum<?> repeat;
+    public static Enum<?> singlePlay;
+    public static Enum<?> endScreen;
     @SuppressLint("StaticFieldLeak")
     public static Object pivotBar;
+
+    public static Enum<?> changeShortsRepeatState(Enum<?> currentState) {
+        switch (SettingsEnum.CHANGE_SHORTS_REPEAT_STATE.getInt()) {
+            case 1 -> currentState = repeat;
+            case 2 -> currentState = singlePlay;
+            case 3 -> currentState = endScreen;
+        }
+
+        return currentState;
+    }
 
     public static boolean disableResumingStartupShortsPlayer() {
         return SettingsEnum.DISABLE_RESUMING_SHORTS_PLAYER.getBoolean();

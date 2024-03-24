@@ -325,6 +325,7 @@ public enum SettingsEnum {
 
 
     // Shorts
+    CHANGE_SHORTS_REPEAT_STATE("revanced_change_shorts_repeat_state", INTEGER, 0),
     DISABLE_RESUMING_SHORTS_PLAYER("revanced_disable_resuming_shorts_player", BOOLEAN, TRUE),
     HIDE_SHORTS_PLAYER_COMMENTS_BUTTON("revanced_hide_shorts_player_comments_button", BOOLEAN, FALSE),
     HIDE_SHORTS_PLAYER_DISLIKE_BUTTON("revanced_hide_shorts_player_dislike_button", BOOLEAN, FALSE),
