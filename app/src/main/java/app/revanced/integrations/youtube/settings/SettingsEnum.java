@@ -175,6 +175,7 @@ public enum SettingsEnum {
     HIDE_MIX_PLAYLISTS("revanced_hide_mix_playlists", BOOLEAN, FALSE),
     HIDE_SEARCH_TERM_THUMBNAIL("revanced_hide_search_term_thumbnail", BOOLEAN, FALSE),
     HIDE_SNACK_BAR("revanced_hide_snack_bar", BOOLEAN, FALSE),
+    HIDE_SUGGESTIONS_SHELF("revanced_hide_suggestions_shelf", BOOLEAN, FALSE, true),
     HIDE_TOOLBAR_CREATE_NOTIFICATION_BUTTON("revanced_hide_toolbar_create_notification_button", BOOLEAN, FALSE, true),
     HIDE_TRENDING_SEARCHES("revanced_hide_trending_searches", BOOLEAN, TRUE),
     REMOVE_VIEWER_DISCRETION_DIALOG("revanced_remove_viewer_discretion_dialog", BOOLEAN, FALSE),
@@ -200,8 +201,6 @@ public enum SettingsEnum {
     HIDE_TICKET_SHELF("revanced_hide_ticket_shelf", BOOLEAN, TRUE),
     HIDE_TIMED_REACTIONS("revanced_hide_timed_reactions", BOOLEAN, TRUE),
     // Experimental Flags
-    HIDE_SUGGESTIONS_SHELF("revanced_hide_suggestions_shelf", BOOLEAN, FALSE, true),
-    HIDE_SUGGESTIONS_SHELF_METHOD("revanced_hide_suggestions_shelf_method", BOOLEAN, FALSE, true),
     HIDE_VIDEO_WITH_GRAY_DESCRIPTION("revanced_hide_video_with_gray_description", BOOLEAN, FALSE, true),
     HIDE_VIDEO_WITH_LOW_VIEW("revanced_hide_video_with_low_view", BOOLEAN, FALSE, true),
 

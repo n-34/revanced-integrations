@@ -97,10 +97,6 @@ public class BrowseIdPatch {
     public static void setDefaultBrowseIdToField() {
         setBrowseIdToField(DEFAULT_BROWSE_ID);
     }
-
-    public static boolean isHomeFeed() {
-        return browseId.equals(DEFAULT_BROWSE_ID);
-    }
 }
 
 
