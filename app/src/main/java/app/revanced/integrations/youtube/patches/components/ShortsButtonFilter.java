@@ -9,19 +9,16 @@ import app.revanced.integrations.youtube.utils.StringTrieSearch;
  * @noinspection rawtypes
  */
 @SuppressWarnings("unused")
-public final class ShortsFilter extends Filter {
+public final class ShortsButtonFilter extends Filter {
     private static final String REEL_CHANNEL_BAR_PATH = "reel_channel_bar.eml";
-    private static final String SHORTS_SHELF_HEADER_CONVERSION_CONTEXT = "horizontalCollectionSwipeProtector=null";
-
     private final StringTrieSearch exceptions = new StringTrieSearch();
     private final StringFilterGroup infoPanel;
-    private final StringFilterGroup shelfHeader;
 
     private final StringFilterGroup videoActionButton;
     private final ByteArrayFilterGroupList videoActionButtonGroupList = new ByteArrayFilterGroupList();
 
 
-    public ShortsFilter() {
+    public ShortsButtonFilter() {
         exceptions.addPatterns(
                 "lock_mode_suggested_action"
         );
@@ -31,26 +28,7 @@ public final class ShortsFilter extends Filter {
                 "suggested_action"
         );
 
-        // Feed Shorts shelf header.
-        // Use a different filter group for this pattern, as it requires an additional check after matching.
-        shelfHeader = new StringFilterGroup(
-                SettingsEnum.HIDE_SHORTS_SHELF,
-                "shelf_header.eml"
-        );
-
-        final StringFilterGroup shorts = new StringFilterGroup(
-                SettingsEnum.HIDE_SHORTS_SHELF,
-                "shorts_shelf",
-                "inline_shorts",
-                "shorts_grid",
-                "shorts_video_cell"
-        );
-
-        identifierFilterGroupList.addAll(
-                shelfHeader,
-                shorts,
-                thanksButton
-        );
+        identifierFilterGroupList.addAll(thanksButton);
 
         final StringFilterGroup joinButton = new StringFilterGroup(
                 SettingsEnum.HIDE_SHORTS_PLAYER_JOIN_BUTTON,
@@ -141,10 +119,6 @@ public final class ShortsFilter extends Filter {
                 // to avoid false positives.
                 return path.startsWith(REEL_CHANNEL_BAR_PATH);
             }
-        } else if (matchedGroup == shelfHeader) {
-            // Check ConversationContext to not hide shelf header in channel profile
-            // This value does not exist in the shelf header in the channel profile
-            return allValue.contains(SHORTS_SHELF_HEADER_CONVERSION_CONTEXT);
         }
 
         // Super class handles logging.

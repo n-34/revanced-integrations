@@ -11,6 +11,7 @@ import app.revanced.integrations.youtube.utils.LogHelper;
 @SuppressWarnings("unused")
 public class BrowseIdPatch {
     private static final String DEFAULT_BROWSE_ID = "FEwhat_to_watch";
+    private static final String HISTORY_BROWSE_ID = "FEhistory";
 
     /**
      * Current browse id.
@@ -96,6 +97,10 @@ public class BrowseIdPatch {
 
     public static void setDefaultBrowseIdToField() {
         setBrowseIdToField(DEFAULT_BROWSE_ID);
+    }
+
+    public static boolean isHistory() {
+        return browseId.equals(HISTORY_BROWSE_ID);
     }
 }
 
