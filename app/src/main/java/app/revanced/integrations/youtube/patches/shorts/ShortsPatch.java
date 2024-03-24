@@ -16,8 +16,8 @@ public class ShortsPatch {
     @SuppressLint("StaticFieldLeak")
     public static Object pivotBar;
 
-    public static boolean disableStartupShortsPlayer() {
-        return SettingsEnum.DISABLE_STARTUP_SHORTS_PLAYER.getBoolean();
+    public static boolean disableResumingStartupShortsPlayer() {
+        return SettingsEnum.DISABLE_RESUMING_SHORTS_PLAYER.getBoolean();
     }
 
     public static View hideShortsPlayerNavigationBar(View view) {
