@@ -14,6 +14,7 @@ import app.revanced.integrations.youtube.utils.ReVancedUtils;
 @SuppressWarnings("unused")
 public final class ChannelProfileFilter extends Filter {
     private static final String BROWSE_STORE_BUTTON_PATH = "|ContainerType|button.eml|";
+    private static final String CHANNEL_PROFILE_LINKS_PATH = "|ContainerType|ContainerType|ContainerType|ContainerType|TextType|";
     @SuppressLint("StaticFieldLeak")
     public static View channelTabView;
     /**
@@ -83,6 +84,10 @@ public final class ChannelProfileFilter extends Filter {
                        FilterGroupList matchedList, FilterGroup matchedGroup, int matchedIndex) {
         if (matchedGroup == channelProfileButtonRule) {
             final boolean isBrowseStoreButtonShown = path.contains(BROWSE_STORE_BUTTON_PATH) && browseStoreButton.check(protobufBufferArray).isFiltered();
+            final boolean isChannelProfileLinkShown = path.contains(CHANNEL_PROFILE_LINKS_PATH);
+            if (isChannelProfileLinkShown && SettingsEnum.HIDE_CHANNEL_PROFILE_LINKS.getBoolean()) {
+                return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedList, matchedGroup, matchedIndex);
+            }
             hideStoreTab(isBrowseStoreButtonShown);
             if (!isBrowseStoreButtonShown || !SettingsEnum.HIDE_BROWSE_STORE_BUTTON.getBoolean()) {
                 return false;
