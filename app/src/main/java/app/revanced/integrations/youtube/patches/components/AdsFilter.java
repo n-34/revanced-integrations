@@ -99,6 +99,14 @@ public final class AdsFilter extends Filter {
         hideViewBy0dpUnderCondition(SettingsEnum.HIDE_GENERAL_ADS.getBoolean(), view);
     }
 
+    public static boolean hideFullscreenAds() {
+        return SettingsEnum.HIDE_FULLSCREEN_ADS.getBoolean();
+    }
+
+    public static void hideFullscreenAds(View view) {
+        hideViewBy0dpUnderCondition(SettingsEnum.HIDE_FULLSCREEN_ADS.getBoolean(), view);
+    }
+
     public static boolean hideGetPremium() {
         return SettingsEnum.HIDE_GET_PREMIUM.getBoolean();
     }

@@ -34,6 +34,7 @@ import app.revanced.integrations.youtube.utils.ReVancedUtils;
 public enum SettingsEnum {
 
     // Ads
+    HIDE_FULLSCREEN_ADS("revanced_hide_fullscreen_ads", BOOLEAN, TRUE, true),
     HIDE_GENERAL_ADS("revanced_hide_general_ads", BOOLEAN, TRUE),
     HIDE_GET_PREMIUM("revanced_hide_get_premium", BOOLEAN, TRUE, true),
     HIDE_IMAGE_SHELF("revanced_hide_image_shelf", BOOLEAN, TRUE),
@@ -43,8 +44,6 @@ public enum SettingsEnum {
     HIDE_VIDEO_ADS("revanced_hide_video_ads", BOOLEAN, TRUE, true),
     HIDE_VIEW_PRODUCTS("revanced_hide_view_products", BOOLEAN, TRUE),
     HIDE_WEB_SEARCH_RESULTS("revanced_hide_web_search_results", BOOLEAN, TRUE),
-    // Experimental Flags
-    CLOSE_INTERSTITIAL_ADS("revanced_close_interstitial_ads", BOOLEAN, FALSE, true),
 
 
     // Alternative Thumbnails
