@@ -1,17 +1,13 @@
 package app.revanced.integrations.music.patches.player;
 
 import static app.revanced.integrations.music.utils.ReVancedUtils.hideViewUnderCondition;
-import static app.revanced.integrations.music.utils.ReVancedUtils.runOnBackgroundThread;
-import static app.revanced.integrations.music.utils.ReVancedUtils.runOnMainThreadDelayed;
 import static app.revanced.integrations.music.utils.ReVancedUtils.showToastShort;
 import static app.revanced.integrations.music.utils.ResourceUtils.identifier;
 import static app.revanced.integrations.music.utils.StringRef.str;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Instrumentation;
 import android.content.Context;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +29,6 @@ import app.revanced.integrations.music.utils.VideoHelpers;
 public class PlayerPatch {
     private static final int MUSIC_VIDEO_GREY_BACKGROUND_COLOR = -12566464;
     private static final int MUSIC_VIDEO_ORIGINAL_BACKGROUND_COLOR = -16579837;
-    private static final Instrumentation instrumentation = new Instrumentation();
     @SuppressLint("StaticFieldLeak")
     public static View previousButton;
     @SuppressLint("StaticFieldLeak")
@@ -149,7 +144,7 @@ public class PlayerPatch {
         viewGroup.addView(linearLayout);
     }
 
-    public static void setNextButtonOnClickListener(View nextButtonView) {
+    public static void setNextButton(View nextButtonView) {
         if (nextButtonView == null)
             return;
 
@@ -158,10 +153,16 @@ public class PlayerPatch {
                 nextButtonView
         );
 
-        nextButtonView.setOnClickListener(view -> runOnMainThreadDelayed(() -> runOnBackgroundThread(() -> instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_MEDIA_NEXT)), 0));
+        nextButtonView.setOnClickListener(PlayerPatch::setNextButtonOnClickListener);
     }
 
-    public static void setPreviousButtonOnClickListener(View previousButtonView) {
+    // rest of the implementation added by patch.
+    private static void setNextButtonOnClickListener(View view) {
+        if (SettingsEnum.ENABLE_MINI_PLAYER_NEXT_BUTTON.getBoolean())
+            view.getClass();
+    }
+
+    public static void setPreviousButton(View previousButtonView) {
         if (previousButtonView == null)
             return;
 
@@ -170,7 +171,13 @@ public class PlayerPatch {
                 previousButtonView
         );
 
-        previousButtonView.setOnClickListener(view -> runOnMainThreadDelayed(() -> runOnBackgroundThread(() -> instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_MEDIA_PREVIOUS)), 0));
+        previousButtonView.setOnClickListener(PlayerPatch::setPreviousButtonOnClickListener);
+    }
+
+    // rest of the implementation added by patch.
+    private static void setPreviousButtonOnClickListener(View view) {
+        if (SettingsEnum.ENABLE_MINI_PLAYER_PREVIOUS_BUTTON.getBoolean())
+            view.getClass();
     }
 
     public static void setShuffleState(int buttonState) {
