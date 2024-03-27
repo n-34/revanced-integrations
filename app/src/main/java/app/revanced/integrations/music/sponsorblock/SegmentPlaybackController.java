@@ -89,6 +89,7 @@ public class SegmentPlaybackController {
     public static void setVideoId(@NonNull String videoId) {
         try {
             if (!SettingsEnum.SB_ENABLED.getBoolean()) {
+                clearData();
                 return;
             }
             if (ReVancedUtils.isNetworkNotConnected()) {
