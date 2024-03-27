@@ -337,7 +337,7 @@ public class GeneralPatch {
                 ReVancedUtils.runOnMainThreadDelayed(() -> {
                     mTextView.setSoundEffectsEnabled(false);
                     mTextView.performClick();
-                    }, 200
+                    }, 500
                 );
             } catch (Exception ignored) {
             }
