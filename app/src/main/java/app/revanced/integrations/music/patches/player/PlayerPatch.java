@@ -24,6 +24,7 @@ import java.util.Arrays;
 
 import app.revanced.integrations.music.patches.utils.CheckMusicVideoPatch;
 import app.revanced.integrations.music.settings.SettingsEnum;
+import app.revanced.integrations.music.shared.PlayerType;
 import app.revanced.integrations.music.shared.VideoType;
 import app.revanced.integrations.music.utils.ResourceType;
 import app.revanced.integrations.music.utils.VideoHelpers;
@@ -76,15 +77,13 @@ public class PlayerPatch {
         return SettingsEnum.ENABLE_SWIPE_TO_DISMISS_MINI_PLAYER.getBoolean() ? null : object;
     }
 
-    public static boolean enableZenMode() {
-        return SettingsEnum.ENABLE_ZEN_MODE.getBoolean();
-    }
-
     public static int enableZenMode(int originalColor) {
-        return SettingsEnum.ENABLE_ZEN_MODE.getBoolean()
-                && originalColor == MUSIC_VIDEO_ORIGINAL_BACKGROUND_COLOR
-                ? MUSIC_VIDEO_GREY_BACKGROUND_COLOR
-                : originalColor;
+        if (SettingsEnum.ENABLE_ZEN_MODE.getBoolean() && originalColor == MUSIC_VIDEO_ORIGINAL_BACKGROUND_COLOR) {
+            if (SettingsEnum.ENABLE_ZEN_MODE_PODCAST.getBoolean() || !VideoType.getCurrent().isPodCast()) {
+                return MUSIC_VIDEO_GREY_BACKGROUND_COLOR;
+            }
+        }
+        return originalColor;
     }
 
     public static int getShuffleState() {

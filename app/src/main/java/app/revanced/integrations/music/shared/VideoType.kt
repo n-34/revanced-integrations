@@ -56,4 +56,8 @@ enum class VideoType {
     fun isMusicVideo(): Boolean {
         return this == MUSIC_VIDEO_TYPE_OMV
     }
+
+    fun isPodCast(): Boolean {
+        return this == MUSIC_VIDEO_TYPE_PODCAST_EPISODE
+    }
 }

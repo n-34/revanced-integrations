@@ -148,6 +148,7 @@ public enum SettingsEnum {
     ENABLE_OLD_PLAYER_LAYOUT("revanced_enable_old_player_layout", BOOLEAN, FALSE, true),
     ENABLE_SWIPE_TO_DISMISS_MINI_PLAYER("revanced_enable_swipe_to_dismiss_mini_player", BOOLEAN, TRUE, true),
     ENABLE_ZEN_MODE("revanced_enable_zen_mode", BOOLEAN, FALSE),
+    ENABLE_ZEN_MODE_PODCAST("revanced_enable_zen_mode_podcast", BOOLEAN, FALSE),
     HIDE_FULLSCREEN_SHARE_BUTTON("revanced_hide_fullscreen_share_button", BOOLEAN, FALSE, true),
     REMEMBER_REPEAT_SATE("revanced_remember_repeat_state", BOOLEAN, TRUE),
     REMEMBER_SHUFFLE_SATE("revanced_remember_shuffle_state", BOOLEAN, TRUE),
