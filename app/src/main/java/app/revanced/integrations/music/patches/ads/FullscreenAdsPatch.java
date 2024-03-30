@@ -1,28 +1,28 @@
 package app.revanced.integrations.music.patches.ads;
 
-import static app.revanced.integrations.music.utils.ReVancedUtils.hideViewBy0dpUnderCondition;
+import static app.revanced.integrations.shared.utils.Utils.hideViewBy0dpUnderCondition;
 
 import android.view.View;
 
-import app.revanced.integrations.music.settings.SettingsEnum;
+import app.revanced.integrations.music.settings.Settings;
 
 @SuppressWarnings("unused")
 public class FullscreenAdsPatch {
 
     public static boolean hideFullscreenAds() {
-        return SettingsEnum.HIDE_FULLSCREEN_ADS.getBoolean();
+        return Settings.HIDE_FULLSCREEN_ADS.get();
     }
 
     public static void hideFullscreenAds(View view) {
         hideViewBy0dpUnderCondition(
-                SettingsEnum.HIDE_FULLSCREEN_ADS.getBoolean(),
+                Settings.HIDE_FULLSCREEN_ADS.get(),
                 view
         );
     }
 
     /*
     public static void confirmDialog(final Button button) {
-        if (SettingsEnum.HIDE_FULLSCREEN_ADS.getBoolean() && button != null) {
+        if (Settings.HIDE_FULLSCREEN_ADS.get() && button != null) {
             button.setSoundEffectsEnabled(false);
             button.performClick();
         }

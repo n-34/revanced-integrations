@@ -1,13 +1,13 @@
 package app.revanced.integrations.music.patches.actionbar;
 
-import static app.revanced.integrations.music.utils.ReVancedUtils.hideViewUnderCondition;
+import static app.revanced.integrations.shared.utils.Utils.hideViewUnderCondition;
 
 import android.view.View;
 
 import androidx.annotation.NonNull;
 
-import app.revanced.integrations.music.settings.SettingsEnum;
-import app.revanced.integrations.music.utils.VideoHelpers;
+import app.revanced.integrations.music.settings.Settings;
+import app.revanced.integrations.music.utils.VideoUtils;
 
 @SuppressWarnings("unused")
 public class ActionBarPatch {
@@ -16,7 +16,7 @@ public class ActionBarPatch {
     private static String buttonType = "";
 
     public static boolean hideActionBarLabel() {
-        return SettingsEnum.HIDE_ACTION_BUTTON_LABEL.getBoolean();
+        return Settings.HIDE_ACTION_BUTTON_LABEL.get();
     }
 
     public static boolean hideActionButton() {
@@ -29,22 +29,22 @@ public class ActionBarPatch {
 
     public static void hideLikeDislikeButton(View view) {
         hideViewUnderCondition(
-                SettingsEnum.HIDE_ACTION_BUTTON_LIKE_DISLIKE.getBoolean(),
+                Settings.HIDE_ACTION_BUTTON_LIKE_DISLIKE.get(),
                 view
         );
     }
 
     public static boolean hideLikeDislikeButton(boolean original) {
-        return SettingsEnum.HIDE_ACTION_BUTTON_LIKE_DISLIKE.getBoolean() || original;
+        return Settings.HIDE_ACTION_BUTTON_LIKE_DISLIKE.get() || original;
     }
 
     public static void hookDownloadButton(View view) {
-        if (!SettingsEnum.HOOK_ACTION_BUTTON_DOWNLOAD.getBoolean()) {
+        if (!Settings.HOOK_ACTION_BUTTON_DOWNLOAD.get()) {
             return;
         }
 
         if (buttonType.equals(ActionButton.DOWNLOAD.name))
-            view.setOnClickListener(imageView -> VideoHelpers.downloadMusic(imageView.getContext()));
+            view.setOnClickListener(imageView -> VideoUtils.downloadMusic(imageView.getContext()));
     }
 
     public static void setButtonType(@NonNull Object obj) {
@@ -67,12 +67,12 @@ public class ActionBarPatch {
     }
 
     private enum ActionButton {
-        ADD_TO_PLAYLIST("ACTION_BUTTON_ADD_TO_PLAYLIST", "69487224", SettingsEnum.HIDE_ACTION_BUTTON_ADD_TO_PLAYLIST.getBoolean()),
-        COMMENT_DISABLED("ACTION_BUTTON_COMMENT", "76623563", SettingsEnum.HIDE_ACTION_BUTTON_COMMENT.getBoolean()),
-        COMMENT_ENABLED("ACTION_BUTTON_COMMENT", "138681778", SettingsEnum.HIDE_ACTION_BUTTON_COMMENT.getBoolean()),
-        DOWNLOAD("ACTION_BUTTON_DOWNLOAD", "73080600", SettingsEnum.HIDE_ACTION_BUTTON_DOWNLOAD.getBoolean()),
-        RADIO("ACTION_BUTTON_RADIO", "48687757", SettingsEnum.HIDE_ACTION_BUTTON_RADIO.getBoolean()),
-        SHARE("ACTION_BUTTON_SHARE", "90650344", SettingsEnum.HIDE_ACTION_BUTTON_SHARE.getBoolean());
+        ADD_TO_PLAYLIST("ACTION_BUTTON_ADD_TO_PLAYLIST", "69487224", Settings.HIDE_ACTION_BUTTON_ADD_TO_PLAYLIST.get()),
+        COMMENT_DISABLED("ACTION_BUTTON_COMMENT", "76623563", Settings.HIDE_ACTION_BUTTON_COMMENT.get()),
+        COMMENT_ENABLED("ACTION_BUTTON_COMMENT", "138681778", Settings.HIDE_ACTION_BUTTON_COMMENT.get()),
+        DOWNLOAD("ACTION_BUTTON_DOWNLOAD", "73080600", Settings.HIDE_ACTION_BUTTON_DOWNLOAD.get()),
+        RADIO("ACTION_BUTTON_RADIO", "48687757", Settings.HIDE_ACTION_BUTTON_RADIO.get()),
+        SHARE("ACTION_BUTTON_SHARE", "90650344", Settings.HIDE_ACTION_BUTTON_SHARE.get());
 
         private final String name;
         private final String identifier;

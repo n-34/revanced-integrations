@@ -2,12 +2,13 @@ package app.revanced.integrations.youtube.patches.components;
 
 import androidx.annotation.Nullable;
 
-import app.revanced.integrations.youtube.settings.SettingsEnum;
-import app.revanced.integrations.youtube.utils.StringTrieSearch;
+import app.revanced.integrations.shared.patches.components.ByteArrayFilterGroup;
+import app.revanced.integrations.shared.patches.components.ByteArrayFilterGroupList;
+import app.revanced.integrations.shared.patches.components.Filter;
+import app.revanced.integrations.shared.patches.components.StringFilterGroup;
+import app.revanced.integrations.shared.utils.StringTrieSearch;
+import app.revanced.integrations.youtube.settings.Settings;
 
-/**
- * @noinspection rawtypes
- */
 @SuppressWarnings("unused")
 public final class ShortsButtonFilter extends Filter {
     private static final String REEL_CHANNEL_BAR_PATH = "reel_channel_bar.eml";
@@ -24,25 +25,25 @@ public final class ShortsButtonFilter extends Filter {
         );
 
         final StringFilterGroup thanksButton = new StringFilterGroup(
-                SettingsEnum.HIDE_SHORTS_PLAYER_THANKS_BUTTON,
+                Settings.HIDE_SHORTS_PLAYER_THANKS_BUTTON,
                 "suggested_action"
         );
 
-        identifierFilterGroupList.addAll(thanksButton);
+        addIdentifierCallbacks(thanksButton);
 
         final StringFilterGroup joinButton = new StringFilterGroup(
-                SettingsEnum.HIDE_SHORTS_PLAYER_JOIN_BUTTON,
+                Settings.HIDE_SHORTS_PLAYER_JOIN_BUTTON,
                 "sponsor_button"
         );
 
         final StringFilterGroup subscribeButton = new StringFilterGroup(
-                SettingsEnum.HIDE_SHORTS_PLAYER_SUBSCRIPTIONS_BUTTON,
+                Settings.HIDE_SHORTS_PLAYER_SUBSCRIPTIONS_BUTTON,
                 "shorts_paused_state",
                 "subscribe_button"
         );
 
         infoPanel = new StringFilterGroup(
-                SettingsEnum.HIDE_SHORTS_PLAYER_INFO_PANEL,
+                Settings.HIDE_SHORTS_PLAYER_INFO_PANEL,
                 "reel_multi_format_link",
                 "reel_sound_metadata",
                 "shorts_info_panel_overview"
@@ -53,42 +54,42 @@ public final class ShortsButtonFilter extends Filter {
                 "shorts_video_action_button"
         );
 
-        pathFilterGroupList.addAll(
+        addPathCallbacks(
                 joinButton,
                 subscribeButton,
                 infoPanel,
                 videoActionButton
         );
 
-        final ByteArrayAsStringFilterGroup shortsDislikeButton =
-                new ByteArrayAsStringFilterGroup(
-                        SettingsEnum.HIDE_SHORTS_PLAYER_DISLIKE_BUTTON,
+        final ByteArrayFilterGroup shortsDislikeButton =
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_SHORTS_PLAYER_DISLIKE_BUTTON,
                         "reel_dislike_button",
                         "reel_dislike_toggled_button"
                 );
 
-        final ByteArrayAsStringFilterGroup shortsLikeButton =
-                new ByteArrayAsStringFilterGroup(
-                        SettingsEnum.HIDE_SHORTS_PLAYER_LIKE_BUTTON,
+        final ByteArrayFilterGroup shortsLikeButton =
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_SHORTS_PLAYER_LIKE_BUTTON,
                         "reel_like_button",
                         "reel_like_toggled_button"
                 );
 
-        final ByteArrayAsStringFilterGroup shortsCommentButton =
-                new ByteArrayAsStringFilterGroup(
-                        SettingsEnum.HIDE_SHORTS_PLAYER_COMMENTS_BUTTON,
+        final ByteArrayFilterGroup shortsCommentButton =
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_SHORTS_PLAYER_COMMENTS_BUTTON,
                         "reel_comment_button"
                 );
 
-        final ByteArrayAsStringFilterGroup shortsRemixButton =
-                new ByteArrayAsStringFilterGroup(
-                        SettingsEnum.HIDE_SHORTS_PLAYER_REMIX_BUTTON,
+        final ByteArrayFilterGroup shortsRemixButton =
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_SHORTS_PLAYER_REMIX_BUTTON,
                         "reel_remix_button"
                 );
 
-        final ByteArrayAsStringFilterGroup shortsShareButton =
-                new ByteArrayAsStringFilterGroup(
-                        SettingsEnum.HIDE_SHORTS_PLAYER_SHARE_BUTTON,
+        final ByteArrayFilterGroup shortsShareButton =
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_SHORTS_PLAYER_SHARE_BUTTON,
                         "reel_share_button"
                 );
 
@@ -102,26 +103,26 @@ public final class ShortsButtonFilter extends Filter {
     }
 
     @Override
-    boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
-                       FilterGroupList matchedList, FilterGroup matchedGroup, int matchedIndex) {
+    public boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
+                       StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
         if (exceptions.matches(path))
             return false;
 
-        if (matchedList == pathFilterGroupList) {
+        if (contentType == FilterContentType.PATH) {
             if (matchedGroup == infoPanel) {
                 // Always filter if matched.
-                return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedList, matchedGroup, matchedIndex);
+                return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
             } else if (matchedGroup == videoActionButton) {
                 // Video action buttons have the same path.
                 return videoActionButtonGroupList.check(protobufBufferArray).isFiltered();
             } else {
-                // Filter other path groups from pathFilterGroupList, only when reelChannelBar is visible
+                // Filter other path groups from pathCallbacks, only when reelChannelBar is visible
                 // to avoid false positives.
                 return path.startsWith(REEL_CHANNEL_BAR_PATH);
             }
         }
 
         // Super class handles logging.
-        return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedList, matchedGroup, matchedIndex);
+        return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
     }
 }

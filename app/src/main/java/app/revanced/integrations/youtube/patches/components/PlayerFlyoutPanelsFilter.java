@@ -2,14 +2,15 @@ package app.revanced.integrations.youtube.patches.components;
 
 import androidx.annotation.Nullable;
 
-import app.revanced.integrations.youtube.settings.SettingsEnum;
+import app.revanced.integrations.shared.patches.components.ByteArrayFilterGroup;
+import app.revanced.integrations.shared.patches.components.ByteArrayFilterGroupList;
+import app.revanced.integrations.shared.patches.components.Filter;
+import app.revanced.integrations.shared.patches.components.StringFilterGroup;
+import app.revanced.integrations.youtube.settings.Settings;
 import app.revanced.integrations.youtube.shared.PlayerType;
 
-/**
- * @noinspection rawtypes
- */
 @SuppressWarnings("unused")
-final class PlayerFlyoutPanelsFilter extends Filter {
+public final class PlayerFlyoutPanelsFilter extends Filter {
     // Search the buffer only if the flyout menu identifier is found.
     // Handle the searching in this class instead of adding to the global filter group (which searches all the time)
     private final ByteArrayFilterGroupList flyoutFilterGroupList = new ByteArrayFilterGroupList();
@@ -17,83 +18,83 @@ final class PlayerFlyoutPanelsFilter extends Filter {
     private final ByteArrayFilterGroupList exceptionFilterGroup = new ByteArrayFilterGroupList();
 
     public PlayerFlyoutPanelsFilter() {
-        exceptionFilterGroup.addAll(new ByteArrayAsStringFilterGroup(null, "quality_sheet"));
-        pathFilterGroupList.addAll(new StringFilterGroup(null, "overflow_menu_item.eml|")); // Using pathFilterGroupList due to new flyout panel(A/B)
+        exceptionFilterGroup.addAll(new ByteArrayFilterGroup(null, "quality_sheet"));
+        addPathCallbacks(new StringFilterGroup(null, "overflow_menu_item.eml|")); // Using pathCallbacks due to new flyout panel(A/B)
 
         flyoutFilterGroupList.addAll(
-                new ByteArrayAsStringFilterGroup(
-                        SettingsEnum.HIDE_PLAYER_FLYOUT_PANEL_AMBIENT,
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_PLAYER_FLYOUT_PANEL_AMBIENT,
                         "yt_outline_screen_light"
                 ),
-                new ByteArrayAsStringFilterGroup(
-                        SettingsEnum.HIDE_PLAYER_FLYOUT_PANEL_AUDIO_TRACK,
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_PLAYER_FLYOUT_PANEL_AUDIO_TRACK,
                         "yt_outline_person_radar"
                 ),
-                new ByteArrayAsStringFilterGroup(
-                        SettingsEnum.HIDE_PLAYER_FLYOUT_PANEL_CAPTIONS,
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_PLAYER_FLYOUT_PANEL_CAPTIONS,
                         "closed_caption"
                 ),
-                new ByteArrayAsStringFilterGroup(
-                        SettingsEnum.HIDE_PLAYER_FLYOUT_PANEL_HELP,
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_PLAYER_FLYOUT_PANEL_HELP,
                         "yt_outline_question_circle"
                 ),
-                new ByteArrayAsStringFilterGroup(
-                        SettingsEnum.HIDE_PLAYER_FLYOUT_PANEL_LOCK_SCREEN,
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_PLAYER_FLYOUT_PANEL_LOCK_SCREEN,
                         "yt_outline_lock"
                 ),
-                new ByteArrayAsStringFilterGroup(
-                        SettingsEnum.HIDE_PLAYER_FLYOUT_PANEL_LOOP,
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_PLAYER_FLYOUT_PANEL_LOOP,
                         "yt_outline_arrow_repeat_1_"
                 ),
-                new ByteArrayAsStringFilterGroup(
-                        SettingsEnum.HIDE_PLAYER_FLYOUT_PANEL_MORE,
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_PLAYER_FLYOUT_PANEL_MORE,
                         "yt_outline_info_circle"
                 ),
-                new ByteArrayAsStringFilterGroup(
-                        SettingsEnum.HIDE_PLAYER_FLYOUT_PANEL_PLAYBACK_SPEED,
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_PLAYER_FLYOUT_PANEL_PLAYBACK_SPEED,
                         "yt_outline_play_arrow_half_circle"
                 ),
-                new ByteArrayAsStringFilterGroup(
-                        SettingsEnum.HIDE_PLAYER_FLYOUT_PANEL_PREMIUM_CONTROLS,
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_PLAYER_FLYOUT_PANEL_PREMIUM_CONTROLS,
                         "yt_outline_adjust"
                 ),
-                new ByteArrayAsStringFilterGroup(
-                        SettingsEnum.HIDE_PLAYER_FLYOUT_PANEL_ADDITIONAL_SETTINGS,
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_PLAYER_FLYOUT_PANEL_ADDITIONAL_SETTINGS,
                         "yt_outline_gear"
                 ),
-                new ByteArrayAsStringFilterGroup(
-                        SettingsEnum.HIDE_PLAYER_FLYOUT_PANEL_REPORT,
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_PLAYER_FLYOUT_PANEL_REPORT,
                         "yt_outline_flag"
                 ),
-                new ByteArrayAsStringFilterGroup(
-                        SettingsEnum.HIDE_PLAYER_FLYOUT_PANEL_STABLE_VOLUME,
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_PLAYER_FLYOUT_PANEL_STABLE_VOLUME,
                         "volume_stable"
                 ),
-                new ByteArrayAsStringFilterGroup(
-                        SettingsEnum.HIDE_PLAYER_FLYOUT_PANEL_STATS_FOR_NERDS,
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_PLAYER_FLYOUT_PANEL_STATS_FOR_NERDS,
                         "yt_outline_statistics_graph"
                 ),
-                new ByteArrayAsStringFilterGroup(
-                        SettingsEnum.HIDE_PLAYER_FLYOUT_PANEL_WATCH_IN_VR,
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_PLAYER_FLYOUT_PANEL_WATCH_IN_VR,
                         "yt_outline_vr"
                 ),
-                new ByteArrayAsStringFilterGroup(
-                        SettingsEnum.HIDE_PLAYER_FLYOUT_PANEL_YT_MUSIC,
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_PLAYER_FLYOUT_PANEL_YT_MUSIC,
                         "yt_outline_open_new"
                 )
         );
     }
 
     @Override
-    boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
-                       FilterGroupList matchedList, FilterGroup matchedGroup, int matchedIndex) {
+    public boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
+                       StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
         // In YouTube v18.33.xx+, Shorts also use the player flyout panel
         if (PlayerType.getCurrent().isNoneOrHidden() || exceptionFilterGroup.check(protobufBufferArray).isFiltered())
             return false;
         // Only 1 group is added to the parent class, so the matched group must be the overflow menu.
-        if (matchedIndex == 0 && flyoutFilterGroupList.check(protobufBufferArray).isFiltered()) {
+        if (contentIndex == 0 && flyoutFilterGroupList.check(protobufBufferArray).isFiltered()) {
             // Super class handles logging.
-            return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedList, matchedGroup, matchedIndex);
+            return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
         }
         return false;
     }

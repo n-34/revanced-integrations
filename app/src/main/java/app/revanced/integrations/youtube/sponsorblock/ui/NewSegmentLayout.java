@@ -1,6 +1,6 @@
 package app.revanced.integrations.youtube.sponsorblock.ui;
 
-import static app.revanced.integrations.youtube.utils.ResourceUtils.identifier;
+import static app.revanced.integrations.shared.utils.ResourceUtils.identifier;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -11,11 +11,11 @@ import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
+import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.ResourceType;
 import app.revanced.integrations.youtube.patches.video.VideoInformation;
-import app.revanced.integrations.youtube.settings.SettingsEnum;
+import app.revanced.integrations.youtube.settings.Settings;
 import app.revanced.integrations.youtube.sponsorblock.SponsorBlockUtils;
-import app.revanced.integrations.youtube.utils.LogHelper;
-import app.revanced.integrations.youtube.utils.ResourceType;
 
 public final class NewSegmentLayout extends FrameLayout {
     private static final ColorStateList rippleColorStateList = new ColorStateList(
@@ -43,7 +43,7 @@ public final class NewSegmentLayout extends FrameLayout {
                             final int defStyleAttr, final int defStyleRes) {
         super(context, attributeSet, defStyleAttr, defStyleRes);
 
-        LayoutInflater.from(context).inflate(identifier("new_segment", ResourceType.LAYOUT, context), this, true);
+        LayoutInflater.from(context).inflate(identifier("revanced_sb_new_segment", ResourceType.LAYOUT, context), this, true);
 
 
         TypedValue rippleEffect = new TypedValue();
@@ -52,42 +52,42 @@ public final class NewSegmentLayout extends FrameLayout {
 
         initializeButton(
                 context,
-                "sb_new_segment_rewind",
-                () -> VideoInformation.seekToRelative(-SettingsEnum.SB_CREATE_NEW_SEGMENT_STEP.getInt()),
+                "revanced_sb_new_segment_rewind",
+                () -> VideoInformation.seekToRelative(-Settings.SB_CREATE_NEW_SEGMENT_STEP.get()),
                 "Rewind button clicked"
         );
 
         initializeButton(
                 context,
-                "sb_new_segment_forward",
-                () -> VideoInformation.seekToRelative(SettingsEnum.SB_CREATE_NEW_SEGMENT_STEP.getInt()),
+                "revanced_sb_new_segment_forward",
+                () -> VideoInformation.seekToRelative(Settings.SB_CREATE_NEW_SEGMENT_STEP.get()),
                 "Forward button clicked"
         );
 
         initializeButton(
                 context,
-                "sb_new_segment_adjust",
+                "revanced_sb_new_segment_adjust",
                 SponsorBlockUtils::onMarkLocationClicked,
                 "Adjust button clicked"
         );
 
         initializeButton(
                 context,
-                "sb_new_segment_compare",
+                "revanced_sb_new_segment_compare",
                 SponsorBlockUtils::onPreviewClicked,
                 "Compare button clicked"
         );
 
         initializeButton(
                 context,
-                "sb_new_segment_edit",
+                "revanced_sb_new_segment_edit",
                 SponsorBlockUtils::onEditByHandClicked,
                 "Edit button clicked"
         );
 
         initializeButton(
                 context,
-                "sb_new_segment_publish",
+                "revanced_sb_new_segment_publish",
                 SponsorBlockUtils::onPublishClicked,
                 "Publish button clicked"
         );
@@ -116,7 +116,7 @@ public final class NewSegmentLayout extends FrameLayout {
 
         button.setOnClickListener((v) -> {
             handler.apply();
-            LogHelper.printDebug(() -> debugMessage);
+            Logger.printDebug(() -> debugMessage);
         });
     }
 

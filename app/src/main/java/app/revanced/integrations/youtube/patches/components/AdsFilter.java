@@ -1,10 +1,12 @@
 package app.revanced.integrations.youtube.patches.components;
 
-import static app.revanced.integrations.youtube.utils.ReVancedUtils.hideViewBy0dpUnderCondition;
+import static app.revanced.integrations.shared.utils.Utils.hideViewBy0dpUnderCondition;
 
 import android.view.View;
 
-import app.revanced.integrations.youtube.settings.SettingsEnum;
+import app.revanced.integrations.shared.patches.components.Filter;
+import app.revanced.integrations.shared.patches.components.StringFilterGroup;
+import app.revanced.integrations.youtube.settings.Settings;
 
 @SuppressWarnings("unused")
 public final class AdsFilter extends Filter {
@@ -12,32 +14,32 @@ public final class AdsFilter extends Filter {
     public AdsFilter() {
 
         final StringFilterGroup carouselAd = new StringFilterGroup(
-                SettingsEnum.HIDE_GENERAL_ADS,
+                Settings.HIDE_GENERAL_ADS,
                 "carousel_ad"
         );
 
         final StringFilterGroup imageShelf = new StringFilterGroup(
-                SettingsEnum.HIDE_IMAGE_SHELF,
+                Settings.HIDE_IMAGE_SHELF,
                 "image_shelf"
         );
 
         final StringFilterGroup merchandise = new StringFilterGroup(
-                SettingsEnum.HIDE_MERCHANDISE_SHELF,
+                Settings.HIDE_MERCHANDISE_SHELF,
                 "product_carousel"
         );
 
         final StringFilterGroup paidContent = new StringFilterGroup(
-                SettingsEnum.HIDE_PAID_PROMOTION,
+                Settings.HIDE_PAID_PROMOTION,
                 "paid_content_overlay"
         );
 
         final StringFilterGroup selfSponsor = new StringFilterGroup(
-                SettingsEnum.HIDE_SELF_SPONSOR_CARDS,
+                Settings.HIDE_SELF_SPONSOR_CARDS,
                 "cta_shelf_card"
         );
 
         final StringFilterGroup generalAds = new StringFilterGroup(
-                SettingsEnum.HIDE_GENERAL_ADS,
+                Settings.HIDE_GENERAL_ADS,
                 "ads_video_with_context",
                 "banner_text_icon",
                 "brand_video",
@@ -66,18 +68,18 @@ public final class AdsFilter extends Filter {
         );
 
         final StringFilterGroup viewProducts = new StringFilterGroup(
-                SettingsEnum.HIDE_VIEW_PRODUCTS,
+                Settings.HIDE_VIEW_PRODUCTS,
                 "product_item",
                 "products_in_video"
         );
 
         final StringFilterGroup webSearchPanel = new StringFilterGroup(
-                SettingsEnum.HIDE_WEB_SEARCH_RESULTS,
+                Settings.HIDE_WEB_SEARCH_RESULTS,
                 "web_link_panel",
                 "web_result_panel"
         );
 
-        pathFilterGroupList.addAll(
+        addPathCallbacks(
                 generalAds,
                 imageShelf,
                 merchandise,
@@ -87,7 +89,7 @@ public final class AdsFilter extends Filter {
                 webSearchPanel
         );
 
-        identifierFilterGroupList.addAll(carouselAd);
+        addIdentifierCallbacks(carouselAd);
     }
 
     /**
@@ -96,18 +98,18 @@ public final class AdsFilter extends Filter {
      * @param view The view, which shows ads.
      */
     public static void hideAdAttributionView(View view) {
-        hideViewBy0dpUnderCondition(SettingsEnum.HIDE_GENERAL_ADS.getBoolean(), view);
+        hideViewBy0dpUnderCondition(Settings.HIDE_GENERAL_ADS.get(), view);
     }
 
     public static boolean hideFullscreenAds() {
-        return SettingsEnum.HIDE_FULLSCREEN_ADS.getBoolean();
+        return Settings.HIDE_FULLSCREEN_ADS.get();
     }
 
     public static void hideFullscreenAds(View view) {
-        hideViewBy0dpUnderCondition(SettingsEnum.HIDE_FULLSCREEN_ADS.getBoolean(), view);
+        hideViewBy0dpUnderCondition(Settings.HIDE_FULLSCREEN_ADS.get(), view);
     }
 
     public static boolean hideGetPremium() {
-        return SettingsEnum.HIDE_GET_PREMIUM.getBoolean();
+        return Settings.HIDE_GET_PREMIUM.get();
     }
 }

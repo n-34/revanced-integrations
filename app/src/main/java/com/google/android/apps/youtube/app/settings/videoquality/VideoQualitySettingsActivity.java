@@ -1,7 +1,8 @@
 package com.google.android.apps.youtube.app.settings.videoquality;
 
-import static app.revanced.integrations.youtube.utils.ReVancedUtils.getChildView;
-import static app.revanced.integrations.youtube.utils.ResourceUtils.identifier;
+import static app.revanced.integrations.shared.utils.ResourceUtils.identifier;
+import static app.revanced.integrations.shared.utils.Utils.getChildView;
+import static app.revanced.integrations.youtube.utils.ThemeUtils.setBackButtonDrawable;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -12,13 +13,12 @@ import android.widget.TextView;
 
 import java.util.Objects;
 
-import app.revanced.integrations.youtube.settingsmenu.ReVancedSettingsFragment;
-import app.revanced.integrations.youtube.settingsmenu.ReturnYouTubeDislikeSettingsFragment;
-import app.revanced.integrations.youtube.settingsmenu.SponsorBlockSettingsFragment;
-import app.revanced.integrations.youtube.utils.LogHelper;
-import app.revanced.integrations.youtube.utils.ResourceHelper;
-import app.revanced.integrations.youtube.utils.ResourceType;
-import app.revanced.integrations.youtube.utils.ThemeHelper;
+import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.ResourceType;
+import app.revanced.integrations.youtube.settings.preference.ReVancedPreferenceFragment;
+import app.revanced.integrations.youtube.settings.preference.ReturnYouTubeDislikePreferenceFragment;
+import app.revanced.integrations.youtube.settings.preference.SponsorBlockPreferenceFragment;
+import app.revanced.integrations.youtube.utils.ThemeUtils;
 
 /**
  * @noinspection ALL
@@ -29,7 +29,7 @@ public class VideoQualitySettingsActivity extends Activity {
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         try {
-            setTheme(ThemeHelper.getSettingTheme());
+            setTheme(ThemeUtils.getThemeId());
             setContentView(identifier("revanced_settings_with_toolbar", ResourceType.LAYOUT));
 
             final int fragmentId = identifier("revanced_settings_fragments", ResourceType.ID);
@@ -41,20 +41,20 @@ public class VideoQualitySettingsActivity extends Activity {
             String toolbarTitleResourceName;
             String dataString = Objects.requireNonNull(getIntent().getDataString());
             switch (dataString) {
-                case "sponsorblock_settings" -> {
-                    fragment = new SponsorBlockSettingsFragment();
-                    toolbarTitleResourceName = "revanced_sponsorblock_settings_title";
+                case "revanced_sb_settings_intent" -> {
+                    fragment = new SponsorBlockPreferenceFragment();
+                    toolbarTitleResourceName = "revanced_sb_settings_title";
                 }
-                case "ryd_settings" -> {
-                    fragment = new ReturnYouTubeDislikeSettingsFragment();
+                case "revanced_ryd_settings_intent" -> {
+                    fragment = new ReturnYouTubeDislikePreferenceFragment();
                     toolbarTitleResourceName = "revanced_ryd_settings_title";
                 }
-                case "extended_settings" -> {
-                    fragment = new ReVancedSettingsFragment();
+                case "revanced_extended_settings_intent" -> {
+                    fragment = new ReVancedPreferenceFragment();
                     toolbarTitleResourceName = "revanced_extended_settings_title";
                 }
                 default -> {
-                    LogHelper.printException(() -> "Unknown setting: " + dataString);
+                    Logger.printException(() -> "Unknown setting: " + dataString);
                     return;
                 }
             }
@@ -65,7 +65,7 @@ public class VideoQualitySettingsActivity extends Activity {
                     .replace(fragmentId, fragment)
                     .commit();
         } catch (Exception ex) {
-            LogHelper.printException(() -> "onCreate failure", ex);
+            Logger.printException(() -> "onCreate failure", ex);
         }
     }
 
@@ -77,7 +77,7 @@ public class VideoQualitySettingsActivity extends Activity {
     private void setBackButton(ViewGroup toolBar) {
         ImageButton imageButton = Objects.requireNonNull(getChildView(toolBar, view -> view instanceof ImageButton));
         imageButton.setOnClickListener(view -> VideoQualitySettingsActivity.this.onBackPressed());
-        imageButton.setImageDrawable(getResources().getDrawable(ResourceHelper.getArrow()));
+        setBackButtonDrawable(imageButton);
     }
 
     private void setToolbarTitle(ViewGroup toolBar, String toolbarTitleResourceName) {

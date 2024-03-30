@@ -2,9 +2,9 @@ package app.revanced.integrations.youtube.patches.video;
 
 import androidx.annotation.NonNull;
 
-import app.revanced.integrations.youtube.settings.SettingsEnum;
+import app.revanced.integrations.shared.utils.Utils;
+import app.revanced.integrations.youtube.settings.Settings;
 import app.revanced.integrations.youtube.shared.PlayerType;
-import app.revanced.integrations.youtube.utils.ReVancedUtils;
 
 @SuppressWarnings("unused")
 public class ReloadVideoPatch {
@@ -17,7 +17,7 @@ public class ReloadVideoPatch {
      * @param newlyLoadedVideoId id of the current video
      */
     public static void setVideoId(@NonNull String newlyLoadedVideoId) {
-        if (!SettingsEnum.SKIP_PRELOADED_BUFFER.getBoolean()) {
+        if (!Settings.SKIP_PRELOADED_BUFFER.get()) {
             return;
         }
 
@@ -30,6 +30,6 @@ public class ReloadVideoPatch {
 
         videoId = newlyLoadedVideoId;
 
-        ReVancedUtils.runOnMainThreadDelayed(VideoInformation::reloadVideo, 700);
+        Utils.runOnMainThreadDelayed(VideoInformation::reloadVideo, 700);
     }
 }

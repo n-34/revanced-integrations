@@ -1,18 +1,17 @@
 package app.revanced.integrations.youtube.patches.components;
 
-import static app.revanced.integrations.youtube.utils.ReVancedUtils.hideViewUnderCondition;
+import static app.revanced.integrations.shared.utils.Utils.hideViewUnderCondition;
 
 import android.view.View;
 
 import androidx.annotation.Nullable;
 
-import app.revanced.integrations.youtube.settings.SettingsEnum;
+import app.revanced.integrations.shared.patches.components.Filter;
+import app.revanced.integrations.shared.patches.components.StringFilterGroup;
+import app.revanced.integrations.shared.utils.StringTrieSearch;
+import app.revanced.integrations.youtube.settings.Settings;
 import app.revanced.integrations.youtube.shared.PlayerType;
-import app.revanced.integrations.youtube.utils.StringTrieSearch;
 
-/**
- * @noinspection rawtypes
- */
 @SuppressWarnings("unused")
 public final class SuggestedActionFilter extends Filter {
     private final StringTrieSearch exceptions = new StringTrieSearch();
@@ -24,24 +23,24 @@ public final class SuggestedActionFilter extends Filter {
                 "shorts"
         );
 
-        allValueFilterGroupList.addAll(
+        addAllValueCallbacks(
                 new StringFilterGroup(
-                        SettingsEnum.HIDE_SUGGESTED_ACTION,
+                        Settings.HIDE_SUGGESTED_ACTION,
                         "suggested_action"
                 )
         );
     }
 
     public static void hideSuggestedActions(View view) {
-        hideViewUnderCondition(SettingsEnum.HIDE_SUGGESTED_ACTION.getBoolean(), view);
+        hideViewUnderCondition(Settings.HIDE_SUGGESTED_ACTION.get(), view);
     }
 
     @Override
-    boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
-                       FilterGroupList matchedList, FilterGroup matchedGroup, int matchedIndex) {
+    public boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
+                       StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
         if (exceptions.matches(path) || PlayerType.getCurrent().isNoneOrHidden())
             return false;
 
-        return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedList, matchedGroup, matchedIndex);
+        return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
     }
 }

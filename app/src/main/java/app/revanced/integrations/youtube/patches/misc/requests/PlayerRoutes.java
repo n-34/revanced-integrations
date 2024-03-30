@@ -1,6 +1,6 @@
 package app.revanced.integrations.youtube.patches.misc.requests;
 
-import static app.revanced.integrations.youtube.utils.ReVancedHelper.appVersionName;
+import static app.revanced.integrations.youtube.utils.ExtendedUtils.appVersionName;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -8,9 +8,9 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 
-import app.revanced.integrations.youtube.requests.Requester;
-import app.revanced.integrations.youtube.requests.Route;
-import app.revanced.integrations.youtube.utils.LogHelper;
+import app.revanced.integrations.shared.requests.Requester;
+import app.revanced.integrations.shared.requests.Route;
+import app.revanced.integrations.shared.utils.Logger;
 
 public final class PlayerRoutes {
     public static final Route.CompiledRoute GET_CHANNEL_INFORMATION = new Route(
@@ -56,7 +56,7 @@ public final class PlayerRoutes {
             innerTubeBody.put("context", context);
             innerTubeBody.put("videoId", "%s");
         } catch (JSONException e) {
-            LogHelper.printException(() -> "Failed to create innerTubeBody", e);
+            Logger.printException(() -> "Failed to create innerTubeBody", e);
         }
 
         ANDROID_INNER_TUBE_BODY = innerTubeBody.toString();
@@ -81,7 +81,7 @@ public final class PlayerRoutes {
             tvEmbedInnerTubeBody.put("context", context);
             tvEmbedInnerTubeBody.put("videoId", "%s");
         } catch (JSONException e) {
-            LogHelper.printException(() -> "Failed to create tvEmbedInnerTubeBody", e);
+            Logger.printException(() -> "Failed to create tvEmbedInnerTubeBody", e);
         }
 
         TV_EMBED_INNER_TUBE_BODY = tvEmbedInnerTubeBody.toString();
@@ -101,7 +101,7 @@ public final class PlayerRoutes {
             webInnerTubeBody.put("context", context);
             webInnerTubeBody.put("videoId", "%s");
         } catch (JSONException e) {
-            LogHelper.printException(() -> "Failed to create webInnerTubeBody", e);
+            Logger.printException(() -> "Failed to create webInnerTubeBody", e);
         }
 
         WEB_INNER_TUBE_BODY = webInnerTubeBody.toString();

@@ -1,108 +1,62 @@
 package app.revanced.integrations.youtube.patches.overlaybutton;
 
+import static app.revanced.integrations.shared.utils.StringRef.str;
+import static app.revanced.integrations.shared.utils.Utils.showToastShort;
 import static app.revanced.integrations.youtube.patches.video.PlaybackSpeedPatch.overrideSpeed;
-import static app.revanced.integrations.youtube.utils.ReVancedUtils.showToastShort;
-import static app.revanced.integrations.youtube.utils.ResourceUtils.anim;
-import static app.revanced.integrations.youtube.utils.ResourceUtils.findView;
-import static app.revanced.integrations.youtube.utils.ResourceUtils.integer;
-import static app.revanced.integrations.youtube.utils.StringRef.str;
 
-import android.annotation.SuppressLint;
-import android.support.constraint.ConstraintLayout;
 import android.view.View;
-import android.view.animation.Animation;
-import android.widget.ImageView;
+import android.view.ViewGroup;
 
-import java.lang.ref.WeakReference;
+import androidx.annotation.Nullable;
 
-import app.revanced.integrations.youtube.settings.SettingsEnum;
-import app.revanced.integrations.youtube.utils.LogHelper;
-import app.revanced.integrations.youtube.utils.VideoHelpers;
+import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.youtube.settings.Settings;
+import app.revanced.integrations.youtube.utils.VideoUtils;
 
 @SuppressWarnings("unused")
-public class SpeedDialog {
-    volatile static boolean isButtonEnabled;
-    volatile static boolean isShowing;
-    volatile static boolean isScrubbed;
-    static WeakReference<ImageView> buttonView = new WeakReference<>(null);
-    @SuppressLint("StaticFieldLeak")
-    static ConstraintLayout constraintLayout;
-    static int fadeDurationFast;
-    static int fadeDurationScheduled;
-    static Animation fadeIn;
-    static Animation fadeOut;
+public class SpeedDialog extends BottomControlButton {
+    @Nullable
+    private static SpeedDialog instance;
 
-    public static void initialize(Object obj) {
+    public SpeedDialog(ViewGroup bottomControlsViewGroup) {
+        super(
+                bottomControlsViewGroup,
+                "speed_dialog_button",
+                Settings.OVERLAY_BUTTON_SPEED_DIALOG,
+                view -> VideoUtils.playbackSpeedDialogListener(view.getContext()),
+                view -> {
+                    overrideSpeed(1.0f);
+                    showToastShort(str("revanced_overlay_button_speed_dialog_reset"));
+                    return true;
+                }
+        );
+    }
+
+    /**
+     * Injection point.
+     */
+    public static void initialize(View bottomControlsViewGroup) {
         try {
-            constraintLayout = (ConstraintLayout) obj;
-            isButtonEnabled = setValue();
-            ImageView imageView = findView(constraintLayout, "speed_dialog_button");
-
-            imageView.setOnClickListener(view -> VideoHelpers.playbackSpeedDialogListener(view.getContext()));
-            imageView.setOnLongClickListener(view -> {
-                overrideSpeed(1.0f);
-                showToastShort(view.getContext(), str("revanced_overlay_button_speed_dialog_reset"));
-                return true;
-            });
-            buttonView = new WeakReference<>(imageView);
-
-            fadeDurationFast = integer("fade_duration_fast");
-            fadeDurationScheduled = integer("fade_duration_scheduled");
-
-            fadeIn = anim("fade_in");
-            fadeIn.setDuration(fadeDurationFast);
-
-            fadeOut = anim("fade_out");
-            fadeOut.setDuration(fadeDurationScheduled);
-
-            isShowing = true;
-            isScrubbed = false;
-            changeVisibility(false);
-
+            if (bottomControlsViewGroup instanceof ViewGroup viewGroup) {
+                instance = new SpeedDialog(viewGroup);
+            }
         } catch (Exception ex) {
-            LogHelper.printException(() -> "Unable to set FrameLayout", ex);
+            Logger.printException(() -> "initialize failure", ex);
         }
     }
 
-    public static void changeVisibility(boolean currentVisibility) {
-        ImageView imageView = buttonView.get();
-
-        if (isShowing == currentVisibility || constraintLayout == null || imageView == null)
-            return;
-
-        isShowing = currentVisibility;
-
-        if (isScrubbed && isButtonEnabled) {
-            isScrubbed = false;
-            imageView.setVisibility(View.VISIBLE);
-            return;
-        }
-
-        if (currentVisibility && isButtonEnabled) {
-            imageView.setVisibility(View.VISIBLE);
-            imageView.startAnimation(fadeIn);
-        } else if (imageView.getVisibility() == View.VISIBLE) {
-            imageView.startAnimation(fadeOut);
-            imageView.setVisibility(View.GONE);
-        }
+    /**
+     * Injection point.
+     */
+    public static void changeVisibility(boolean showing) {
+        if (instance != null) instance.setVisibility(showing);
     }
 
-    public static void changeVisibilityNegatedImmediate(boolean isUserScrubbing) {
-        ImageView imageView = buttonView.get();
-
-        if (constraintLayout == null || imageView == null || !isUserScrubbing)
-            return;
-
-        isShowing = false;
-        isScrubbed = true;
-        imageView.setVisibility(View.GONE);
+    /**
+     * Injection point.
+     */
+    public static void changeVisibilityNegatedImmediate(boolean scrubbing) {
+        if (instance != null && scrubbing) instance.setVisibilityNegatedImmediate();
     }
 
-    public static void refreshVisibility() {
-        isButtonEnabled = setValue();
-    }
-
-    private static boolean setValue() {
-        return SettingsEnum.OVERLAY_BUTTON_SPEED_DIALOG.getBoolean();
-    }
 }

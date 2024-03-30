@@ -1,6 +1,6 @@
 package app.revanced.integrations.youtube.patches.video;
 
-import static app.revanced.integrations.youtube.utils.StringRef.str;
+import static app.revanced.integrations.shared.utils.StringRef.str;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -9,11 +9,11 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
-import app.revanced.integrations.youtube.settings.SettingsEnum;
+import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.Utils;
+import app.revanced.integrations.youtube.settings.Settings;
 import app.revanced.integrations.youtube.shared.VideoState;
-import app.revanced.integrations.youtube.utils.LogHelper;
-import app.revanced.integrations.youtube.utils.ReVancedUtils;
-import app.revanced.integrations.youtube.utils.VideoHelpers;
+import app.revanced.integrations.youtube.utils.VideoUtils;
 
 /**
  * Hooking class for the current playing video.
@@ -59,7 +59,7 @@ public final class VideoInformation {
             seekMethod = playerController.getClass().getMethod(SEEK_METHOD_NAME, Long.TYPE);
             seekMethod.setAccessible(true);
         } catch (Exception ex) {
-            LogHelper.printException(() -> "Failed to initialize", ex);
+            Logger.printException(() -> "Failed to initialize", ex);
         }
     }
 
@@ -74,7 +74,7 @@ public final class VideoInformation {
      * @return true if the seek was successful.
      */
     public static boolean seekTo(final long seekTime) {
-        ReVancedUtils.verifyOnMainThread();
+        Utils.verifyOnMainThread();
         try {
             final long videoTime = getVideoTime();
             final long videoLength = getVideoLength();
@@ -85,16 +85,16 @@ public final class VideoInformation {
                 // Both the current video time and the seekTo are in the last 250ms of the video.
                 // Ignore this seek call, otherwise if a video ends with multiple closely timed segments
                 // then seeking here can create an infinite loop of skip attempts.
-                LogHelper.printDebug(() -> "Ignoring seekTo call as video playback is almost finished. "
+                Logger.printDebug(() -> "Ignoring seekTo call as video playback is almost finished. "
                         + " videoTime: " + videoTime + " videoLength: " + videoLength + " seekTo: " + seekTime);
                 return false;
             }
 
-            LogHelper.printDebug(() -> "Seeking to " + adjustedSeekTime);
+            Logger.printDebug(() -> "Seeking to " + adjustedSeekTime);
             //noinspection DataFlowIssue
             return (Boolean) seekMethod.invoke(playerControllerRef.get(), adjustedSeekTime);
         } catch (Exception ex) {
-            LogHelper.printException(() -> "Failed to seek", ex);
+            Logger.printException(() -> "Failed to seek", ex);
         }
         return false;
     }
@@ -108,22 +108,22 @@ public final class VideoInformation {
             return;
 
         final long lastVideoTime = videoTime;
-        final float playbackSpeed = VideoHelpers.getCurrentSpeed();
+        final float playbackSpeed = VideoUtils.getCurrentSpeed();
         final long speedAdjustedTimeThreshold = (long) (playbackSpeed * 1000);
         seekTo(10000);
         seekTo(lastVideoTime + speedAdjustedTimeThreshold);
 
-        if (!SettingsEnum.SKIP_PRELOADED_BUFFER_TOAST.getBoolean())
+        if (!Settings.SKIP_PRELOADED_BUFFER_TOAST.get())
             return;
 
-        ReVancedUtils.showToastShort(str("revanced_skipped_preloaded_buffer"));
+        Utils.showToastShort(str("revanced_skipped_preloaded_buffer"));
     }
 
     public static boolean videoEnded() {
-        if (!SettingsEnum.ALWAYS_REPEAT.getBoolean())
+        if (!Settings.ALWAYS_REPEAT.get())
             return false;
 
-        ReVancedUtils.runOnMainThreadDelayed(() -> seekTo(0), 0);
+        Utils.runOnMainThreadDelayed(() -> seekTo(0), 0);
 
         return true;
     }

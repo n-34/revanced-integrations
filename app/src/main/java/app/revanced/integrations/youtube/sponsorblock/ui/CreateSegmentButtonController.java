@@ -1,39 +1,37 @@
 package app.revanced.integrations.youtube.sponsorblock.ui;
 
-import static app.revanced.integrations.youtube.utils.ResourceUtils.anim;
-import static app.revanced.integrations.youtube.utils.ResourceUtils.identifier;
-import static app.revanced.integrations.youtube.utils.ResourceUtils.integer;
+import static app.revanced.integrations.shared.utils.ResourceUtils.anim;
+import static app.revanced.integrations.shared.utils.ResourceUtils.identifier;
+import static app.revanced.integrations.shared.utils.ResourceUtils.integer;
 
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 
 import java.lang.ref.WeakReference;
 import java.util.Objects;
 
+import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.ResourceType;
 import app.revanced.integrations.youtube.patches.video.VideoInformation;
-import app.revanced.integrations.youtube.settings.SettingsEnum;
-import app.revanced.integrations.youtube.utils.LogHelper;
-import app.revanced.integrations.youtube.utils.ResourceType;
+import app.revanced.integrations.youtube.settings.Settings;
 
+@SuppressWarnings("unused")
 public class CreateSegmentButtonController {
     private static WeakReference<ImageView> buttonReference = new WeakReference<>(null);
 
     private static Animation fadeIn;
     private static Animation fadeOut;
     private static boolean isShowing;
-    private static boolean isScrubbed;
 
 
     /**
      * injection point
      */
-    public static void initialize(Object viewStub) {
+    public static void initialize(View youtubeControlsLayout) {
         try {
-            RelativeLayout controlsLayout = (RelativeLayout) viewStub;
-            ImageView imageView = Objects.requireNonNull(controlsLayout.findViewById(
-                    identifier("sb_sponsorblock_button", ResourceType.ID)));
+            ImageView imageView = Objects.requireNonNull(youtubeControlsLayout.findViewById(
+                    identifier("revanced_sb_create_segment_button", ResourceType.ID)));
 
             imageView.setOnClickListener(v -> SponsorBlockViewController.toggleNewSegmentLayoutVisibility());
             buttonReference = new WeakReference<>(imageView);
@@ -46,10 +44,9 @@ public class CreateSegmentButtonController {
                 fadeOut.setDuration(integer("fade_duration_scheduled"));
             }
             isShowing = true;
-            isScrubbed = false;
             changeVisibilityImmediate(false);
         } catch (Exception ex) {
-            LogHelper.printException(() -> "Unable to set RelativeLayout", ex);
+            Logger.printException(() -> "Unable to set RelativeLayout", ex);
         }
     }
 
@@ -66,7 +63,6 @@ public class CreateSegmentButtonController {
         if (imageView == null || !isUserScrubbing) return;
 
         isShowing = false;
-        isScrubbed = true;
         imageView.setVisibility(View.GONE);
     }
 
@@ -105,12 +101,12 @@ public class CreateSegmentButtonController {
                 iView.setVisibility(View.GONE);
             }
         } catch (Exception ex) {
-            LogHelper.printException(() -> "changeVisibility failure", ex);
+            Logger.printException(() -> "changeVisibility failure", ex);
         }
     }
 
     private static boolean shouldBeShown() {
-        return SettingsEnum.SB_ENABLED.getBoolean() && SettingsEnum.SB_CREATE_NEW_SEGMENT.getBoolean()
+        return Settings.SB_ENABLED.get() && Settings.SB_CREATE_NEW_SEGMENT.get()
                 && VideoInformation.isNotAtEndOfVideo();
     }
 }

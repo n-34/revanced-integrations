@@ -1,7 +1,7 @@
 package app.revanced.integrations.youtube.patches.shorts;
 
-import static app.revanced.integrations.youtube.utils.ReVancedUtils.hideViewBy0dpUnderCondition;
-import static app.revanced.integrations.youtube.utils.ReVancedUtils.hideViewUnderCondition;
+import static app.revanced.integrations.shared.utils.Utils.hideViewBy0dpUnderCondition;
+import static app.revanced.integrations.shared.utils.Utils.hideViewUnderCondition;
 
 import android.annotation.SuppressLint;
 import android.view.View;
@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.HorizontalScrollView;
 
-import app.revanced.integrations.youtube.settings.SettingsEnum;
+import app.revanced.integrations.youtube.settings.Settings;
 
 @SuppressWarnings("unused")
 public class ShortsPatch {
@@ -20,7 +20,7 @@ public class ShortsPatch {
     public static Object pivotBar;
 
     public static Enum<?> changeShortsRepeatState(Enum<?> currentState) {
-        switch (SettingsEnum.CHANGE_SHORTS_REPEAT_STATE.getInt()) {
+        switch (Settings.CHANGE_SHORTS_REPEAT_STATE.get()) {
             case 1 -> currentState = repeat;
             case 2 -> currentState = singlePlay;
             case 3 -> currentState = endScreen;
@@ -30,15 +30,15 @@ public class ShortsPatch {
     }
 
     public static boolean disableResumingStartupShortsPlayer() {
-        return SettingsEnum.DISABLE_RESUMING_SHORTS_PLAYER.getBoolean();
+        return Settings.DISABLE_RESUMING_SHORTS_PLAYER.get();
     }
 
     public static View hideShortsPlayerNavigationBar(View view) {
-        return SettingsEnum.HIDE_SHORTS_PLAYER_NAVIGATION_BAR.getBoolean() ? null : view;
+        return Settings.HIDE_SHORTS_PLAYER_NAVIGATION_BAR.get() ? null : view;
     }
 
     public static void hideShortsPlayerNavigationBar() {
-        if (!SettingsEnum.HIDE_SHORTS_PLAYER_NAVIGATION_BAR.getBoolean())
+        if (!Settings.HIDE_SHORTS_PLAYER_NAVIGATION_BAR.get())
             return;
 
         if (!(pivotBar instanceof HorizontalScrollView horizontalScrollView))
@@ -48,51 +48,51 @@ public class ShortsPatch {
     }
 
     public static void hideShortsPlayerCommentsButton(View view) {
-        hideViewUnderCondition(SettingsEnum.HIDE_SHORTS_PLAYER_COMMENTS_BUTTON.getBoolean(), view);
+        hideViewUnderCondition(Settings.HIDE_SHORTS_PLAYER_COMMENTS_BUTTON.get(), view);
     }
 
     public static boolean hideShortsPlayerDislikeButton() {
-        return SettingsEnum.HIDE_SHORTS_PLAYER_DISLIKE_BUTTON.getBoolean();
+        return Settings.HIDE_SHORTS_PLAYER_DISLIKE_BUTTON.get();
     }
 
     public static ViewGroup hideShortsPlayerInfoPanel(ViewGroup viewGroup) {
-        return SettingsEnum.HIDE_SHORTS_PLAYER_INFO_PANEL.getBoolean() ? null : viewGroup;
+        return Settings.HIDE_SHORTS_PLAYER_INFO_PANEL.get() ? null : viewGroup;
     }
 
     public static boolean hideShortsPlayerLikeButton() {
-        return SettingsEnum.HIDE_SHORTS_PLAYER_LIKE_BUTTON.getBoolean();
+        return Settings.HIDE_SHORTS_PLAYER_LIKE_BUTTON.get();
     }
 
     public static ViewStub hideShortsPlayerPaidPromotionBanner(ViewStub viewStub) {
-        return SettingsEnum.HIDE_SHORTS_PLAYER_PAID_PROMOTION.getBoolean() ? null : viewStub;
+        return Settings.HIDE_SHORTS_PLAYER_PAID_PROMOTION.get() ? null : viewStub;
     }
 
     public static boolean hideShortsPlayerPivotButton() {
-        return SettingsEnum.HIDE_SHORTS_PLAYER_PIVOT_BUTTON.getBoolean();
+        return Settings.HIDE_SHORTS_PLAYER_PIVOT_BUTTON.get();
     }
 
     public static Object hideShortsPlayerPivotButton(Object object) {
-        return SettingsEnum.HIDE_SHORTS_PLAYER_PIVOT_BUTTON.getBoolean() ? null : object;
+        return Settings.HIDE_SHORTS_PLAYER_PIVOT_BUTTON.get() ? null : object;
     }
 
     public static void hideShortsPlayerRemixButton(View view) {
-        hideViewUnderCondition(SettingsEnum.HIDE_SHORTS_PLAYER_REMIX_BUTTON.getBoolean(), view);
+        hideViewUnderCondition(Settings.HIDE_SHORTS_PLAYER_REMIX_BUTTON.get(), view);
     }
 
     public static void hideShortsPlayerShareButton(View view) {
-        hideViewUnderCondition(SettingsEnum.HIDE_SHORTS_PLAYER_SHARE_BUTTON.getBoolean(), view);
+        hideViewUnderCondition(Settings.HIDE_SHORTS_PLAYER_SHARE_BUTTON.get(), view);
     }
 
     public static void hideShortsPlayerSubscriptionsButton(View view) {
-        hideViewBy0dpUnderCondition(SettingsEnum.HIDE_SHORTS_PLAYER_SUBSCRIPTIONS_BUTTON.getBoolean(), view);
+        hideViewBy0dpUnderCondition(Settings.HIDE_SHORTS_PLAYER_SUBSCRIPTIONS_BUTTON.get(), view);
     }
 
     public static int hideShortsPlayerSubscriptionsButton(int original) {
-        return SettingsEnum.HIDE_SHORTS_PLAYER_SUBSCRIPTIONS_BUTTON.getBoolean() ? 0 : original;
+        return Settings.HIDE_SHORTS_PLAYER_SUBSCRIPTIONS_BUTTON.get() ? 0 : original;
     }
 
     public static boolean hideShortsToolBarBanner() {
-        return SettingsEnum.HIDE_SHORTS_TOOLBAR_BANNER.getBoolean();
+        return Settings.HIDE_SHORTS_TOOLBAR_BANNER.get();
     }
 
 
@@ -106,12 +106,12 @@ public class ShortsPatch {
     }
 
     private enum ToolBarButton {
-        SEARCH("SEARCH_BOLD", SettingsEnum.HIDE_SHORTS_TOOLBAR_SEARCH_BUTTON.getBoolean()),
-        SEARCH_OLD_LAYOUT("SEARCH_FILLED", SettingsEnum.HIDE_SHORTS_TOOLBAR_SEARCH_BUTTON.getBoolean()),
-        CAMERA("SHORTS_HEADER_CAMERA_BOLD", SettingsEnum.HIDE_SHORTS_TOOLBAR_CAMERA_BUTTON.getBoolean()),
-        CAMERA_OLD_LAYOUT("SHORTS_HEADER_CAMERA", SettingsEnum.HIDE_SHORTS_TOOLBAR_CAMERA_BUTTON.getBoolean()),
-        MENU("MORE_VERT_BOLD", SettingsEnum.HIDE_SHORTS_TOOLBAR_MENU_BUTTON.getBoolean()),
-        MENU_TABLET("MORE_VERT", SettingsEnum.HIDE_SHORTS_TOOLBAR_MENU_BUTTON.getBoolean());
+        SEARCH("SEARCH_BOLD", Settings.HIDE_SHORTS_TOOLBAR_SEARCH_BUTTON.get()),
+        SEARCH_OLD_LAYOUT("SEARCH_FILLED", Settings.HIDE_SHORTS_TOOLBAR_SEARCH_BUTTON.get()),
+        CAMERA("SHORTS_HEADER_CAMERA_BOLD", Settings.HIDE_SHORTS_TOOLBAR_CAMERA_BUTTON.get()),
+        CAMERA_OLD_LAYOUT("SHORTS_HEADER_CAMERA", Settings.HIDE_SHORTS_TOOLBAR_CAMERA_BUTTON.get()),
+        MENU("MORE_VERT_BOLD", Settings.HIDE_SHORTS_TOOLBAR_MENU_BUTTON.get()),
+        MENU_TABLET("MORE_VERT", Settings.HIDE_SHORTS_TOOLBAR_MENU_BUTTON.get());
 
         private final boolean enabled;
         private final String name;

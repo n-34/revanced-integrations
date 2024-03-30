@@ -2,7 +2,7 @@ package app.revanced.integrations.youtube.swipecontrols.controller.gesture.core
 
 import android.content.Context
 import android.util.TypedValue
-import app.revanced.integrations.youtube.settings.SettingsEnum
+import app.revanced.integrations.youtube.settings.Settings
 import app.revanced.integrations.youtube.swipecontrols.controller.AudioVolumeController
 import app.revanced.integrations.youtube.swipecontrols.controller.ScreenBrightnessController
 import app.revanced.integrations.youtube.swipecontrols.misc.ScrollDistanceHelper
@@ -79,7 +79,7 @@ class VolumeAndBrightnessScrollerImpl(
             )
         ) { _, _, direction ->
             screenController?.run {
-                if (!SettingsEnum.ENABLE_SWIPE_AUTO_BRIGHTNESS.boolean) {
+                if (!Settings.ENABLE_SWIPE_AUTO_BRIGHTNESS.get()) {
                     if (screenBrightness >= 0 || direction > 0) {
                         restore()
                         screenBrightness += direction

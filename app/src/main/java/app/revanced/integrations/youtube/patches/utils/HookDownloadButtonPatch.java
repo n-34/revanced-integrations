@@ -1,18 +1,18 @@
 package app.revanced.integrations.youtube.patches.utils;
 
-import static app.revanced.integrations.youtube.utils.VideoHelpers.download;
+import static app.revanced.integrations.youtube.utils.VideoUtils.downloadVideo;
 
-import app.revanced.integrations.youtube.settings.SettingsEnum;
-import app.revanced.integrations.youtube.utils.ReVancedUtils;
+import app.revanced.integrations.shared.utils.Utils;
+import app.revanced.integrations.youtube.settings.Settings;
 
 @SuppressWarnings("unused")
 public class HookDownloadButtonPatch {
 
     public static boolean shouldHookDownloadButton() {
-        return SettingsEnum.HOOK_DOWNLOAD_BUTTON.getBoolean();
+        return Settings.HOOK_DOWNLOAD_BUTTON.get();
     }
 
     public static void startDownloadActivity() {
-        download(ReVancedUtils.getContext());
+        downloadVideo(Utils.getContext());
     }
 }

@@ -6,7 +6,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
-import app.revanced.integrations.youtube.utils.LogHelper;
+import app.revanced.integrations.shared.utils.Logger;
 
 @SuppressWarnings("unused")
 public class BrowseIdPatch {
@@ -42,7 +42,7 @@ public class BrowseIdPatch {
             field.setAccessible(true);
             browseIdField = field;
         } catch (Exception ex) {
-            LogHelper.printException(() -> "Failed to initialize", ex);
+            Logger.printException(() -> "Failed to initialize", ex);
         }
     }
 
@@ -67,9 +67,9 @@ public class BrowseIdPatch {
                 return;
             }
             browseId = newlyLoadedBrowseId;
-            LogHelper.printDebug(() -> "setBrowseIdFromField: " + browseId);
+            Logger.printDebug(() -> "setBrowseIdFromField: " + browseId);
         } catch (Exception ex) {
-            LogHelper.printException(() -> "Failed to setBrowseIdFromField", ex);
+            Logger.printException(() -> "Failed to setBrowseIdFromField", ex);
         }
     }
 
@@ -91,7 +91,7 @@ public class BrowseIdPatch {
             browseId = newlyLoadedBrowseId;
             browseIdField.set(browseIdFieldReference, newlyLoadedBrowseId);
         } catch (Exception ex) {
-            LogHelper.printException(() -> "Failed to setBrowseIdToField", ex);
+            Logger.printException(() -> "Failed to setBrowseIdToField", ex);
         }
     }
 

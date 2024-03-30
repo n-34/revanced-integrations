@@ -1,6 +1,6 @@
 package app.revanced.integrations.music.patches.components;
 
-import static app.revanced.integrations.music.utils.StringRef.str;
+import static app.revanced.integrations.shared.utils.StringRef.str;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -10,28 +10,24 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import app.revanced.integrations.music.settings.SettingsEnum;
-import app.revanced.integrations.music.utils.ByteTrieSearch;
-import app.revanced.integrations.music.utils.LogHelper;
-import app.revanced.integrations.music.utils.ReVancedUtils;
-import app.revanced.integrations.music.utils.StringTrieSearch;
+import app.revanced.integrations.music.settings.Settings;
+import app.revanced.integrations.shared.patches.components.Filter;
+import app.revanced.integrations.shared.patches.components.StringFilterGroup;
+import app.revanced.integrations.shared.utils.ByteTrieSearch;
+import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.Utils;
 
 /**
  * Allows custom filtering using a path and optionally a proto buffer string.
  */
 @SuppressWarnings("unused")
-final class CustomFilter extends Filter {
+public final class CustomFilter extends Filter {
 
     private static void showInvalidSyntaxToast(@NonNull String expression) {
-        ReVancedUtils.showToastLong(str("revanced_custom_filter_toast_invalid_syntax", expression));
-    }
-
-    private static void showInvalidCharactersToast(@NonNull String expression) {
-        ReVancedUtils.showToastLong(str("revanced_custom_filter_toast_invalid_characters", expression));
+        Utils.showToastLong(str("revanced_custom_filter_toast_invalid_syntax", expression));
     }
 
     private static class CustomFilterGroup extends StringFilterGroup {
@@ -47,12 +43,12 @@ final class CustomFilter extends Filter {
         public static final String SYNTAX_BUFFER_SYMBOL = "$";
 
         /**
-         * @return the parsed objects, or NULL if there was a parse error.
+         * @return the parsed objects
          */
-        @Nullable
+        @NonNull
         @SuppressWarnings("ConstantConditions")
         static Collection<CustomFilterGroup> parseCustomFilterGroups() {
-            String rawCustomFilterText = SettingsEnum.CUSTOM_FILTER_STRINGS.getString();
+            String rawCustomFilterText = Settings.CUSTOM_FILTER_STRINGS.get();
             if (rawCustomFilterText.isBlank()) {
                 return Collections.emptyList();
             }
@@ -73,7 +69,7 @@ final class CustomFilter extends Filter {
                 Matcher matcher = pattern.matcher(expression);
                 if (!matcher.find()) {
                     showInvalidSyntaxToast(expression);
-                    return null;
+                    continue;
                 }
 
                 final String mapKey = matcher.group(1);
@@ -84,13 +80,7 @@ final class CustomFilter extends Filter {
 
                 if (path.isBlank() || (hasBufferSymbol && bufferString.isBlank())) {
                     showInvalidSyntaxToast(expression);
-                    return null;
-                }
-                if (!StringTrieSearch.isValidPattern(path)
-                        || (hasBufferSymbol && !StringTrieSearch.isValidPattern(bufferString))) {
-                    // Currently only ASCII is allowed.
-                    showInvalidCharactersToast(path);
-                    return null;
+                    continue;
                 }
 
                 // Use one group object for all expressions with the same path.
@@ -113,7 +103,7 @@ final class CustomFilter extends Filter {
         ByteTrieSearch bufferSearch;
 
         CustomFilterGroup(boolean startsWith, @NonNull String path) {
-            super(SettingsEnum.CUSTOM_FILTER, path);
+            super(Settings.CUSTOM_FILTER, path);
             this.startsWith = startsWith;
         }
 
@@ -149,31 +139,26 @@ final class CustomFilter extends Filter {
 
     public CustomFilter() {
         Collection<CustomFilterGroup> groups = CustomFilterGroup.parseCustomFilterGroups();
-        if (groups == null) {
-            SettingsEnum.CUSTOM_FILTER_STRINGS.resetToDefault();
-            ReVancedUtils.showToastLong(str("revanced_custom_filter_strings_warning"));
-            groups = Objects.requireNonNull(CustomFilterGroup.parseCustomFilterGroups());
-        }
 
         if (!groups.isEmpty()) {
             CustomFilterGroup[] groupsArray = groups.toArray(new CustomFilterGroup[0]);
-            LogHelper.printDebug(()-> "Using Custom filters: " + Arrays.toString(groupsArray));
-            this.pathFilterGroupList.addAll(groupsArray);
+            Logger.printDebug(()-> "Using Custom filters: " + Arrays.toString(groupsArray));
+            addPathCallbacks(groupsArray);
         }
     }
 
-    /** @noinspection rawtypes*/
     @Override
     public boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
-                       FilterGroupList matchedList, FilterGroup matchedGroup, int matchedIndex) {
+                              StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
         // All callbacks are custom filter groups.
         CustomFilterGroup custom = (CustomFilterGroup) matchedGroup;
-        if (custom.startsWith && matchedIndex != 0) {
+        if (custom.startsWith && contentIndex != 0) {
             return false;
         }
         if (custom.bufferSearch != null && !custom.bufferSearch.matches(protobufBufferArray)) {
             return false;
         }
-        return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedList, matchedGroup, matchedIndex);
+
+        return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
     }
 }

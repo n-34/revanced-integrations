@@ -6,8 +6,8 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
-import app.revanced.integrations.music.utils.LogHelper;
-import app.revanced.integrations.music.utils.ReVancedUtils;
+import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.Utils;
 
 /**
  * Hooking class for the current playing video.
@@ -39,7 +39,7 @@ public final class VideoInformation {
             seekMethod = playerController.getClass().getMethod(SEEK_METHOD_NAME, Long.TYPE);
             seekMethod.setAccessible(true);
         } catch (Exception ex) {
-            LogHelper.printException(() -> "Failed to initialize", ex);
+            Logger.printException(() -> "Failed to initialize", ex);
         }
     }
 
@@ -62,7 +62,7 @@ public final class VideoInformation {
         if (Objects.equals(newlyLoadedVideoId, videoId)) {
             return;
         }
-        LogHelper.printDebug(() -> "New video id: " + newlyLoadedVideoId);
+        Logger.printDebug(() -> "New video id: " + newlyLoadedVideoId);
         videoId = newlyLoadedVideoId;
     }
 
@@ -77,9 +77,9 @@ public final class VideoInformation {
      * @return if the seek was successful
      */
     public static boolean seekTo(final long millisecond) {
-        ReVancedUtils.verifyOnMainThread();
+        Utils.verifyOnMainThread();
         try {
-            LogHelper.printDebug(() -> "Seeking to " + millisecond);
+            Logger.printDebug(() -> "Seeking to " + millisecond);
             Object seekResultObject = seekMethod.invoke(playerControllerRef.get(), millisecond);
 
             if (!(seekResultObject instanceof Boolean seekResult))
@@ -87,7 +87,7 @@ public final class VideoInformation {
 
             return seekResult;
         } catch (Exception ex) {
-            LogHelper.printException(() -> "Failed to seek", ex);
+            Logger.printException(() -> "Failed to seek", ex);
             return false;
         }
     }

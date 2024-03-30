@@ -1,8 +1,8 @@
 package app.revanced.integrations.youtube.returnyoutubedislike;
 
-import static app.revanced.integrations.youtube.utils.ReVancedHelper.isSpoofingToLessThan;
-import static app.revanced.integrations.youtube.utils.ResourceHelper.getResources;
-import static app.revanced.integrations.youtube.utils.StringRef.str;
+import static app.revanced.integrations.shared.returnyoutubedislike.ReturnYouTubeDislike.Vote;
+import static app.revanced.integrations.shared.utils.StringRef.str;
+import static app.revanced.integrations.youtube.utils.ExtendedUtils.isSpoofingToLessThan;
 
 import android.content.res.Resources;
 import android.graphics.Canvas;
@@ -39,13 +39,13 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import app.revanced.integrations.youtube.returnyoutubedislike.requests.RYDVoteData;
-import app.revanced.integrations.youtube.returnyoutubedislike.requests.ReturnYouTubeDislikeApi;
-import app.revanced.integrations.youtube.settings.SettingsEnum;
+import app.revanced.integrations.shared.returnyoutubedislike.requests.RYDVoteData;
+import app.revanced.integrations.shared.returnyoutubedislike.requests.ReturnYouTubeDislikeApi;
+import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.Utils;
+import app.revanced.integrations.youtube.settings.Settings;
 import app.revanced.integrations.youtube.shared.PlayerType;
-import app.revanced.integrations.youtube.utils.LogHelper;
-import app.revanced.integrations.youtube.utils.ReVancedUtils;
-import app.revanced.integrations.youtube.utils.ThemeHelper;
+import app.revanced.integrations.youtube.utils.ThemeUtils;
 
 /**
  * Handles fetching and creation/replacing of RYD dislike text spans.
@@ -53,18 +53,6 @@ import app.revanced.integrations.youtube.utils.ThemeHelper;
  * Because Litho creates spans using multiple threads, this entire class supports multithreading as well.
  */
 public class ReturnYouTubeDislike {
-
-    public enum Vote {
-        LIKE(1),
-        DISLIKE(-1),
-        LIKE_REMOVE(0);
-
-        public final int value;
-
-        Vote(int value) {
-            this.value = value;
-        }
-    }
 
     /**
      * Maximum amount of time to block the UI from updates while waiting for network call to complete.
@@ -129,7 +117,7 @@ public class ReturnYouTubeDislike {
     public static final Locale locale;
 
     static {
-        final Resources resources = getResources();
+        final Resources resources = Utils.getResources();
         DisplayMetrics dp = resources.getDisplayMetrics();
 
         leftSeparatorBounds = new Rect(0, 0,
@@ -145,6 +133,8 @@ public class ReturnYouTubeDislike {
         leftSeparatorShape.setBounds(leftSeparatorBounds);
         // noinspection deprecation
         locale = resources.getConfiguration().locale;
+
+        ReturnYouTubeDislikeApi.toastOnConnectionError = Settings.RYD_TOAST_ON_CONNECTION_ERROR.get();
     }
 
     private final String videoId;
@@ -199,12 +189,12 @@ public class ReturnYouTubeDislike {
      */
     private static int getSeparatorColor() {
         if (IS_SPOOFING_TO_OLD_SEPARATOR_COLOR) {
-            return ThemeHelper.getDayNightTheme()
+            return ThemeUtils.isDarkTheme()
                     ? 0x29AAAAAA  // transparent dark gray
                     : 0xFFD9D9D9; // light gray
         }
 
-        return ThemeHelper.getDayNightTheme()
+        return ThemeUtils.isDarkTheme()
                 ? 0x33FFFFFF
                 : 0xFFD9D9D9;
     }
@@ -249,10 +239,10 @@ public class ReturnYouTubeDislike {
         }
 
         SpannableStringBuilder builder = new SpannableStringBuilder();
-        final boolean compactLayout = SettingsEnum.RYD_COMPACT_LAYOUT.getBoolean();
+        final boolean compactLayout = Settings.RYD_COMPACT_LAYOUT.get();
 
         if (!compactLayout) {
-            String leftSeparatorString = ReVancedUtils.isRightToLeftTextLayout()
+            String leftSeparatorString = Utils.isRightToLeftTextLayout()
                     ? "\u200F"  // u200F = right to left character
                     : "\u200E"; // u200E = left to right character
             final Spannable leftSeparatorSpan;
@@ -342,7 +332,7 @@ public class ReturnYouTubeDislike {
 
     private static SpannableString newSpannableWithDislikes(@NonNull Spanned sourceStyling, @NonNull RYDVoteData voteData) {
         return newSpanUsingStylingOfAnotherSpan(sourceStyling,
-                SettingsEnum.RYD_DISLIKE_PERCENTAGE.getBoolean()
+                Settings.RYD_DISLIKE_PERCENTAGE.get()
                         ? formatDislikePercentage(voteData.getDislikePercentage())
                         : formatDislikeCount(voteData.getDislikeCount()));
     }
@@ -392,7 +382,7 @@ public class ReturnYouTubeDislike {
             fetchCache.values().removeIf(value -> {
                 final boolean expired = value.isExpired(now);
                 if (expired)
-                    LogHelper.printDebug(() -> "Removing expired fetch: " + value.videoId);
+                    Logger.printDebug(() -> "Removing expired fetch: " + value.videoId);
                 return expired;
             });
 
@@ -419,7 +409,7 @@ public class ReturnYouTubeDislike {
     private ReturnYouTubeDislike(@NonNull String videoId) {
         this.videoId = Objects.requireNonNull(videoId);
         this.timeFetched = System.currentTimeMillis();
-        this.future = ReVancedUtils.submitOnBackgroundThread(() -> ReturnYouTubeDislikeApi.fetchVotes(videoId));
+        this.future = Utils.submitOnBackgroundThread(() -> ReturnYouTubeDislikeApi.fetchVotes(videoId));
     }
 
     private boolean isExpired(long now) {
@@ -439,9 +429,9 @@ public class ReturnYouTubeDislike {
         try {
             return future.get(maxTimeToWait, TimeUnit.MILLISECONDS);
         } catch (TimeoutException ex) {
-            LogHelper.printDebug(() -> "Waited but future was not complete after: " + maxTimeToWait + "ms");
+            Logger.printDebug(() -> "Waited but future was not complete after: " + maxTimeToWait + "ms");
         } catch (ExecutionException | InterruptedException ex) {
-            LogHelper.printException(() -> "Future failure ", ex); // will never happen
+            Logger.printException(() -> "Future failure ", ex); // will never happen
         }
         return null;
     }
@@ -455,9 +445,31 @@ public class ReturnYouTubeDislike {
 
     private synchronized void clearUICache() {
         if (replacementLikeDislikeSpan != null) {
-            LogHelper.printDebug(() -> "Clearing replacement span for: " + videoId);
+            Logger.printDebug(() -> "Clearing replacement span for: " + videoId);
         }
         replacementLikeDislikeSpan = null;
+    }
+
+    /**
+     * Must call off main thread, as this will make a network call if user is not yet registered.
+     *
+     * @return ReturnYouTubeDislike user ID. If user registration has never happened
+     * and the network call fails, this returns NULL.
+     */
+    @Nullable
+    private static String getUserId() {
+        Utils.verifyOffMainThread();
+
+        String userId = Settings.RYD_USER_ID.get();
+        if (!userId.isEmpty()) {
+            return userId;
+        }
+
+        userId = ReturnYouTubeDislikeApi.registerAsNewUser();
+        if (userId != null) {
+            Settings.RYD_USER_ID.save(userId);
+        }
+        return userId;
     }
 
     @NonNull
@@ -498,7 +510,7 @@ public class ReturnYouTubeDislike {
         try {
             RYDVoteData votingData = getFetchData(MAX_MILLISECONDS_TO_BLOCK_UI_WAITING_FOR_FETCH);
             if (votingData == null) {
-                LogHelper.printDebug(() -> "Cannot add dislike to UI (RYD data not available)");
+                Logger.printDebug(() -> "Cannot add dislike to UI (RYD data not available)");
                 return original;
             }
 
@@ -516,7 +528,7 @@ public class ReturnYouTubeDislike {
                     // 2. opened a short (without closing the regular video)
                     // 3. closed the short
                     // 4. regular video is now present, but the videoId and RYD data is still for the short
-                    LogHelper.printDebug(() -> "Ignoring regular video dislike span,"
+                    Logger.printDebug(() -> "Ignoring regular video dislike span,"
                             + " as data loaded was previously used for a Short: " + videoId);
                     return original;
                 }
@@ -528,17 +540,17 @@ public class ReturnYouTubeDislike {
                 // 3. click video's title to open the video description
                 // 4. dislike count may be replaced in the like count area or view count area of the video description
                 if (PlayerType.getCurrent().isFullScreenOrSlidingFullScreen()) {
-                    LogHelper.printDebug(() -> "Ignoring fullscreen video description panel: " + videoId);
+                    Logger.printDebug(() -> "Ignoring fullscreen video description panel: " + videoId);
                     return original;
                 }
 
                 if (originalDislikeSpan != null && replacementLikeDislikeSpan != null) {
                     if (spansHaveEqualTextAndColor(original, replacementLikeDislikeSpan)) {
-                        LogHelper.printDebug(() -> "Ignoring previously created dislikes span of data: " + videoId);
+                        Logger.printDebug(() -> "Ignoring previously created dislikes span of data: " + videoId);
                         return original;
                     }
                     if (spansHaveEqualTextAndColor(original, originalDislikeSpan)) {
-                        LogHelper.printDebug(() -> "Replacing span with previously created dislike span of data: " + videoId);
+                        Logger.printDebug(() -> "Replacing span with previously created dislike span of data: " + videoId);
                         return replacementLikeDislikeSpan;
                     }
                 }
@@ -546,7 +558,7 @@ public class ReturnYouTubeDislike {
                     // need to recreate using original, as original has prior outdated dislike values
                     if (originalDislikeSpan == null) {
                         // Should never happen.
-                        LogHelper.printDebug(() -> "Cannot add dislikes - original span is null. videoId: " + videoId);
+                        Logger.printDebug(() -> "Cannot add dislikes - original span is null. videoId: " + videoId);
                         return original;
                     }
                     original = originalDislikeSpan;
@@ -559,19 +571,19 @@ public class ReturnYouTubeDislike {
                 }
                 originalDislikeSpan = original;
                 replacementLikeDislikeSpan = createDislikeSpan(original, isSegmentedButton, isRollingNumber, votingData);
-                LogHelper.printDebug(() -> "Replaced: '" + originalDislikeSpan + "' with: '"
+                Logger.printDebug(() -> "Replaced: '" + originalDislikeSpan + "' with: '"
                         + replacementLikeDislikeSpan + "'" + " using video: " + videoId);
 
                 return replacementLikeDislikeSpan;
             }
         } catch (Exception e) {
-            LogHelper.printException(() -> "waitForFetchAndUpdateReplacementSpan failure", e); // should never happen
+            Logger.printException(() -> "waitForFetchAndUpdateReplacementSpan failure", e); // should never happen
         }
         return original;
     }
 
     public void sendVote(@NonNull Vote vote) {
-        ReVancedUtils.verifyOnMainThread();
+        Utils.verifyOnMainThread();
         Objects.requireNonNull(vote);
         try {
             if (isShort != PlayerType.getCurrent().isNoneOrHidden()) {
@@ -585,13 +597,13 @@ public class ReturnYouTubeDislike {
 
             voteSerialExecutor.execute(() -> {
                 try { // Must wrap in try/catch to properly log exceptions.
-                    ReturnYouTubeDislikeApi.sendVote(videoId, vote);
+                    ReturnYouTubeDislikeApi.sendVote(getUserId(), videoId, vote);
                 } catch (Exception ex) {
-                    LogHelper.printException(() -> "Failed to send vote", ex);
+                    Logger.printException(() -> "Failed to send vote", ex);
                 }
             });
         } catch (Exception ex) {
-            LogHelper.printException(() -> "Error trying to send vote", ex);
+            Logger.printException(() -> "Error trying to send vote", ex);
         }
     }
 
@@ -603,7 +615,7 @@ public class ReturnYouTubeDislike {
     public void setUserVote(@NonNull Vote vote) {
         Objects.requireNonNull(vote);
         try {
-            LogHelper.printDebug(() -> "setUserVote: " + vote);
+            Logger.printDebug(() -> "setUserVote: " + vote);
 
             synchronized (this) {
                 userVote = vote;
@@ -615,14 +627,14 @@ public class ReturnYouTubeDislike {
                 RYDVoteData voteData = getFetchData(MAX_MILLISECONDS_TO_BLOCK_UI_WAITING_FOR_FETCH);
                 if (voteData == null) {
                     // RYD fetch failed.
-                    LogHelper.printDebug(() -> "Cannot update UI (vote data not available)");
+                    Logger.printDebug(() -> "Cannot update UI (vote data not available)");
                     return;
                 }
                 voteData.updateUsingVote(vote);
             } // Else, vote will be applied after fetch completes.
 
         } catch (Exception ex) {
-            LogHelper.printException(() -> "setUserVote failure", ex);
+            Logger.printException(() -> "setUserVote failure", ex);
         }
     }
 }

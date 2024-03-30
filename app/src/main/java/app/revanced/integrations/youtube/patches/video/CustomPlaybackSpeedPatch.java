@@ -1,6 +1,6 @@
 package app.revanced.integrations.youtube.patches.video;
 
-import static app.revanced.integrations.youtube.utils.StringRef.str;
+import static app.revanced.integrations.shared.utils.StringRef.str;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -11,11 +11,11 @@ import androidx.annotation.NonNull;
 
 import java.util.Arrays;
 
+import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.patches.components.PlaybackSpeedMenuFilter;
-import app.revanced.integrations.youtube.settings.SettingsEnum;
-import app.revanced.integrations.youtube.utils.LogHelper;
-import app.revanced.integrations.youtube.utils.ReVancedUtils;
-import app.revanced.integrations.youtube.utils.VideoHelpers;
+import app.revanced.integrations.youtube.settings.Settings;
+import app.revanced.integrations.youtube.utils.VideoUtils;
 
 @SuppressWarnings("unused")
 public class CustomPlaybackSpeedPatch {
@@ -53,15 +53,15 @@ public class CustomPlaybackSpeedPatch {
     }
 
     private static void resetCustomSpeeds(@NonNull String toastMessage) {
-        ReVancedUtils.showToastLong(toastMessage);
-        SettingsEnum.CUSTOM_PLAYBACK_SPEEDS.resetToDefault();
+        Utils.showToastLong(toastMessage);
+        Settings.CUSTOM_PLAYBACK_SPEEDS.resetToDefault();
     }
 
     private static void loadSpeeds() {
         try {
             if (!isCustomPlaybackSpeedEnabled()) return;
 
-            String[] speedStrings = SettingsEnum.CUSTOM_PLAYBACK_SPEEDS.getString().split("\\s+");
+            String[] speedStrings = Settings.CUSTOM_PLAYBACK_SPEEDS.get().split("\\s+");
             Arrays.sort(speedStrings);
             if (speedStrings.length == 0) {
                 throw new IllegalArgumentException();
@@ -97,7 +97,7 @@ public class CustomPlaybackSpeedPatch {
                 i++;
             }
         } catch (Exception ex) {
-            LogHelper.printInfo(() -> "parse error", ex);
+            Logger.printInfo(() -> "parse error", ex);
             resetCustomSpeeds(str("revanced_custom_playback_speeds_invalid"));
             loadSpeeds();
         }
@@ -123,11 +123,11 @@ public class CustomPlaybackSpeedPatch {
     }
 
     private static boolean isCustomPlaybackSpeedEnabled() {
-        return SettingsEnum.ENABLE_CUSTOM_PLAYBACK_SPEED.getBoolean();
+        return Settings.ENABLE_CUSTOM_PLAYBACK_SPEED.get();
     }
 
     public static void onFlyoutMenuCreate(final RecyclerView recyclerView) {
-        if (!SettingsEnum.ENABLE_CUSTOM_PLAYBACK_SPEED.getBoolean())
+        if (!Settings.ENABLE_CUSTOM_PLAYBACK_SPEED.get())
             return;
 
         recyclerView.getViewTreeObserver().addOnDrawListener(() -> {
@@ -166,12 +166,12 @@ public class CustomPlaybackSpeedPatch {
                 // It works without issues for both tablet and phone layouts,
                 // So no code is needed to check whether the current device is a tablet or phone.
                 // If YouTube makes changes on the server side in the future,
-                // So we need to check the tablet layout and phone layout, use [ReVancedHelper.isTablet()].
+                // So we need to check the tablet layout and phone layout, use [ExtendedUtils.isTablet()].
 
                 // Show custom playback speed menu.
                 showCustomPlaybackSpeedMenu(recyclerView.getContext());
             } catch (Exception ex) {
-                LogHelper.printException(() -> "onFlyoutMenuCreate failure", ex);
+                Logger.printException(() -> "onFlyoutMenuCreate failure", ex);
             }
         });
     }
@@ -190,9 +190,9 @@ public class CustomPlaybackSpeedPatch {
             return;
         lastTimeUsed = currentTime;
 
-        if (SettingsEnum.CUSTOM_PLAYBACK_SPEED_PANEL_TYPE.getBoolean()) {
+        if (Settings.CUSTOM_PLAYBACK_SPEED_PANEL_TYPE.get()) {
             // Open playback speed dialog
-            VideoHelpers.playbackSpeedDialogListener(context);
+            VideoUtils.playbackSpeedDialogListener(context);
         } else {
             // Open old style flyout panel
             showOldPlaybackSpeedMenu();
@@ -200,7 +200,7 @@ public class CustomPlaybackSpeedPatch {
     }
 
     private static void showOldPlaybackSpeedMenu() {
-        SettingsEnum.ENABLE_CUSTOM_PLAYBACK_SPEED.getBoolean();
+        Settings.ENABLE_CUSTOM_PLAYBACK_SPEED.get();
         // Rest of the implementation added by patch.
     }
 

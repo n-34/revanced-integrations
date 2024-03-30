@@ -1,9 +1,9 @@
 package app.revanced.integrations.music.patches.video;
 
-import static app.revanced.integrations.music.utils.ReVancedUtils.showToastShort;
-import static app.revanced.integrations.music.utils.StringRef.str;
+import static app.revanced.integrations.shared.utils.StringRef.str;
+import static app.revanced.integrations.shared.utils.Utils.showToastShort;
 
-import app.revanced.integrations.music.settings.SettingsEnum;
+import app.revanced.integrations.music.settings.Settings;
 
 @SuppressWarnings("unused")
 public class PlaybackSpeedPatch {
@@ -11,7 +11,7 @@ public class PlaybackSpeedPatch {
 
     public static float getPlaybackSpeed() {
         try {
-            return SettingsEnum.DEFAULT_PLAYBACK_SPEED.getFloat();
+            return Settings.DEFAULT_PLAYBACK_SPEED.get();
         } catch (Exception ignored) {
         }
         return selectedSpeed;
@@ -19,17 +19,17 @@ public class PlaybackSpeedPatch {
 
     /** @noinspection ResultOfMethodCallIgnored*/
     public static void showPlaybackSpeedMenu() {
-        SettingsEnum.REPLACE_FLYOUT_PANEL_REPORT.getBoolean();
+        Settings.REPLACE_FLYOUT_PANEL_REPORT.get();
         // Rest of the implementation added by patch.
     }
 
     public static void userChangedSpeed(final float speed) {
         selectedSpeed = speed;
 
-        if (!SettingsEnum.ENABLE_SAVE_PLAYBACK_SPEED.getBoolean())
+        if (!Settings.ENABLE_SAVE_PLAYBACK_SPEED.get())
             return;
 
-        SettingsEnum.DEFAULT_PLAYBACK_SPEED.saveValue(speed);
+        Settings.DEFAULT_PLAYBACK_SPEED.save(speed);
         showToastShort(str("revanced_save_playback_speed", speed + "x"));
     }
 }

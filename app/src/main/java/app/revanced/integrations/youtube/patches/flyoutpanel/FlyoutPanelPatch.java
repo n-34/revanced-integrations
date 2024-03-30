@@ -6,31 +6,31 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.ResourceUtils;
+import app.revanced.integrations.shared.utils.StringRef;
+import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.patches.components.VideoQualityMenuFilter;
-import app.revanced.integrations.youtube.settings.SettingsEnum;
-import app.revanced.integrations.youtube.utils.LogHelper;
-import app.revanced.integrations.youtube.utils.ResourceUtils;
-import app.revanced.integrations.youtube.utils.ReVancedUtils;
-import app.revanced.integrations.youtube.utils.StringRef;
+import app.revanced.integrations.youtube.settings.Settings;
 
 @SuppressWarnings("unused")
 public class FlyoutPanelPatch {
 
     public static boolean changeSwitchToggle(boolean original) {
-        return !SettingsEnum.CHANGE_PLAYER_FLYOUT_PANEL_TOGGLE.getBoolean() && original;
+        return !Settings.CHANGE_PLAYER_FLYOUT_PANEL_TOGGLE.get() && original;
     }
 
     public static boolean enableOldQualityMenu() {
-        return SettingsEnum.ENABLE_OLD_QUALITY_LAYOUT.getBoolean();
+        return Settings.ENABLE_OLD_QUALITY_LAYOUT.get();
     }
 
     public static void enableOldQualityMenu(ListView listView) {
-        if (!SettingsEnum.ENABLE_OLD_QUALITY_LAYOUT.getBoolean())
+        if (!Settings.ENABLE_OLD_QUALITY_LAYOUT.get())
             return;
 
         listView.setVisibility(View.GONE);
 
-        ReVancedUtils.runOnMainThreadDelayed(() -> {
+        Utils.runOnMainThreadDelayed(() -> {
                     listView.setSoundEffectsEnabled(false);
                     listView.performItemClick(null, 2, 0);
                 },
@@ -55,10 +55,10 @@ public class FlyoutPanelPatch {
      * @param charSequence raw text
      */
     public static CharSequence hideFeedFlyoutPanel(CharSequence charSequence) {
-        if (charSequence == null || !SettingsEnum.HIDE_FEED_FLYOUT_PANEL.getBoolean())
+        if (charSequence == null || !Settings.HIDE_FEED_FLYOUT_PANEL.get())
             return charSequence;
 
-        String[] blockList = SettingsEnum.HIDE_FEED_FLYOUT_PANEL_FILTER_STRINGS.getString().split("\\n");
+        String[] blockList = Settings.HIDE_FEED_FLYOUT_PANEL_FILTER_STRINGS.get().split("\\n");
         String targetString = charSequence.toString();
 
         for (String filter : blockList) {
@@ -76,37 +76,37 @@ public class FlyoutPanelPatch {
      * @param charSequence raw text
      */
     public static void hideFeedFlyoutPanel(TextView textView, CharSequence charSequence) {
-        if (charSequence == null || !SettingsEnum.HIDE_FEED_FLYOUT_PANEL.getBoolean())
+        if (charSequence == null || !Settings.HIDE_FEED_FLYOUT_PANEL.get())
             return;
 
         if (textView.getParent() == null || !(textView.getParent() instanceof View parentView))
             return;
 
-        String[] blockList = SettingsEnum.HIDE_FEED_FLYOUT_PANEL_FILTER_STRINGS.getString().split("\\n");
+        String[] blockList = Settings.HIDE_FEED_FLYOUT_PANEL_FILTER_STRINGS.get().split("\\n");
         String targetString = charSequence.toString();
 
         for (String filter : blockList) {
             if (targetString.equals(filter) && !filter.isEmpty())
-                ReVancedUtils.hideViewByLayoutParams(parentView);
+                Utils.hideViewByLayoutParams(parentView);
         }
     }
 
     public static void hideFooterCaptions(View view) {
-        ReVancedUtils.hideViewUnderCondition(
-                SettingsEnum.HIDE_PLAYER_FLYOUT_PANEL_CAPTIONS_FOOTER.getBoolean(),
+        Utils.hideViewUnderCondition(
+                Settings.HIDE_PLAYER_FLYOUT_PANEL_CAPTIONS_FOOTER.get(),
                 view
         );
     }
 
     public static void hideFooterQuality(View view) {
-        ReVancedUtils.hideViewUnderCondition(
-                SettingsEnum.HIDE_PLAYER_FLYOUT_PANEL_QUALITY_FOOTER.getBoolean(),
+        Utils.hideViewUnderCondition(
+                Settings.HIDE_PLAYER_FLYOUT_PANEL_QUALITY_FOOTER.get(),
                 view
         );
     }
 
     public static void onFlyoutMenuCreate(final RecyclerView recyclerView) {
-        if (!SettingsEnum.ENABLE_OLD_QUALITY_LAYOUT.getBoolean())
+        if (!Settings.ENABLE_OLD_QUALITY_LAYOUT.get())
             return;
 
         recyclerView.getViewTreeObserver().addOnDrawListener(() -> {
@@ -128,7 +128,7 @@ public class FlyoutPanelPatch {
                     VideoQualityMenuFilter.isVideoQualityMenuVisible = false;
                 }
             } catch (Exception ex) {
-                LogHelper.printException(() -> "onFlyoutMenuCreate failure", ex);
+                Logger.printException(() -> "onFlyoutMenuCreate failure", ex);
             }
         });
     }

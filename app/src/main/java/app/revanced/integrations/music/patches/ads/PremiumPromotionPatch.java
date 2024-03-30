@@ -5,14 +5,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import app.revanced.integrations.music.settings.SettingsEnum;
-import app.revanced.integrations.music.utils.LogHelper;
+import app.revanced.integrations.music.settings.Settings;
+import app.revanced.integrations.shared.utils.Logger;
 
 @SuppressWarnings("unused")
 public class PremiumPromotionPatch {
 
     public static void hidePremiumPromotion(View view) {
-        if (!SettingsEnum.HIDE_PREMIUM_PROMOTION.getBoolean())
+        if (!Settings.HIDE_PREMIUM_PROMOTION.get())
             return;
 
         view.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
@@ -33,7 +33,7 @@ public class PremiumPromotionPatch {
                     view.setVisibility(View.GONE);
                 }
             } catch (Exception ex) {
-                LogHelper.printException(() -> "hideGetPremium failure", ex);
+                Logger.printException(() -> "hideGetPremium failure", ex);
             }
         });
     }

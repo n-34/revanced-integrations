@@ -1,7 +1,7 @@
 package app.revanced.integrations.youtube.shared
 
-import app.revanced.integrations.youtube.utils.Event
-import app.revanced.integrations.youtube.utils.LogHelper
+import app.revanced.integrations.shared.utils.Event
+import app.revanced.integrations.shared.utils.Logger
 
 /**
  * WatchWhile player type
@@ -53,9 +53,9 @@ enum class PlayerType {
         fun setFromString(enumName: String) {
             val newType = nameToPlayerType[enumName]
             if (newType == null) {
-                LogHelper.printException { "Unknown PlayerType encountered: $enumName" }
+                Logger.printException { "Unknown PlayerType encountered: $enumName" }
             } else if (current != newType) {
-                LogHelper.printDebug { "PlayerType changed to: $newType" }
+                Logger.printDebug { "PlayerType changed to: $newType" }
                 current = newType
             }
         }

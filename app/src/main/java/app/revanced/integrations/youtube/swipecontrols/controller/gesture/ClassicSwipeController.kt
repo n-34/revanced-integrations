@@ -1,7 +1,7 @@
 package app.revanced.integrations.youtube.swipecontrols.controller.gesture
 
 import android.view.MotionEvent
-import app.revanced.integrations.youtube.settings.SettingsEnum
+import app.revanced.integrations.youtube.settings.Settings
 import app.revanced.integrations.youtube.shared.LockModeState
 import app.revanced.integrations.youtube.shared.PlayerControlsVisibilityObserver
 import app.revanced.integrations.youtube.shared.PlayerControlsVisibilityObserverImpl
@@ -95,7 +95,7 @@ class ClassicSwipeController(
         distanceY: Double
     ): Boolean {
         // cancel if locked
-        if (!SettingsEnum.SWIPE_LOCK_MODE.boolean && LockModeState.current.isLocked())
+        if (!Settings.SWIPE_LOCK_MODE.get() && LockModeState.current.isLocked())
             return false
         // cancel if not vertical
         if (currentSwipe != SwipeDetector.SwipeDirection.VERTICAL)

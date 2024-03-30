@@ -1,22 +1,24 @@
 package app.revanced.integrations.youtube.patches.components;
 
-import app.revanced.integrations.youtube.settings.SettingsEnum;
-import app.revanced.integrations.youtube.utils.StringTrieSearch;
+import app.revanced.integrations.shared.patches.components.ByteArrayFilterGroup;
+import app.revanced.integrations.shared.patches.components.Filter;
+import app.revanced.integrations.shared.utils.StringTrieSearch;
+import app.revanced.integrations.youtube.settings.Settings;
 
 @SuppressWarnings("unused")
 public final class MixPlaylistsFilter extends Filter {
 
     private static final StringTrieSearch exceptions = new StringTrieSearch();
     private static final StringTrieSearch mixPlaylistsExceptions = new StringTrieSearch();
-    private static final ByteArrayAsStringFilterGroup mixPlaylistsExceptions2 =
-            new ByteArrayAsStringFilterGroup(
+    private static final ByteArrayFilterGroup mixPlaylistsExceptions2 =
+            new ByteArrayFilterGroup(
                     null,
                     "cell_description_body"
             );
 
-    private static final ByteArrayAsStringFilterGroup mixPlaylists =
-            new ByteArrayAsStringFilterGroup(
-                    SettingsEnum.HIDE_MIX_PLAYLISTS,
+    private static final ByteArrayFilterGroup mixPlaylists =
+            new ByteArrayFilterGroup(
+                    Settings.HIDE_MIX_PLAYLISTS,
                     "&list="
             );
 

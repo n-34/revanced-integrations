@@ -1,14 +1,14 @@
 package app.revanced.integrations.youtube.patches.misc;
 
-import app.revanced.integrations.youtube.settings.SettingsEnum;
+import app.revanced.integrations.youtube.settings.Settings;
 
 @SuppressWarnings("unused")
 public class SpoofAppVersionPatch {
 
     public static String getVersionOverride(String appVersion) {
-        if (!SettingsEnum.SPOOF_APP_VERSION.getBoolean())
+        if (!Settings.SPOOF_APP_VERSION.get())
             return appVersion;
 
-        return SettingsEnum.SPOOF_APP_VERSION_TARGET.getString();
+        return Settings.SPOOF_APP_VERSION_TARGET.get();
     }
 }

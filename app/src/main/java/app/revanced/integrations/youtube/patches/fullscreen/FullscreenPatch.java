@@ -1,6 +1,6 @@
 package app.revanced.integrations.youtube.patches.fullscreen;
 
-import static app.revanced.integrations.youtube.utils.StringRef.str;
+import static app.revanced.integrations.shared.utils.StringRef.str;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -10,72 +10,72 @@ import android.widget.FrameLayout;
 
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
-import app.revanced.integrations.youtube.settings.SettingsEnum;
-import app.revanced.integrations.youtube.utils.ReVancedUtils;
+import app.revanced.integrations.shared.utils.Utils;
+import app.revanced.integrations.youtube.settings.Settings;
 
 @SuppressWarnings("unused")
 public class FullscreenPatch {
-    private static final int DEFAULT_MARGIN_TOP = (int) SettingsEnum.QUICK_ACTIONS_MARGIN_TOP.defaultValue;
+    private static final int DEFAULT_MARGIN_TOP = (int) Settings.QUICK_ACTIONS_MARGIN_TOP.defaultValue;
     @SuppressLint("StaticFieldLeak")
     public static Activity watchDescriptorActivity;
     private static boolean isLandScapeVideo = true;
     private static volatile boolean isScreenOn;
 
     public static boolean disableAmbientMode() {
-        return !SettingsEnum.DISABLE_AMBIENT_MODE_IN_FULLSCREEN.getBoolean();
+        return !Settings.DISABLE_AMBIENT_MODE_IN_FULLSCREEN.get();
     }
 
     public static boolean disableLandScapeMode(boolean original) {
-        return SettingsEnum.DISABLE_LANDSCAPE_MODE.getBoolean() || original;
+        return Settings.DISABLE_LANDSCAPE_MODE.get() || original;
     }
 
     public static boolean enableCompactControlsOverlay(boolean original) {
-        return SettingsEnum.ENABLE_COMPACT_CONTROLS_OVERLAY.getBoolean() || original;
+        return Settings.ENABLE_COMPACT_CONTROLS_OVERLAY.get() || original;
     }
 
     public static boolean forceFullscreen(boolean original) {
-        if (!SettingsEnum.FORCE_FULLSCREEN.getBoolean())
+        if (!Settings.FORCE_FULLSCREEN.get())
             return original;
 
-        ReVancedUtils.runOnMainThreadDelayed(FullscreenPatch::setOrientation, 1000);
+        Utils.runOnMainThreadDelayed(FullscreenPatch::setOrientation, 1000);
         return true;
     }
 
     public static boolean keepFullscreen(boolean original) {
-        if (!SettingsEnum.KEEP_LANDSCAPE_MODE.getBoolean())
+        if (!Settings.KEEP_LANDSCAPE_MODE.get())
             return original;
 
         return isScreenOn;
     }
 
     public static void setScreenStatus() {
-        if (!SettingsEnum.KEEP_LANDSCAPE_MODE.getBoolean())
+        if (!Settings.KEEP_LANDSCAPE_MODE.get())
             return;
 
         isScreenOn = true;
-        ReVancedUtils.runOnMainThreadDelayed(() -> isScreenOn = false, SettingsEnum.KEEP_LANDSCAPE_MODE_TIMEOUT.getLong());
+        Utils.runOnMainThreadDelayed(() -> isScreenOn = false, Settings.KEEP_LANDSCAPE_MODE_TIMEOUT.get());
     }
 
     public static boolean hideAutoPlayPreview() {
-        return SettingsEnum.HIDE_AUTOPLAY_PREVIEW.getBoolean() || SettingsEnum.HIDE_AUTOPLAY_BUTTON.getBoolean();
+        return Settings.HIDE_AUTOPLAY_PREVIEW.get() || Settings.HIDE_AUTOPLAY_BUTTON.get();
     }
 
     public static boolean hideEndScreenOverlay() {
-        return SettingsEnum.HIDE_END_SCREEN_OVERLAY.getBoolean();
+        return Settings.HIDE_END_SCREEN_OVERLAY.get();
     }
 
     public static int hideFullscreenPanels() {
-        return SettingsEnum.HIDE_FULLSCREEN_PANELS.getBoolean() ? 8 : 0;
+        return Settings.HIDE_FULLSCREEN_PANELS.get() ? 8 : 0;
     }
 
     public static void hideFullscreenPanels(CoordinatorLayout coordinatorLayout) {
-        if (!SettingsEnum.HIDE_FULLSCREEN_PANELS.getBoolean()) return;
+        if (!Settings.HIDE_FULLSCREEN_PANELS.get()) return;
         coordinatorLayout.setVisibility(View.GONE);
     }
 
     public static void hideQuickActions(View view) {
-        ReVancedUtils.hideViewBy0dpUnderCondition(
-                SettingsEnum.HIDE_FULLSCREEN_PANELS.getBoolean() || SettingsEnum.HIDE_QUICK_ACTIONS.getBoolean(),
+        Utils.hideViewBy0dpUnderCondition(
+                Settings.HIDE_FULLSCREEN_PANELS.get() || Settings.HIDE_QUICK_ACTIONS.get(),
                 view
         );
     }
@@ -89,11 +89,11 @@ public class FullscreenPatch {
     }
 
     public static void setQuickActionMargin(FrameLayout frameLayout) {
-        int marginTop = SettingsEnum.QUICK_ACTIONS_MARGIN_TOP.getInt();
+        int marginTop = Settings.QUICK_ACTIONS_MARGIN_TOP.get();
 
         if (marginTop < 0 || marginTop > 64) {
-            ReVancedUtils.showToastShort(str("revanced_quick_actions_margin_top_warning"));
-            SettingsEnum.QUICK_ACTIONS_MARGIN_TOP.saveValue(DEFAULT_MARGIN_TOP);
+            Utils.showToastShort(str("revanced_quick_actions_margin_top_warning"));
+            Settings.QUICK_ACTIONS_MARGIN_TOP.save(DEFAULT_MARGIN_TOP);
             marginTop = DEFAULT_MARGIN_TOP;
         }
 
@@ -109,13 +109,13 @@ public class FullscreenPatch {
     }
 
     public static void setVideoPortrait(int width, int height) {
-        if (!SettingsEnum.FORCE_FULLSCREEN.getBoolean())
+        if (!Settings.FORCE_FULLSCREEN.get())
             return;
 
         isLandScapeVideo = width > height;
     }
 
     public static boolean showFullscreenTitle() {
-        return SettingsEnum.SHOW_FULLSCREEN_TITLE.getBoolean() || !SettingsEnum.HIDE_FULLSCREEN_PANELS.getBoolean();
+        return Settings.SHOW_FULLSCREEN_TITLE.get() || !Settings.HIDE_FULLSCREEN_PANELS.get();
     }
 }

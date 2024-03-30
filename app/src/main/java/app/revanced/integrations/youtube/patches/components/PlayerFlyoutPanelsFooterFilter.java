@@ -2,14 +2,13 @@ package app.revanced.integrations.youtube.patches.components;
 
 import androidx.annotation.Nullable;
 
-import app.revanced.integrations.youtube.settings.SettingsEnum;
-import app.revanced.integrations.youtube.utils.StringTrieSearch;
+import app.revanced.integrations.shared.patches.components.Filter;
+import app.revanced.integrations.shared.patches.components.StringFilterGroup;
+import app.revanced.integrations.shared.utils.StringTrieSearch;
+import app.revanced.integrations.youtube.settings.Settings;
 
-/**
- * @noinspection rawtypes
- */
 @SuppressWarnings("unused")
-final class PlayerFlyoutPanelsFooterFilter extends Filter {
+public final class PlayerFlyoutPanelsFooterFilter extends Filter {
 
     private final StringTrieSearch exceptions = new StringTrieSearch();
     private final StringTrieSearch targetPath = new StringTrieSearch();
@@ -24,14 +23,14 @@ final class PlayerFlyoutPanelsFooterFilter extends Filter {
                 "quality_sheet_content.eml"
         );
 
-        pathFilterGroupList.addAll(
+        addPathCallbacks(
                 new StringFilterGroup(
-                        SettingsEnum.HIDE_PLAYER_FLYOUT_PANEL_QUALITY_FOOTER,
+                        Settings.HIDE_PLAYER_FLYOUT_PANEL_QUALITY_FOOTER,
                         "quality_sheet_footer.eml",
                         "|divider.eml|"
                 ),
                 new StringFilterGroup(
-                        SettingsEnum.HIDE_PLAYER_FLYOUT_PANEL_CAPTIONS_FOOTER,
+                        Settings.HIDE_PLAYER_FLYOUT_PANEL_CAPTIONS_FOOTER,
                         "|ContainerType|ContainerType|ContainerType|TextType|",
                         "|divider.eml|"
                 )
@@ -39,11 +38,11 @@ final class PlayerFlyoutPanelsFooterFilter extends Filter {
     }
 
     @Override
-    boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
-                       FilterGroupList matchedList, FilterGroup matchedGroup, int matchedIndex) {
+    public boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
+                       StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
         if (exceptions.matches(path) || !targetPath.matches(path))
             return false;
 
-        return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedList, matchedGroup, matchedIndex);
+        return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
     }
 }

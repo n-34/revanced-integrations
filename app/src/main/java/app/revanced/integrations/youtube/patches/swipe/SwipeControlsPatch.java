@@ -3,15 +3,16 @@ package app.revanced.integrations.youtube.patches.swipe;
 import android.annotation.SuppressLint;
 import android.view.View;
 
-import app.revanced.integrations.youtube.settings.SettingsEnum;
+import app.revanced.integrations.youtube.settings.Settings;
 
 @SuppressWarnings("unused")
 public class SwipeControlsPatch {
     @SuppressLint("StaticFieldLeak")
     public static View engagementOverlay;
 
+    /** @noinspection deprecation*/
     public static boolean disableHDRAutoBrightness() {
-        return SettingsEnum.DISABLE_HDR_AUTO_BRIGHTNESS.getBoolean();
+        return Settings.DISABLE_HDR_AUTO_BRIGHTNESS.get();
     }
 
     public static boolean isEngagementOverlayVisible() {

@@ -1,7 +1,7 @@
 package app.revanced.integrations.youtube.patches.video;
 
-import static app.revanced.integrations.youtube.utils.StringRef.str;
-import static app.revanced.integrations.youtube.utils.VideoHelpers.getCurrentQuality;
+import static app.revanced.integrations.shared.utils.StringRef.str;
+import static app.revanced.integrations.youtube.utils.VideoUtils.getCurrentQuality;
 
 import androidx.annotation.Nullable;
 
@@ -9,14 +9,15 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import app.revanced.integrations.youtube.settings.SettingsEnum;
-import app.revanced.integrations.youtube.utils.LogHelper;
-import app.revanced.integrations.youtube.utils.ReVancedUtils;
+import app.revanced.integrations.shared.settings.IntegerSetting;
+import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.Utils;
+import app.revanced.integrations.youtube.settings.Settings;
 
 @SuppressWarnings("unused")
 public class VideoQualityPatch {
-    private static final SettingsEnum mobileQualitySetting = SettingsEnum.DEFAULT_VIDEO_QUALITY_MOBILE;
-    private static final SettingsEnum wifiQualitySetting = SettingsEnum.DEFAULT_VIDEO_QUALITY_WIFI;
+    private static final IntegerSetting mobileQualitySetting = Settings.DEFAULT_VIDEO_QUALITY_MOBILE;
+    private static final IntegerSetting wifiQualitySetting = Settings.DEFAULT_VIDEO_QUALITY_WIFI;
 
     /**
      * The available qualities of the current video in human readable form: [1080, 720, 480]
@@ -25,25 +26,25 @@ public class VideoQualityPatch {
     private static List<Integer> videoQualities;
 
     private static void changeDefaultQuality(final int defaultQuality) {
-        if (!SettingsEnum.ENABLE_SAVE_VIDEO_QUALITY.getBoolean())
+        if (!Settings.ENABLE_SAVE_VIDEO_QUALITY.get())
             return;
 
-        final ReVancedUtils.NetworkType networkType = ReVancedUtils.getNetworkType();
+        final Utils.NetworkType networkType = Utils.getNetworkType();
 
         switch (networkType) {
             case NONE -> {
-                ReVancedUtils.showToastShort(str("revanced_save_video_quality_none"));
+                Utils.showToastShort(str("revanced_save_video_quality_none"));
                 return;
             }
-            case MOBILE -> mobileQualitySetting.saveValue(defaultQuality);
-            default -> wifiQualitySetting.saveValue(defaultQuality);
+            case MOBILE -> mobileQualitySetting.save(defaultQuality);
+            default -> wifiQualitySetting.save(defaultQuality);
         }
 
-        ReVancedUtils.showToastShort(str("revanced_save_video_quality_" + networkType.getName(), defaultQuality + "p"));
+        Utils.showToastShort(str("revanced_save_video_quality_" + networkType.getName(), defaultQuality + "p"));
     }
 
     public static void overrideQuality(final int qualityValue) {
-        LogHelper.printDebug(() -> "Quality changed to: " + qualityValue);
+        Logger.printDebug(() -> "Quality changed to: " + qualityValue);
         // Rest of the implementation added by patch.
     }
 
@@ -64,10 +65,10 @@ public class VideoQualityPatch {
                         }
                     }
                 }
-                LogHelper.printDebug(() -> "videoQualities: " + videoQualities);
+                Logger.printDebug(() -> "videoQualities: " + videoQualities);
             }
         } catch (Exception ex) {
-            LogHelper.printException(() -> "Failed to set quality list", ex);
+            Logger.printException(() -> "Failed to set quality list", ex);
         }
     }
 
@@ -89,14 +90,14 @@ public class VideoQualityPatch {
      */
     public static void newVideoStarted(final String ignoredVideoId) {
         final int preferredQuality =
-                ReVancedUtils.getNetworkType() == ReVancedUtils.NetworkType.MOBILE
-                        ? mobileQualitySetting.getInt()
-                        : wifiQualitySetting.getInt();
+                Utils.getNetworkType() == Utils.NetworkType.MOBILE
+                        ? mobileQualitySetting.get()
+                        : wifiQualitySetting.get();
 
         if (preferredQuality == -2)
             return;
 
-        ReVancedUtils.runOnMainThreadDelayed(() -> setVideoQuality(preferredQuality), 500);
+        Utils.runOnMainThreadDelayed(() -> setVideoQuality(preferredQuality), 500);
     }
 
     /**
@@ -105,7 +106,7 @@ public class VideoQualityPatch {
      * @param selectedQuality user selected quality
      */
     public static void userChangedQuality(final int selectedQuality) {
-        ReVancedUtils.runOnMainThreadDelayed(() ->
+        Utils.runOnMainThreadDelayed(() ->
                         changeDefaultQuality(getCurrentQuality(selectedQuality)),
                 300
         );

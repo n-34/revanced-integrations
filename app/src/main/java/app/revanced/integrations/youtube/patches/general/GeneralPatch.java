@@ -1,9 +1,9 @@
 package app.revanced.integrations.youtube.patches.general;
 
-import static app.revanced.integrations.youtube.utils.ReVancedUtils.hideViewBy0dpUnderCondition;
-import static app.revanced.integrations.youtube.utils.ReVancedUtils.hideViewUnderCondition;
-import static app.revanced.integrations.youtube.utils.ResourceUtils.identifier;
-import static app.revanced.integrations.youtube.utils.StringRef.str;
+import static app.revanced.integrations.shared.utils.ResourceUtils.identifier;
+import static app.revanced.integrations.shared.utils.StringRef.str;
+import static app.revanced.integrations.shared.utils.Utils.hideViewBy0dpUnderCondition;
+import static app.revanced.integrations.shared.utils.Utils.hideViewUnderCondition;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -24,10 +24,10 @@ import androidx.annotation.NonNull;
 
 import java.util.Objects;
 
-import app.revanced.integrations.youtube.settings.SettingsEnum;
-import app.revanced.integrations.youtube.utils.LogHelper;
-import app.revanced.integrations.youtube.utils.ReVancedUtils;
-import app.revanced.integrations.youtube.utils.ResourceType;
+import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.ResourceType;
+import app.revanced.integrations.shared.utils.Utils;
+import app.revanced.integrations.youtube.settings.Settings;
 
 /**
  * @noinspection ALL
@@ -63,7 +63,7 @@ public class GeneralPatch {
         if (!Objects.equals(intent.getAction(), MAIN_ACTIONS))
             return;
 
-        final String startPage = SettingsEnum.CHANGE_START_PAGE.getString();
+        final String startPage = Settings.CHANGE_START_PAGE.get();
         if (startPage.isEmpty())
             return;
 
@@ -72,11 +72,11 @@ public class GeneralPatch {
         } else if (startPage.startsWith("www.youtube.com")) {
             intent.setData(Uri.parse(startPage));
         } else {
-            ReVancedUtils.showToastShort(str("revanced_change_start_page_warning"));
-            SettingsEnum.CHANGE_START_PAGE.resetToDefault();
+            Utils.showToastShort(str("revanced_change_start_page_warning"));
+            Settings.CHANGE_START_PAGE.resetToDefault();
             return;
         }
-        LogHelper.printDebug(() -> "Changing start page to " + startPage);
+        Logger.printDebug(() -> "Changing start page to " + startPage);
     }
 
     /**
@@ -96,7 +96,7 @@ public class GeneralPatch {
      * and {@link AlertDialog#getButton(int)} method can be used without issue.
      */
     public static void confirmDialog(final AlertDialog dialog) {
-        if (!SettingsEnum.REMOVE_VIEWER_DISCRETION_DIALOG.getBoolean()) {
+        if (!Settings.REMOVE_VIEWER_DISCRETION_DIALOG.get()) {
             return;
         }
 
@@ -129,7 +129,7 @@ public class GeneralPatch {
     }
 
     public static boolean disableAutoCaptions(boolean original) {
-        if (!SettingsEnum.DISABLE_AUTO_CAPTIONS.getBoolean())
+        if (!Settings.DISABLE_AUTO_CAPTIONS.get())
             return original;
 
         return subtitlePrefetched;
@@ -138,42 +138,42 @@ public class GeneralPatch {
     public static void disableDescriptionInteraction(TextView textView, boolean original) {
         if (textView != null) {
             textView.setTextIsSelectable(
-                    !SettingsEnum.DISABLE_DESCRIPTION_INTERACTION.getBoolean() && original
+                    !Settings.DISABLE_DESCRIPTION_INTERACTION.get() && original
             );
         }
     }
 
     public static boolean enableGradientLoadingScreen() {
-        return SettingsEnum.ENABLE_GRADIENT_LOADING_SCREEN.getBoolean();
+        return Settings.ENABLE_GRADIENT_LOADING_SCREEN.get();
     }
 
     public static boolean enableSongSearch() {
-        return SettingsEnum.ENABLE_SONG_SEARCH.getBoolean();
+        return Settings.ENABLE_SONG_SEARCH.get();
     }
 
     public static boolean enableTabletMiniPlayer(boolean original) {
-        return SettingsEnum.ENABLE_TABLET_MINI_PLAYER.getBoolean() || original;
+        return Settings.ENABLE_TABLET_MINI_PLAYER.get() || original;
     }
 
     public static boolean enableWideSearchBar(boolean original) {
-        return SettingsEnum.ENABLE_WIDE_SEARCH_BAR.getBoolean() || original;
+        return Settings.ENABLE_WIDE_SEARCH_BAR.get() || original;
     }
 
     public static boolean enableWideSearchBarInYouTab(boolean original) {
-        if (!SettingsEnum.ENABLE_WIDE_SEARCH_BAR.getBoolean())
+        if (!Settings.ENABLE_WIDE_SEARCH_BAR.get())
             return original;
         else
-            return !SettingsEnum.ENABLE_WIDE_SEARCH_BAR_IN_YOU_TAB.getBoolean() && original;
+            return !Settings.ENABLE_WIDE_SEARCH_BAR_IN_YOU_TAB.get() && original;
     }
 
     public static void hideAccountList(View view, CharSequence charSequence) {
-        if (!SettingsEnum.HIDE_ACCOUNT_MENU.getBoolean())
+        if (!Settings.HIDE_ACCOUNT_MENU.get())
             return;
 
         if (!(view.getParent().getParent().getParent() instanceof ViewGroup viewGroup))
             return;
 
-        String[] blockList = SettingsEnum.HIDE_ACCOUNT_MENU_FILTER_STRINGS.getString().split("\\n");
+        String[] blockList = Settings.HIDE_ACCOUNT_MENU_FILTER_STRINGS.get().split("\\n");
         String targetString = charSequence.toString();
 
         for (String filter : blockList) {
@@ -184,13 +184,13 @@ public class GeneralPatch {
     }
 
     public static void hideAccountMenu(View view, CharSequence charSequence) {
-        if (!SettingsEnum.HIDE_ACCOUNT_MENU.getBoolean())
+        if (!Settings.HIDE_ACCOUNT_MENU.get())
             return;
 
         if (!(view.getParent().getParent() instanceof ViewGroup viewGroup))
             return;
 
-        String[] blockList = SettingsEnum.HIDE_ACCOUNT_MENU_FILTER_STRINGS.getString().split("\\n");
+        String[] blockList = Settings.HIDE_ACCOUNT_MENU_FILTER_STRINGS.get().split("\\n");
         String targetString = charSequence.toString();
 
         for (String filter : blockList) {
@@ -208,47 +208,47 @@ public class GeneralPatch {
     }
 
     public static boolean hideAutoPlayerPopupPanels() {
-        return SettingsEnum.HIDE_AUTO_PLAYER_POPUP_PANELS.getBoolean();
+        return Settings.HIDE_AUTO_PLAYER_POPUP_PANELS.get();
     }
 
     public static int hideCastButton(int original) {
-        return SettingsEnum.HIDE_CAST_BUTTON.getBoolean() ? View.GONE : original;
+        return Settings.HIDE_CAST_BUTTON.get() ? View.GONE : original;
     }
 
     public static int hideCategoryBarInFeed(int original) {
-        return SettingsEnum.HIDE_CATEGORY_BAR_IN_FEED.getBoolean() ? 0 : original;
+        return Settings.HIDE_CATEGORY_BAR_IN_FEED.get() ? 0 : original;
     }
 
     public static void hideCategoryBarInRelatedVideo(View view) {
-        hideViewBy0dpUnderCondition(SettingsEnum.HIDE_CATEGORY_BAR_IN_RELATED_VIDEO.getBoolean(), view);
+        hideViewBy0dpUnderCondition(Settings.HIDE_CATEGORY_BAR_IN_RELATED_VIDEO.get(), view);
     }
 
     public static int hideCategoryBarInSearchResults(int original) {
-        return SettingsEnum.HIDE_CATEGORY_BAR_IN_SEARCH_RESULTS.getBoolean() ? 0 : original;
+        return Settings.HIDE_CATEGORY_BAR_IN_SEARCH_RESULTS.get() ? 0 : original;
     }
 
     public static void hideChannelListSubMenu(View view) {
-        hideViewUnderCondition(SettingsEnum.HIDE_CHANNEL_LIST_SUBMENU.getBoolean(), view);
+        hideViewUnderCondition(Settings.HIDE_CHANNEL_LIST_SUBMENU.get(), view);
     }
 
     public static void hideCrowdfundingBox(View view) {
-        hideViewBy0dpUnderCondition(SettingsEnum.HIDE_CROWDFUNDING_BOX.getBoolean(), view);
+        hideViewBy0dpUnderCondition(Settings.HIDE_CROWDFUNDING_BOX.get(), view);
     }
 
     public static boolean hideFloatingMicrophone(boolean original) {
-        return SettingsEnum.HIDE_FLOATING_MICROPHONE.getBoolean() || original;
+        return Settings.HIDE_FLOATING_MICROPHONE.get() || original;
     }
 
     public static int hideHandle(int originalValue) {
-        return SettingsEnum.HIDE_HANDLE.getBoolean() ? 8 : originalValue;
+        return Settings.HIDE_HANDLE.get() ? 8 : originalValue;
     }
 
     public static void hideLatestVideosButton(View view) {
-        hideViewUnderCondition(SettingsEnum.HIDE_LATEST_VIDEOS_BUTTON.getBoolean(), view);
+        hideViewUnderCondition(Settings.HIDE_LATEST_VIDEOS_BUTTON.get(), view);
     }
 
     public static void hideLoadMoreButton(View view) {
-        if (!SettingsEnum.HIDE_LOAD_MORE_BUTTON.getBoolean())
+        if (!Settings.HIDE_LOAD_MORE_BUTTON.get())
             return;
 
         if (!(view instanceof ViewGroup viewGroup))
@@ -266,7 +266,7 @@ public class GeneralPatch {
             paddingBottom = view.getPaddingBottom();
         }
 
-        ReVancedUtils.runOnMainThreadDelayed(() -> {
+        Utils.runOnMainThreadDelayed(() -> {
                     if (minimumHeight == 1) {
                         minimumHeight = view.getMinimumHeight();
                     }
@@ -285,20 +285,20 @@ public class GeneralPatch {
     }
 
     public static boolean hideSearchTermThumbnail() {
-        return SettingsEnum.HIDE_SEARCH_TERM_THUMBNAIL.getBoolean();
+        return Settings.HIDE_SEARCH_TERM_THUMBNAIL.get();
     }
 
 
     public static boolean hideSnackBar() {
-        return SettingsEnum.HIDE_SNACK_BAR.getBoolean();
+        return Settings.HIDE_SNACK_BAR.get();
     }
 
     public static void hideToolBarButton(String enumString, View view) {
-        if (!SettingsEnum.HIDE_TOOLBAR_CREATE_NOTIFICATION_BUTTON.getBoolean())
+        if (!Settings.HIDE_TOOLBAR_CREATE_NOTIFICATION_BUTTON.get())
             return;
 
         hideViewUnderCondition(
-                ReVancedUtils.containsAny(enumString, TOOLBAR_BUTTON_LIST),
+                Utils.containsAny(enumString, TOOLBAR_BUTTON_LIST),
                 view
         );
     }
@@ -306,7 +306,7 @@ public class GeneralPatch {
     public static void hideTrendingSearches(ImageView imageView, boolean isTrendingSearches) {
         View parent = (View) imageView.getParent();
 
-        if (SettingsEnum.HIDE_TRENDING_SEARCHES.getBoolean() && isTrendingSearches)
+        if (Settings.HIDE_TRENDING_SEARCHES.get() && isTrendingSearches)
             parent.setVisibility(View.GONE);
         else
             parent.setVisibility(View.VISIBLE);
@@ -322,7 +322,7 @@ public class GeneralPatch {
     }
 
     public static void onDescriptionPanelCreate(RecyclerView recyclerView) {
-        if (!SettingsEnum.ALWAYS_EXPAND_PANEL.getBoolean())
+        if (!Settings.ALWAYS_EXPAND_PANEL.get())
             return;
 
         recyclerView.getViewTreeObserver().addOnDrawListener(() -> {
@@ -334,7 +334,7 @@ public class GeneralPatch {
                 if (!(viewGroup.getChildAt(0) instanceof TextView mTextView))
                     return;
 
-                ReVancedUtils.runOnMainThreadDelayed(() -> {
+                Utils.runOnMainThreadDelayed(() -> {
                     mTextView.setSoundEffectsEnabled(false);
                     mTextView.performClick();
                     }, 500

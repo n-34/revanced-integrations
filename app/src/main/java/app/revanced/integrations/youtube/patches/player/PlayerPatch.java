@@ -1,111 +1,114 @@
 package app.revanced.integrations.youtube.patches.player;
 
-import static app.revanced.integrations.youtube.utils.StringRef.str;
+import static app.revanced.integrations.shared.utils.ResourceUtils.identifier;
+import static app.revanced.integrations.shared.utils.StringRef.str;
 
 import android.annotation.SuppressLint;
 import android.view.View;
 import android.widget.ImageView;
 
-import app.revanced.integrations.youtube.settings.SettingsEnum;
-import app.revanced.integrations.youtube.utils.ReVancedUtils;
-import app.revanced.integrations.youtube.utils.ResourceHelper;
+import app.revanced.integrations.shared.utils.ResourceType;
+import app.revanced.integrations.shared.utils.Utils;
+import app.revanced.integrations.youtube.settings.Settings;
 
 @SuppressWarnings("unused")
 public class PlayerPatch {
+    private static final int collapseButtonId = identifier("player_collapse_button", ResourceType.ID);
     @SuppressLint("StaticFieldLeak")
     private static ImageView lastView;
-
     public static void changePlayerOpacity(ImageView imageView) {
-        int opacity = SettingsEnum.CUSTOM_PLAYER_OVERLAY_OPACITY.getInt();
+        int opacity = Settings.CUSTOM_PLAYER_OVERLAY_OPACITY.get();
 
         if (opacity < 0 || opacity > 100) {
-            ReVancedUtils.showToastShort(str("revanced_custom_player_overlay_opacity_warning"));
-            SettingsEnum.CUSTOM_PLAYER_OVERLAY_OPACITY.resetToDefault();
-            opacity = (int) SettingsEnum.CUSTOM_PLAYER_OVERLAY_OPACITY.defaultValue;
+            Utils.showToastShort(str("revanced_custom_player_overlay_opacity_warning"));
+            Settings.CUSTOM_PLAYER_OVERLAY_OPACITY.resetToDefault();
+            opacity = (int) Settings.CUSTOM_PLAYER_OVERLAY_OPACITY.defaultValue;
         }
 
         imageView.setImageAlpha((opacity * 255) / 100);
     }
 
     public static boolean disableSpeedOverlay(boolean original) {
-        return !SettingsEnum.DISABLE_SPEED_OVERLAY.getBoolean() && original;
+        return !Settings.DISABLE_SPEED_OVERLAY.get() && original;
     }
 
     public static boolean disableChapterVibrate() {
-        return SettingsEnum.DISABLE_HAPTIC_FEEDBACK_CHAPTERS.getBoolean();
+        return Settings.DISABLE_HAPTIC_FEEDBACK_CHAPTERS.get();
     }
 
     public static boolean disableSeekVibrate() {
-        return SettingsEnum.DISABLE_HAPTIC_FEEDBACK_SEEK.getBoolean();
+        return Settings.DISABLE_HAPTIC_FEEDBACK_SEEK.get();
     }
 
     public static boolean disableSeekUndoVibrate() {
-        return SettingsEnum.DISABLE_HAPTIC_FEEDBACK_SEEK_UNDO.getBoolean();
+        return Settings.DISABLE_HAPTIC_FEEDBACK_SEEK_UNDO.get();
     }
 
     public static boolean disableScrubbingVibrate() {
-        return SettingsEnum.DISABLE_HAPTIC_FEEDBACK_SCRUBBING.getBoolean();
+        return Settings.DISABLE_HAPTIC_FEEDBACK_SCRUBBING.get();
     }
 
     public static boolean disableZoomVibrate() {
-        return SettingsEnum.DISABLE_HAPTIC_FEEDBACK_ZOOM.getBoolean();
+        return Settings.DISABLE_HAPTIC_FEEDBACK_ZOOM.get();
     }
 
     public static boolean hideAutoPlayButton() {
-        return SettingsEnum.HIDE_AUTOPLAY_BUTTON.getBoolean();
+        return Settings.HIDE_AUTOPLAY_BUTTON.get();
     }
 
     public static boolean hideCaptionsButton(boolean original) {
-        return !SettingsEnum.HIDE_CAPTIONS_BUTTON.getBoolean() && original;
+        return !Settings.HIDE_CAPTIONS_BUTTON.get() && original;
     }
 
     public static void hideCaptionsButton(View view) {
-        if (!SettingsEnum.HIDE_CAPTIONS_BUTTON.getBoolean())
+        if (!Settings.HIDE_CAPTIONS_BUTTON.get())
             return;
 
         view.setVisibility(View.GONE);
-        ReVancedUtils.hideViewByLayoutParams(view);
+        Utils.hideViewByLayoutParams(view);
     }
 
     public static boolean hideChannelWatermark() {
-        return !SettingsEnum.HIDE_CHANNEL_WATERMARK.getBoolean();
+        return !Settings.HIDE_CHANNEL_WATERMARK.get();
     }
 
     public static void hideEndScreenCards(View view) {
-        if (SettingsEnum.HIDE_END_SCREEN_CARDS.getBoolean()) {
+        if (Settings.HIDE_END_SCREEN_CARDS.get()) {
             view.setVisibility(View.GONE);
         }
     }
 
     public static boolean hideFilmstripOverlay() {
-        return SettingsEnum.HIDE_FILMSTRIP_OVERLAY.getBoolean();
+        return Settings.HIDE_FILMSTRIP_OVERLAY.get();
     }
 
     public static boolean hideInfoCard(boolean original) {
-        return !SettingsEnum.HIDE_INFO_CARDS.getBoolean() && original;
+        return !Settings.HIDE_INFO_CARDS.get() && original;
     }
 
     public static boolean hideMusicButton() {
-        return SettingsEnum.HIDE_YOUTUBE_MUSIC_BUTTON.getBoolean();
+        return Settings.HIDE_YOUTUBE_MUSIC_BUTTON.get();
     }
 
-    public static int hidePlayerButton(View view, int originalValue) {
-        return ResourceHelper.hidePlayerButton(view, originalValue);
+    public static int hidePlayerButton(View view, int visibility) {
+        return Settings.HIDE_COLLAPSE_BUTTON.get() && view.getId() == collapseButtonId
+                ? View.GONE
+                : visibility;
     }
 
     public static boolean hidePreviousNextButton(boolean previousOrNextButtonVisible) {
-        return !SettingsEnum.HIDE_PREVIOUS_NEXT_BUTTON.getBoolean() && previousOrNextButtonVisible;
+        return !Settings.HIDE_PREVIOUS_NEXT_BUTTON.get() && previousOrNextButtonVisible;
     }
 
     public static boolean hideSeekMessage() {
-        return SettingsEnum.HIDE_SEEK_MESSAGE.getBoolean();
+        return Settings.HIDE_SEEK_MESSAGE.get();
     }
 
     public static boolean hideSeekUndoMessage() {
-        return SettingsEnum.HIDE_SEEK_UNDO_MESSAGE.getBoolean();
+        return Settings.HIDE_SEEK_UNDO_MESSAGE.get();
     }
     public static void hideSuggestedVideoOverlay(final ImageView imageView) {
-        if (!SettingsEnum.HIDE_SUGGESTED_VIDEO_OVERLAY.getBoolean())
+        if (!Settings.HIDE_SUGGESTED_VIDEO_OVERLAY.get())
             return;
 
         // Prevent adding the listener multiple times.
@@ -120,15 +123,15 @@ public class PlayerPatch {
     }
 
     public static boolean hideSuggestedVideoOverlay() {
-        return SettingsEnum.HIDE_SUGGESTED_VIDEO_OVERLAY.getBoolean()
-                && !SettingsEnum.HIDE_SUGGESTED_VIDEO_OVERLAY_AUTO_PLAY.getBoolean();
+        return Settings.HIDE_SUGGESTED_VIDEO_OVERLAY.get()
+                && !Settings.HIDE_SUGGESTED_VIDEO_OVERLAY_AUTO_PLAY.get();
     }
 
     public static void hideSuggestedVideoOverlayAutoPlay(View view) {
-        if (!SettingsEnum.HIDE_SUGGESTED_VIDEO_OVERLAY.getBoolean())
+        if (!Settings.HIDE_SUGGESTED_VIDEO_OVERLAY.get())
             return;
 
-        if (!SettingsEnum.HIDE_SUGGESTED_VIDEO_OVERLAY_AUTO_PLAY.getBoolean())
+        if (!Settings.HIDE_SUGGESTED_VIDEO_OVERLAY_AUTO_PLAY.get())
             return;
 
         if (view != null) {

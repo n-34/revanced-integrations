@@ -1,17 +1,16 @@
 package app.revanced.integrations.youtube.patches.components;
 
-import static app.revanced.integrations.youtube.utils.ReVancedUtils.hideViewBy0dpUnderCondition;
+import static app.revanced.integrations.shared.utils.Utils.hideViewBy0dpUnderCondition;
 
 import android.view.View;
 
 import androidx.annotation.Nullable;
 
+import app.revanced.integrations.shared.patches.components.Filter;
+import app.revanced.integrations.shared.patches.components.StringFilterGroup;
 import app.revanced.integrations.youtube.patches.utils.NavBarIndexPatch;
-import app.revanced.integrations.youtube.settings.SettingsEnum;
+import app.revanced.integrations.youtube.settings.Settings;
 
-/**
- * @noinspection rawtypes
- */
 @SuppressWarnings("unused")
 public final class SuggestionsShelfFilter extends Filter {
     private final StringFilterGroup horizontalShelf;
@@ -20,25 +19,25 @@ public final class SuggestionsShelfFilter extends Filter {
 
     public SuggestionsShelfFilter() {
         horizontalShelf = new StringFilterGroup(
-                SettingsEnum.HIDE_SUGGESTIONS_SHELF,
+                Settings.HIDE_SUGGESTIONS_SHELF,
                 "horizontal_shelf.eml",
                 "horizontal_tile_shelf.eml",
                 "horizontal_video_shelf.eml"
         );
 
         libraryShelf = new StringFilterGroup(
-                SettingsEnum.HIDE_SUGGESTIONS_SHELF,
+                Settings.HIDE_SUGGESTIONS_SHELF,
                 "library_recent_shelf.eml"
         );
 
         searchResult = new StringFilterGroup(
-                SettingsEnum.HIDE_SUGGESTIONS_SHELF,
+                Settings.HIDE_SUGGESTIONS_SHELF,
                 "compact_channel.eml",
                 "search_video_with_context.eml"
         );
 
-        identifierFilterGroupList.addAll(libraryShelf, searchResult);
-        pathFilterGroupList.addAll(horizontalShelf);
+        addIdentifierCallbacks(libraryShelf, searchResult);
+        addPathCallbacks(horizontalShelf);
     }
 
     /**
@@ -48,14 +47,14 @@ public final class SuggestionsShelfFilter extends Filter {
      */
     public static void hideBreakingNewsShelf(View view) {
         hideViewBy0dpUnderCondition(
-                SettingsEnum.HIDE_SUGGESTIONS_SHELF.getBoolean(),
+                Settings.HIDE_SUGGESTIONS_SHELF.get(),
                 view
         );
     }
 
     @Override
-    boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
-                       FilterGroupList matchedList, FilterGroup matchedGroup, int matchedIndex) {
+    public boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
+                       StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
         // Even though [NavBarIndex] has not been set yet, but [LithoFilterPatch] can be called.
         // In this case, the patch may not work normally.
         // To prevent this, you need to detect a specific component that exists only in some [NavBarIndex],

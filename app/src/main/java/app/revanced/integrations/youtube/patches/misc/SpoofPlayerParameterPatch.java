@@ -1,8 +1,8 @@
 package app.revanced.integrations.youtube.patches.misc;
 
+import static app.revanced.integrations.shared.utils.Utils.containsAny;
+import static app.revanced.integrations.shared.utils.Utils.submitOnBackgroundThread;
 import static app.revanced.integrations.youtube.patches.misc.requests.StoryboardRendererRequester.getStoryboardRenderer;
-import static app.revanced.integrations.youtube.utils.ReVancedUtils.containsAny;
-import static app.revanced.integrations.youtube.utils.ReVancedUtils.submitOnBackgroundThread;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,17 +12,17 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.youtube.patches.video.VideoInformation;
-import app.revanced.integrations.youtube.settings.SettingsEnum;
+import app.revanced.integrations.youtube.settings.Settings;
 import app.revanced.integrations.youtube.shared.PlayerType;
-import app.revanced.integrations.youtube.utils.LogHelper;
 
 /**
  * @noinspection ALL
  */
 public class SpoofPlayerParameterPatch {
-    private static final boolean spoofParameter = SettingsEnum.SPOOF_PLAYER_PARAMETER.getBoolean();
-    private static final boolean spoofParameterInFeed = SettingsEnum.SPOOF_PLAYER_PARAMETER_IN_FEED.getBoolean();
+    private static final boolean spoofParameter = Settings.SPOOF_PLAYER_PARAMETER.get();
+    private static final boolean spoofParameterInFeed = Settings.SPOOF_PLAYER_PARAMETER_IN_FEED.get();
 
     /**
      * Parameter (also used by
@@ -70,10 +70,10 @@ public class SpoofPlayerParameterPatch {
                     return future.get(20000, TimeUnit.MILLISECONDS); // Any arbitrarily large timeout.
                 } // else, return null.
             } catch (TimeoutException ex) {
-                LogHelper.printDebug(() -> "Could not get renderer (get timed out)");
+                Logger.printDebug(() -> "Could not get renderer (get timed out)");
             } catch (ExecutionException | InterruptedException ex) {
                 // Should never happen.
-                LogHelper.printException(() -> "Could not get renderer", ex);
+                Logger.printException(() -> "Could not get renderer", ex);
             }
         }
         return null;
@@ -90,7 +90,7 @@ public class SpoofPlayerParameterPatch {
      */
     public static String spoofParameter(@NonNull String videoId, @Nullable String parameters, boolean isShortAndOpeningOrPlaying) {
         try {
-            LogHelper.printDebug(() -> "Original player parameter value: " + parameters);
+            Logger.printDebug(() -> "Original player parameter value: " + parameters);
 
             if (!spoofParameter) {
                 return parameters;
@@ -123,7 +123,7 @@ public class SpoofPlayerParameterPatch {
 
             fetchStoryboardRenderer(videoId);
         } catch (Exception ex) {
-            LogHelper.printException(() -> "spoofParameter failure", ex);
+            Logger.printException(() -> "spoofParameter failure", ex);
         }
         return INCOGNITO_PARAMETERS;
     }
@@ -193,7 +193,7 @@ public class SpoofPlayerParameterPatch {
 
     /**
      * Injection point.  Forces seekbar to be shown for paid videos or
-     * if {@link SettingsEnum#SPOOF_PLAYER_PARAMETER} is not enabled.
+     * if {@link Settings#SPOOF_PLAYER_PARAMETER} is not enabled.
      */
     public static boolean getSeekbarThumbnailOverrideValue() {
         if (!spoofParameter) {

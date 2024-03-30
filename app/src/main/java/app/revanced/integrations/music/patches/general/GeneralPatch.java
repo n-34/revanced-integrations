@@ -1,6 +1,6 @@
 package app.revanced.integrations.music.patches.general;
 
-import static app.revanced.integrations.music.utils.ReVancedUtils.hideViewBy0dpUnderCondition;
+import static app.revanced.integrations.shared.utils.Utils.hideViewBy0dpUnderCondition;
 
 import android.app.AlertDialog;
 import android.view.View;
@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 
 import java.util.Objects;
 
-import app.revanced.integrations.music.settings.SettingsEnum;
+import app.revanced.integrations.music.settings.Settings;
 
 /**
  * @noinspection ALL
@@ -27,7 +27,7 @@ public class GeneralPatch {
         if (!browseId.equals("FEmusic_home"))
             return browseId;
 
-        return SettingsEnum.CHANGE_START_PAGE.getString();
+        return Settings.CHANGE_START_PAGE.get();
     }
 
     /**
@@ -47,7 +47,7 @@ public class GeneralPatch {
      * and {@link AlertDialog#getButton(int)} method can be used without issue.
      */
     public static void confirmDialog(final AlertDialog dialog) {
-        if (!SettingsEnum.REMOVE_VIEWER_DISCRETION_DIALOG.getBoolean()) {
+        if (!Settings.REMOVE_VIEWER_DISCRETION_DIALOG.get()) {
             return;
         }
 
@@ -72,7 +72,7 @@ public class GeneralPatch {
     }
 
     public static boolean disableAutoCaptions(boolean original) {
-        if (!SettingsEnum.DISABLE_AUTO_CAPTIONS.getBoolean())
+        if (!Settings.DISABLE_AUTO_CAPTIONS.get())
             return original;
 
         return subtitlePrefetched;
@@ -86,46 +86,46 @@ public class GeneralPatch {
     }
 
     public static boolean disableDislikeRedirection() {
-        return SettingsEnum.DISABLE_DISLIKE_REDIRECTION.getBoolean();
+        return Settings.DISABLE_DISLIKE_REDIRECTION.get();
     }
 
     public static boolean enableLandScapeMode(boolean original) {
         try {
-            return SettingsEnum.ENABLE_LANDSCAPE_MODE.getBoolean() || original;
+            return Settings.ENABLE_LANDSCAPE_MODE.get() || original;
         } catch (Exception ignored) {
             return original;
         }
     }
 
     public static String enableOldStyleLibraryShelf(final String browseId) {
-        return SettingsEnum.ENABLE_OLD_STYLE_LIBRARY_SHELF.getBoolean()
+        return Settings.ENABLE_OLD_STYLE_LIBRARY_SHELF.get()
                 && browseId.equals("FEmusic_library_landing")
                 ? "FEmusic_liked"
                 : browseId;
     }
 
     public static int hideCastButton(int original) {
-        return SettingsEnum.HIDE_CAST_BUTTON.getBoolean() ? View.GONE : original;
+        return Settings.HIDE_CAST_BUTTON.get() ? View.GONE : original;
     }
 
     public static void hideCastButton(View view) {
-        hideViewBy0dpUnderCondition(SettingsEnum.HIDE_CAST_BUTTON.getBoolean(), view);
+        hideViewBy0dpUnderCondition(Settings.HIDE_CAST_BUTTON.get(), view);
     }
 
     public static void hideCategoryBar(View view) {
-        hideViewBy0dpUnderCondition(SettingsEnum.HIDE_CATEGORY_BAR.getBoolean(), view);
+        hideViewBy0dpUnderCondition(Settings.HIDE_CATEGORY_BAR.get(), view);
     }
 
     public static boolean hideHistoryButton(boolean original) {
-        return !SettingsEnum.HIDE_HISTORY_BUTTON.getBoolean() && original;
+        return !Settings.HIDE_HISTORY_BUTTON.get() && original;
     }
 
     public static boolean hideNewPlaylistButton() {
-        return SettingsEnum.HIDE_NEW_PLAYLIST_BUTTON.getBoolean();
+        return Settings.HIDE_NEW_PLAYLIST_BUTTON.get();
     }
 
     public static boolean hideTapToUpdateButton() {
-        return SettingsEnum.HIDE_TAP_TO_UPDATE_BUTTON.getBoolean();
+        return Settings.HIDE_TAP_TO_UPDATE_BUTTON.get();
     }
 
     public static void newVideoStarted(@NonNull String newlyLoadedVideoId) {

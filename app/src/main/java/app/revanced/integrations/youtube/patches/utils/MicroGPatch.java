@@ -1,6 +1,6 @@
 package app.revanced.integrations.youtube.patches.utils;
 
-import static app.revanced.integrations.youtube.utils.StringRef.str;
+import static app.revanced.integrations.shared.utils.StringRef.str;
 
 import android.app.Activity;
 import android.content.ContentProviderClient;
@@ -10,8 +10,8 @@ import android.net.Uri;
 
 import androidx.annotation.NonNull;
 
-import app.revanced.integrations.youtube.utils.LogHelper;
-import app.revanced.integrations.youtube.utils.ReVancedUtils;
+import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.Utils;
 
 @SuppressWarnings("unused")
 public class MicroGPatch {
@@ -23,7 +23,7 @@ public class MicroGPatch {
 
     private static void startIntent(Activity mActivity, String uriString, String... message) {
         for (String string : message) {
-            ReVancedUtils.showToastLong(string);
+            Utils.showToastLong(string);
         }
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -37,14 +37,14 @@ public class MicroGPatch {
         try {
             mActivity.getPackageManager().getPackageInfo(MICROG_PACKAGE_NAME, PackageManager.GET_ACTIVITIES);
         } catch (PackageManager.NameNotFoundException exception) {
-            LogHelper.printInfo(() -> "MicroG was not found", exception);
+            Logger.printInfo(() -> "MicroG was not found", exception);
             startIntent(mActivity, MICROG_DOWNLOAD_LINK, str("microg_not_installed_warning"), str("microg_not_installed_notice"));
         }
 
         try (final ContentProviderClient client = mActivity.getContentResolver().acquireContentProviderClient(MICROG_PROVIDER)) {
             if (client != null)
                 return;
-            LogHelper.printInfo(() -> "MicroG is not running in the background");
+            Logger.printInfo(() -> "MicroG is not running in the background");
             startIntent(mActivity, DONT_KILL_MY_APP_LINK, str("microg_not_running_warning"));
         }
     }

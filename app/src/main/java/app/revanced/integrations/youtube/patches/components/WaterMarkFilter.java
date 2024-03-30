@@ -1,14 +1,16 @@
 package app.revanced.integrations.youtube.patches.components;
 
-import app.revanced.integrations.youtube.settings.SettingsEnum;
+import app.revanced.integrations.shared.patches.components.Filter;
+import app.revanced.integrations.shared.patches.components.StringFilterGroup;
+import app.revanced.integrations.youtube.settings.Settings;
 
 @SuppressWarnings("unused")
-final class WaterMarkFilter extends Filter {
+public final class WaterMarkFilter extends Filter {
 
     public WaterMarkFilter() {
-        pathFilterGroupList.addAll(
+        addPathCallbacks(
                 new StringFilterGroup(
-                        SettingsEnum.HIDE_CHANNEL_WATERMARK,
+                        Settings.HIDE_CHANNEL_WATERMARK,
                         "featured_channel_watermark_overlay.eml"
                 )
         );

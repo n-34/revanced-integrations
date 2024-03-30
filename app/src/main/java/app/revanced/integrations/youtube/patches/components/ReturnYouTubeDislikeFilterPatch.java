@@ -8,11 +8,16 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
+import app.revanced.integrations.shared.patches.components.ByteArrayFilterGroup;
+import app.revanced.integrations.shared.patches.components.ByteArrayFilterGroupList;
+import app.revanced.integrations.shared.patches.components.Filter;
+import app.revanced.integrations.shared.patches.components.FilterGroup;
+import app.revanced.integrations.shared.patches.components.StringFilterGroup;
+import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.TrieSearch;
 import app.revanced.integrations.youtube.patches.utils.ReturnYouTubeDislikePatch;
 import app.revanced.integrations.youtube.patches.video.VideoInformation;
-import app.revanced.integrations.youtube.settings.SettingsEnum;
-import app.revanced.integrations.youtube.utils.LogHelper;
-import app.revanced.integrations.youtube.utils.TrieSearch;
+import app.revanced.integrations.youtube.settings.Settings;
 
 /**
  * Searches for video id's in the proto buffer of Shorts dislike.
@@ -49,15 +54,15 @@ public final class ReturnYouTubeDislikeFilterPatch extends Filter {
     private final ByteArrayFilterGroupList videoIdFilterGroup = new ByteArrayFilterGroupList();
 
     public ReturnYouTubeDislikeFilterPatch() {
-        pathFilterGroupList.addAll(
-                new StringFilterGroup(SettingsEnum.RYD_SHORTS, "|shorts_dislike_button.eml|")
+        addPathCallbacks(
+                new StringFilterGroup(Settings.RYD_SHORTS, "|shorts_dislike_button.eml|")
         );
         // After the dislikes icon name is some binary data and then the video id for that specific short.
         videoIdFilterGroup.addAll(
                 // Video was previously disliked before video was opened.
-                new ByteArrayAsStringFilterGroup(null, "ic_right_dislike_on_shadowed"),
+                new ByteArrayFilterGroup(null, "ic_right_dislike_on_shadowed"),
                 // Video was not already disliked.
-                new ByteArrayAsStringFilterGroup(null, "ic_right_dislike_off_shadowed")
+                new ByteArrayFilterGroup(null, "ic_right_dislike_off_shadowed")
         );
     }
 
@@ -66,16 +71,16 @@ public final class ReturnYouTubeDislikeFilterPatch extends Filter {
      */
     public static void newPlayerResponseVideoId(String videoId, boolean isShortAndOpeningOrPlaying) {
         try {
-            if (!isShortAndOpeningOrPlaying || !SettingsEnum.RYD_SHORTS.getBoolean()) {
+            if (!isShortAndOpeningOrPlaying || !Settings.RYD_SHORTS.get()) {
                 return;
             }
             synchronized (lastVideoIds) {
                 if (lastVideoIds.put(videoId, Boolean.TRUE) == null) {
-                    LogHelper.printDebug(() -> "New Short video id: " + videoId);
+                    Logger.printDebug(() -> "New Short video id: " + videoId);
                 }
             }
         } catch (Exception ex) {
-            LogHelper.printException(() -> "newPlayerResponseVideoId failure", ex);
+            Logger.printException(() -> "newPlayerResponseVideoId failure", ex);
         }
     }
 
@@ -99,12 +104,9 @@ public final class ReturnYouTubeDislikeFilterPatch extends Filter {
         return false;
     }
 
-    /**
-     * @noinspection rawtypes
-     */
     @Override
-    boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
-                       FilterGroupList matchedList, FilterGroup matchedGroup, int matchedIndex) {
+    public boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
+                       StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
         FilterGroup.FilterGroupResult result = videoIdFilterGroup.check(protobufBufferArray);
         if (result.isFiltered()) {
             String matchedVideoId = findVideoId(protobufBufferArray);

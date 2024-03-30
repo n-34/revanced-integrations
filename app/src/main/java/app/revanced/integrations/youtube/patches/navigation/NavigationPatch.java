@@ -1,22 +1,22 @@
 package app.revanced.integrations.youtube.patches.navigation;
 
-import static app.revanced.integrations.youtube.utils.ReVancedUtils.hideViewUnderCondition;
+import static app.revanced.integrations.shared.utils.Utils.hideViewUnderCondition;
 
 import android.view.View;
 import android.widget.TextView;
 
-import app.revanced.integrations.youtube.settings.SettingsEnum;
+import app.revanced.integrations.youtube.settings.Settings;
 
 @SuppressWarnings("unused")
 public class NavigationPatch {
     public static Enum<?> lastPivotTab;
 
     public static boolean switchCreateNotification(boolean original) {
-        return SettingsEnum.SWITCH_CREATE_NOTIFICATION.getBoolean() || original;
+        return Settings.SWITCH_CREATE_NOTIFICATION.get() || original;
     }
 
     public static void hideCreateButton(View view) {
-        hideViewUnderCondition(SettingsEnum.HIDE_CREATE_BUTTON.getBoolean(), view);
+        hideViewUnderCondition(Settings.HIDE_CREATE_BUTTON.get(), view);
     }
 
     public static void hideNavigationButton(View view) {
@@ -29,19 +29,19 @@ public class NavigationPatch {
     }
 
     public static void hideNavigationLabel(TextView view) {
-        hideViewUnderCondition(SettingsEnum.HIDE_NAVIGATION_LABEL.getBoolean(), view);
+        hideViewUnderCondition(Settings.HIDE_NAVIGATION_LABEL.get(), view);
     }
 
     public static boolean enableTabletNavBar(boolean original) {
-        return SettingsEnum.ENABLE_TABLET_NAVIGATION_BAR.getBoolean() || original;
+        return Settings.ENABLE_TABLET_NAVIGATION_BAR.get() || original;
     }
 
     private enum NavigationButton {
-        HOME("PIVOT_HOME", SettingsEnum.HIDE_HOME_BUTTON.getBoolean()),
-        SHORTS("TAB_SHORTS", SettingsEnum.HIDE_SHORTS_BUTTON.getBoolean()),
-        SUBSCRIPTIONS("PIVOT_SUBSCRIPTIONS", SettingsEnum.HIDE_SUBSCRIPTIONS_BUTTON.getBoolean()),
-        NOTIFICATIONS("TAB_ACTIVITY", SettingsEnum.HIDE_NOTIFICATIONS_BUTTON.getBoolean()),
-        LIBRARY("VIDEO_LIBRARY_WHITE", SettingsEnum.HIDE_LIBRARY_BUTTON.getBoolean());
+        HOME("PIVOT_HOME", Settings.HIDE_HOME_BUTTON.get()),
+        SHORTS("TAB_SHORTS", Settings.HIDE_SHORTS_BUTTON.get()),
+        SUBSCRIPTIONS("PIVOT_SUBSCRIPTIONS", Settings.HIDE_SUBSCRIPTIONS_BUTTON.get()),
+        NOTIFICATIONS("TAB_ACTIVITY", Settings.HIDE_NOTIFICATIONS_BUTTON.get()),
+        LIBRARY("VIDEO_LIBRARY_WHITE", Settings.HIDE_LIBRARY_BUTTON.get());
 
         private final boolean enabled;
         private final String name;

@@ -1,14 +1,14 @@
 package app.revanced.integrations.youtube.patches.video;
 
+import static app.revanced.integrations.shared.utils.StringRef.str;
+import static app.revanced.integrations.shared.utils.Utils.showToastShort;
 import static app.revanced.integrations.youtube.patches.video.VideoInformation.isLiveStream;
-import static app.revanced.integrations.youtube.utils.ReVancedUtils.showToastShort;
-import static app.revanced.integrations.youtube.utils.StringRef.str;
 
 import java.util.Objects;
 
+import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.youtube.patches.utils.PatchStatus;
-import app.revanced.integrations.youtube.settings.SettingsEnum;
-import app.revanced.integrations.youtube.utils.LogHelper;
+import app.revanced.integrations.youtube.settings.Settings;
 
 @SuppressWarnings("unused")
 public class PlaybackSpeedPatch {
@@ -22,37 +22,37 @@ public class PlaybackSpeedPatch {
 
             currentContentCpn = contentCpn;
 
-            if (SettingsEnum.DISABLE_DEFAULT_PLAYBACK_SPEED_LIVE.getBoolean() && isLiveStream)
+            if (Settings.DISABLE_DEFAULT_PLAYBACK_SPEED_LIVE.get() && isLiveStream)
                 return;
 
-            currentPlaybackSpeed = SettingsEnum.DEFAULT_PLAYBACK_SPEED.getFloat();
+            currentPlaybackSpeed = Settings.DEFAULT_PLAYBACK_SPEED.get();
 
             overrideSpeed(currentPlaybackSpeed);
         } catch (Exception ex) {
-            LogHelper.printException(() -> "Failed to setDefaultPlaybackSpeed", ex);
+            Logger.printException(() -> "Failed to setDefaultPlaybackSpeed", ex);
         }
     }
 
     public static float getPlaybackSpeedInShorts(final float playbackSpeed) {
-        if (!SettingsEnum.ENABLE_DEFAULT_PLAYBACK_SPEED_SHORTS.getBoolean())
+        if (!Settings.ENABLE_DEFAULT_PLAYBACK_SPEED_SHORTS.get())
             return playbackSpeed;
 
-        if (SettingsEnum.DISABLE_DEFAULT_PLAYBACK_SPEED_LIVE.getBoolean() && isLiveStream)
+        if (Settings.DISABLE_DEFAULT_PLAYBACK_SPEED_LIVE.get() && isLiveStream)
             return playbackSpeed;
 
-        return SettingsEnum.DEFAULT_PLAYBACK_SPEED.getFloat();
+        return Settings.DEFAULT_PLAYBACK_SPEED.get();
     }
 
     public static void userChangedSpeed(final float playbackSpeed) {
         currentPlaybackSpeed = playbackSpeed;
 
-        if (!SettingsEnum.ENABLE_SAVE_PLAYBACK_SPEED.getBoolean())
+        if (!Settings.ENABLE_SAVE_PLAYBACK_SPEED.get())
             return;
 
         if (!PatchStatus.DefaultPlaybackSpeed())
             return;
 
-        SettingsEnum.DEFAULT_PLAYBACK_SPEED.saveValue(playbackSpeed);
+        Settings.DEFAULT_PLAYBACK_SPEED.save(playbackSpeed);
         showToastShort(str("revanced_save_playback_speed", playbackSpeed + "x"));
     }
 

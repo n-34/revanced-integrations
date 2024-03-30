@@ -2,7 +2,7 @@ package app.revanced.integrations.youtube.swipecontrols.controller
 
 import android.app.Activity
 import android.view.WindowManager
-import app.revanced.integrations.youtube.settings.SettingsEnum
+import app.revanced.integrations.youtube.settings.Settings
 import app.revanced.integrations.youtube.swipecontrols.misc.clamp
 
 /**
@@ -33,15 +33,15 @@ class ScreenBrightnessController(
      * save the current screen brightness, to be brought back using [restore]
      */
     fun save() {
-        SettingsEnum.SWIPE_BRIGHTNESS_VALUE.saveValue(rawScreenBrightness)
+        Settings.SWIPE_BRIGHTNESS_VALUE.save(rawScreenBrightness)
     }
 
     /**
      * restore the screen brightness saved using [save]
      */
     fun restore() {
-        if (!SettingsEnum.SWIPE_BRIGHTNESS_AUTO.boolean)
-            rawScreenBrightness = SettingsEnum.SWIPE_BRIGHTNESS_VALUE.float
+        if (!Settings.SWIPE_BRIGHTNESS_AUTO.get())
+            rawScreenBrightness = Settings.SWIPE_BRIGHTNESS_VALUE.get()
     }
 
     /**

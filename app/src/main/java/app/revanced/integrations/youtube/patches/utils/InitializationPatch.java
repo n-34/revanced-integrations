@@ -1,15 +1,16 @@
 package app.revanced.integrations.youtube.patches.utils;
 
-import static app.revanced.integrations.youtube.settings.SettingsUtils.showRestartDialog;
-import static app.revanced.integrations.youtube.utils.ReVancedUtils.runOnMainThreadDelayed;
+import static app.revanced.integrations.shared.settings.preference.AbstractPreferenceFragment.showRestartDialog;
+import static app.revanced.integrations.shared.utils.StringRef.str;
+import static app.revanced.integrations.shared.utils.Utils.runOnMainThreadDelayed;
 
 import android.app.Activity;
 
 import androidx.annotation.NonNull;
 
-import app.revanced.integrations.youtube.settings.SettingsEnum;
-import app.revanced.integrations.youtube.utils.ReVancedHelper;
-import app.revanced.integrations.youtube.utils.ReVancedUtils;
+import app.revanced.integrations.shared.settings.BaseSettings;
+import app.revanced.integrations.shared.utils.Utils;
+import app.revanced.integrations.youtube.utils.ExtendedUtils;
 
 @SuppressWarnings("unused")
 public class InitializationPatch {
@@ -21,22 +22,21 @@ public class InitializationPatch {
      * To fix this, show the restart dialog when the app is installed for the first time.
      */
     public static void onCreate(@NonNull Activity mActivity) {
-        ReVancedHelper.setPlayerFlyoutPanelAdditionalSettings();
-        if (SettingsEnum.INITIALIZED.getBoolean())
+        ExtendedUtils.setPlayerFlyoutPanelAdditionalSettings();
+        if (BaseSettings.SETTINGS_INITIALIZED.get())
             return;
-
-        runOnMainThreadDelayed(() -> showRestartDialog(mActivity, "revanced_restart_first_run", 500), 500);
-        runOnMainThreadDelayed(() -> SettingsEnum.INITIALIZED.saveValue(true), 1000);
+        runOnMainThreadDelayed(() -> showRestartDialog(mActivity, str("revanced_restart_first_run")), 500);
+        runOnMainThreadDelayed(() -> BaseSettings.SETTINGS_INITIALIZED.save(true), 1000);
     }
 
     public static void setDeviceInformation(@NonNull Activity mActivity) {
-        ReVancedHelper.setPackageName(mActivity);
-        ReVancedHelper.setApplicationLabel(mActivity);
-        ReVancedHelper.setIsTablet(mActivity);
-        ReVancedHelper.setVersionName(mActivity);
+        ExtendedUtils.setPackageName(mActivity);
+        ExtendedUtils.setApplicationLabel(mActivity);
+        ExtendedUtils.setIsTablet(mActivity);
+        ExtendedUtils.setVersionName(mActivity);
     }
 
     public static void setMainActivity(@NonNull Activity mActivity) {
-        ReVancedUtils.activity = mActivity;
+        Utils.activity = mActivity;
     }
 }

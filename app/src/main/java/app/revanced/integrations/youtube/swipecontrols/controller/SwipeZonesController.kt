@@ -3,10 +3,10 @@ package app.revanced.integrations.youtube.swipecontrols.controller
 import android.app.Activity
 import android.util.TypedValue
 import android.view.ViewGroup
+import app.revanced.integrations.shared.utils.ResourceType
+import app.revanced.integrations.shared.utils.ResourceUtils
 import app.revanced.integrations.youtube.swipecontrols.misc.Rectangle
 import app.revanced.integrations.youtube.swipecontrols.misc.applyDimension
-import app.revanced.integrations.youtube.utils.ResourceType
-import app.revanced.integrations.youtube.utils.ResourceUtils
 import kotlin.math.min
 
 /**

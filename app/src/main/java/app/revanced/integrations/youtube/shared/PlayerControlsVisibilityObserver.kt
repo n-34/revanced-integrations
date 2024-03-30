@@ -3,8 +3,8 @@ package app.revanced.integrations.youtube.shared
 import android.app.Activity
 import android.view.View
 import android.view.ViewGroup
-import app.revanced.integrations.youtube.utils.ResourceType
-import app.revanced.integrations.youtube.utils.ResourceUtils.identifier
+import app.revanced.integrations.shared.utils.ResourceType
+import app.revanced.integrations.shared.utils.ResourceUtils.identifier
 import java.lang.ref.WeakReference
 
 /**

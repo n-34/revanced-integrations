@@ -4,14 +4,13 @@ import androidx.annotation.Nullable;
 
 import java.util.regex.Pattern;
 
-import app.revanced.integrations.youtube.settings.SettingsEnum;
-import app.revanced.integrations.youtube.utils.StringTrieSearch;
+import app.revanced.integrations.shared.patches.components.Filter;
+import app.revanced.integrations.shared.patches.components.StringFilterGroup;
+import app.revanced.integrations.shared.utils.StringTrieSearch;
+import app.revanced.integrations.youtube.settings.Settings;
 
-/**
- * @noinspection rawtypes
- */
 @SuppressWarnings("unused")
-final class CommentsFilter extends Filter {
+public final class CommentsFilter extends Filter {
     private static final String COMMENT_COMPOSER_PATH = "comment_composer";
     private static final String COMMENT_ENTRY_POINT_TEASER_PATH = "comments_entry_point_teaser";
     private static final Pattern COMMENT_PREVIEW_TEXT_PATTERN = Pattern.compile("comments_entry_point_teaser.+ContainerType");
@@ -28,40 +27,40 @@ final class CommentsFilter extends Filter {
         exceptions.addPatterns("macro_markers_list_item");
 
         final StringFilterGroup channelGuidelines = new StringFilterGroup(
-                SettingsEnum.HIDE_CHANNEL_GUIDELINES,
+                Settings.HIDE_CHANNEL_GUIDELINES,
                 "channel_guidelines_entry_banner",
                 "community_guidelines",
                 "sponsorships_comments_upsell"
         );
 
         final StringFilterGroup comments = new StringFilterGroup(
-                SettingsEnum.HIDE_COMMENTS_SECTION,
+                Settings.HIDE_COMMENTS_SECTION,
                 VIDEO_METADATA_CAROUSEL_PATH,
                 "comments_"
         );
 
         commentsPreviewDots = new StringFilterGroup(
-                SettingsEnum.HIDE_PREVIEW_COMMENT_OLD_METHOD,
+                Settings.HIDE_PREVIEW_COMMENT_OLD_METHOD,
                 "|ContainerType|ContainerType|ContainerType|"
         );
 
         createShorts = new StringFilterGroup(
-                SettingsEnum.HIDE_CREATE_SHORTS_BUTTON,
+                Settings.HIDE_CREATE_SHORTS_BUTTON,
                 "composer_short_creation_button"
         );
 
         emojiPicker = new StringFilterGroup(
-                SettingsEnum.HIDE_EMOJI_PICKER,
+                Settings.HIDE_EMOJI_PICKER,
                 "|CellType|ContainerType|ContainerType|ContainerType|ContainerType|ContainerType|"
         );
 
         final StringFilterGroup membersBanner = new StringFilterGroup(
-                SettingsEnum.HIDE_COMMENTS_BY_MEMBERS,
+                Settings.HIDE_COMMENTS_BY_MEMBERS,
                 "sponsorships_comments"
         );
 
         final StringFilterGroup previewComment = new StringFilterGroup(
-                SettingsEnum.HIDE_PREVIEW_COMMENT_OLD_METHOD,
+                Settings.HIDE_PREVIEW_COMMENT_OLD_METHOD,
                 "|carousel_item",
                 "|carousel_listener",
                 COMMENT_ENTRY_POINT_TEASER_PATH,
@@ -69,18 +68,18 @@ final class CommentsFilter extends Filter {
         );
 
         previewCommentText = new StringFilterGroup(
-                SettingsEnum.HIDE_PREVIEW_COMMENT_NEW_METHOD,
+                Settings.HIDE_PREVIEW_COMMENT_NEW_METHOD,
                 COMMENT_ENTRY_POINT_TEASER_PATH
         );
 
         thanks = new StringFilterGroup(
-                SettingsEnum.HIDE_COMMENTS_THANKS_BUTTON,
+                Settings.HIDE_COMMENTS_THANKS_BUTTON,
                 "|super_thanks_button.eml"
         );
 
-        identifierFilterGroupList.addAll(channelGuidelines);
+        addIdentifierCallbacks(channelGuidelines);
 
-        pathFilterGroupList.addAll(
+        addPathCallbacks(
                 comments,
                 commentsPreviewDots,
                 createShorts,
@@ -93,8 +92,8 @@ final class CommentsFilter extends Filter {
     }
 
     @Override
-    boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
-                       FilterGroupList matchedList, FilterGroup matchedGroup, int matchedIndex) {
+    public boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
+                       StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
         if (exceptions.matches(path))
             return false;
 
@@ -106,6 +105,6 @@ final class CommentsFilter extends Filter {
             return COMMENT_PREVIEW_TEXT_PATTERN.matcher(path).find();
         }
 
-        return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedList, matchedGroup, matchedIndex);
+        return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
     }
 }

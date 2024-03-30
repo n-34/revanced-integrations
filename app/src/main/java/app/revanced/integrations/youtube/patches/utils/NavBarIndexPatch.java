@@ -1,6 +1,6 @@
 package app.revanced.integrations.youtube.patches.utils;
 
-import app.revanced.integrations.youtube.utils.LogHelper;
+import app.revanced.integrations.shared.utils.Logger;
 
 public class NavBarIndexPatch {
     private static int currentNavBarIndex = 0;
@@ -25,7 +25,7 @@ public class NavBarIndexPatch {
             return;
 
         currentNavBarIndex = navBarIndex;
-        LogHelper.printDebug(() -> "Setting NavBar Index to: " + navBarIndex);
+        Logger.printDebug(() -> "Setting NavBar Index to: " + navBarIndex);
     }
 
     public static boolean isNotLibraryTab() {

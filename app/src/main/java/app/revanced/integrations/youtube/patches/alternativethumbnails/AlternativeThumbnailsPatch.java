@@ -1,6 +1,6 @@
 package app.revanced.integrations.youtube.patches.alternativethumbnails;
 
-import static app.revanced.integrations.youtube.utils.StringRef.str;
+import static app.revanced.integrations.shared.utils.StringRef.str;
 
 import android.net.Uri;
 
@@ -20,9 +20,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import app.revanced.integrations.youtube.settings.SettingsEnum;
-import app.revanced.integrations.youtube.utils.LogHelper;
-import app.revanced.integrations.youtube.utils.ReVancedUtils;
+import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.Utils;
+import app.revanced.integrations.youtube.settings.Settings;
 
 /**
  * Alternative YouTube thumbnails.
@@ -73,37 +73,37 @@ public final class AlternativeThumbnailsPatch {
         final int port = dearrowApiUri.getPort();
         String portString = port == -1 ? "" : (":" + port);
         deArrowApiUrlPrefix = dearrowApiUri.getScheme() + "://" + dearrowApiUri.getHost() + portString + "/";
-        LogHelper.printDebug(() -> "Using DeArrow API address: " + deArrowApiUrlPrefix);
+        Logger.printDebug(() -> "Using DeArrow API address: " + deArrowApiUrlPrefix);
     }
 
     /**
      * Fix any bad imported data.
      */
     private static Uri validateSettings() {
-        final int altThumbnailType = SettingsEnum.ALT_THUMBNAIL_STILLS_TIME.getInt();
+        final int altThumbnailType = Settings.ALT_THUMBNAIL_STILLS_TIME.get();
         if (altThumbnailType < 1 || altThumbnailType > 3) {
-            ReVancedUtils.showToastLong("Invalid Alternative still thumbnail type: "
+            Utils.showToastLong("Invalid Alternative still thumbnail type: "
                     + altThumbnailType + ". Using default");
-            SettingsEnum.ALT_THUMBNAIL_STILLS_TIME.resetToDefault();
+            Settings.ALT_THUMBNAIL_STILLS_TIME.resetToDefault();
         }
 
-        Uri apiUri = Uri.parse(SettingsEnum.ALT_THUMBNAIL_DEARROW_API_URL.getString());
+        Uri apiUri = Uri.parse(Settings.ALT_THUMBNAIL_DEARROW_API_URL.get());
         // Cannot use unsecured 'http', otherwise the connections fail to start and no callbacks hooks are made.
         String scheme = apiUri.getScheme();
         if (scheme == null || scheme.equals("http") || apiUri.getHost() == null) {
-            ReVancedUtils.showToastLong("Invalid DeArrow API URL. Using default");
-            SettingsEnum.ALT_THUMBNAIL_DEARROW_API_URL.resetToDefault();
+            Utils.showToastLong("Invalid DeArrow API URL. Using default");
+            Settings.ALT_THUMBNAIL_DEARROW_API_URL.resetToDefault();
             return validateSettings();
         }
         return apiUri;
     }
 
     private static boolean usingDeArrow() {
-        return SettingsEnum.ALT_THUMBNAIL_DEARROW.getBoolean();
+        return Settings.ALT_THUMBNAIL_DEARROW.get();
     }
 
     private static boolean usingVideoStills() {
-        return SettingsEnum.ALT_THUMBNAIL_STILLS.getBoolean();
+        return Settings.ALT_THUMBNAIL_STILLS.get();
     }
 
     /**
@@ -153,7 +153,7 @@ public final class AlternativeThumbnailsPatch {
             return true;
         }
         if (timeToResumeDeArrowAPICalls < System.currentTimeMillis()) {
-            LogHelper.printDebug(() -> "Resuming DeArrow API calls");
+            Logger.printDebug(() -> "Resuming DeArrow API calls");
             timeToResumeDeArrowAPICalls = 0;
             return true;
         }
@@ -161,15 +161,15 @@ public final class AlternativeThumbnailsPatch {
     }
 
     private static void handleDeArrowError(@NonNull String url, int statusCode) {
-        LogHelper.printDebug(() -> "Encountered DeArrow error.  Url: " + url);
+        Logger.printDebug(() -> "Encountered DeArrow error.  Url: " + url);
         final long now = System.currentTimeMillis();
         if (timeToResumeDeArrowAPICalls < now) {
             timeToResumeDeArrowAPICalls = now + DEARROW_FAILURE_API_BACKOFF_MILLISECONDS;
-            if (SettingsEnum.ALT_THUMBNAIL_DEARROW_CONNECTION_TOAST.getBoolean()) {
+            if (Settings.ALT_THUMBNAIL_DEARROW_CONNECTION_TOAST.get()) {
                 String toastMessage = (statusCode != 0)
                         ? str("revanced_alt_thumbnail_dearrow_error", statusCode)
                         : str("revanced_alt_thumbnail_dearrow_error_generic");
-                ReVancedUtils.showToastLong(toastMessage);
+                Utils.showToastLong(toastMessage);
             }
         }
     }
@@ -192,7 +192,7 @@ public final class AlternativeThumbnailsPatch {
                 return originalUrl; // Not a thumbnail.
             }
 
-            LogHelper.printDebug(() -> "Original url: " + decodedUrl.sanitizedUrl);
+            Logger.printDebug(() -> "Original url: " + decodedUrl.sanitizedUrl);
 
             ThumbnailQuality qualityToUse = ThumbnailQuality.getQualityToUse(decodedUrl.imageQuality);
             if (qualityToUse == null) {
@@ -217,13 +217,13 @@ public final class AlternativeThumbnailsPatch {
             }
 
             // Do not log any tracking parameters.
-            LogHelper.printDebug(() -> "Replacement url: " + sanitizedReplacementUrl);
+            Logger.printDebug(() -> "Replacement url: " + sanitizedReplacementUrl);
 
             return includeTracking
                     ? sanitizedReplacementUrl + decodedUrl.viewTrackingParameters
                     : sanitizedReplacementUrl;
         } catch (Exception ex) {
-            LogHelper.printException(() -> "overrideImageURL failure", ex);
+            Logger.printException(() -> "overrideImageURL failure", ex);
             return originalUrl;
         }
     }
@@ -243,7 +243,7 @@ public final class AlternativeThumbnailsPatch {
             String url = responseInfo.getUrl();
 
             if (usingDeArrow() && urlIsDeArrow(url)) {
-                LogHelper.printDebug(() -> "handleCronetSuccess, statusCode: " + statusCode);
+                Logger.printDebug(() -> "handleCronetSuccess, statusCode: " + statusCode);
                 if (statusCode == 304) {
                     // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/304
                     return; // Normal response.
@@ -265,19 +265,19 @@ public final class AlternativeThumbnailsPatch {
                     return; // Not a thumbnail.
                 }
 
-                LogHelper.printDebug(() -> "handleCronetSuccess, image not available: " + url);
+                Logger.printDebug(() -> "handleCronetSuccess, image not available: " + url);
 
                 ThumbnailQuality quality = ThumbnailQuality.altImageNameToQuality(decodedUrl.imageQuality);
                 if (quality == null) {
                     // Video is a short or a seekbar thumbnail, but somehow did not load.  Should not happen.
-                    LogHelper.printDebug(() -> "Failed to recognize image quality of url: " + decodedUrl.sanitizedUrl);
+                    Logger.printDebug(() -> "Failed to recognize image quality of url: " + decodedUrl.sanitizedUrl);
                     return;
                 }
 
                 VerifiedQualities.setAltThumbnailDoesNotExist(decodedUrl.videoId, quality);
             }
         } catch (Exception ex) {
-            LogHelper.printException(() -> "Callback success error", ex);
+            Logger.printException(() -> "Callback success error", ex);
         }
     }
 
@@ -299,7 +299,7 @@ public final class AlternativeThumbnailsPatch {
             if (usingDeArrow()) {
                 String url = ((CronetUrlRequest) request).getHookedUrl();
                 if (urlIsDeArrow(url)) {
-                    LogHelper.printDebug(() -> "handleCronetFailure, exception: " + exception);
+                    Logger.printDebug(() -> "handleCronetFailure, exception: " + exception);
                     final int statusCode = (responseInfo != null)
                             ? responseInfo.getHttpStatusCode()
                             : 0;
@@ -307,7 +307,7 @@ public final class AlternativeThumbnailsPatch {
                 }
             }
         } catch (Exception ex) {
-            LogHelper.printException(() -> "Callback failure error", ex);
+            Logger.printException(() -> "Callback failure error", ex);
         }
     }
 
@@ -365,7 +365,7 @@ public final class AlternativeThumbnailsPatch {
                 return null; // Not a thumbnail for a regular video.
             }
 
-            final boolean useFastQuality = SettingsEnum.ALT_THUMBNAIL_STILLS_FAST.getBoolean();
+            final boolean useFastQuality = Settings.ALT_THUMBNAIL_STILLS_FAST.get();
             // SD is max resolution for fast alt images.
             return switch (quality) {
                 // SD alt images have somewhat worse quality with washed out color and poor contrast.
@@ -401,7 +401,7 @@ public final class AlternativeThumbnailsPatch {
         }
 
         String getAltImageNameToUse() {
-            return altImageName + SettingsEnum.ALT_THUMBNAIL_STILLS_TIME.getInt();
+            return altImageName + Settings.ALT_THUMBNAIL_STILLS_TIME.get();
         }
     }
 
@@ -446,7 +446,7 @@ public final class AlternativeThumbnailsPatch {
 
         static boolean verifyAltThumbnailExist(@NonNull String videoId, @NonNull ThumbnailQuality quality,
                                                @NonNull String imageUrl) {
-            VerifiedQualities verified = getVerifiedQualities(videoId, SettingsEnum.ALT_THUMBNAIL_STILLS_FAST.getBoolean());
+            VerifiedQualities verified = getVerifiedQualities(videoId, Settings.ALT_THUMBNAIL_STILLS_FAST.get());
             if (verified == null) return true; // Fast alt thumbnails is enabled.
             return verified.verifyYouTubeThumbnailExists(videoId, quality, imageUrl);
         }
@@ -484,7 +484,7 @@ public final class AlternativeThumbnailsPatch {
                     lowestQualityNotAvailable = quality;
                     timeToReVerifyLowestQuality = System.currentTimeMillis() + NOT_AVAILABLE_TIMEOUT_MILLISECONDS;
                 }
-                LogHelper.printDebug(() -> quality + " not available for video: " + videoId);
+                Logger.printDebug(() -> quality + " not available for video: " + videoId);
             }
         }
 
@@ -497,13 +497,13 @@ public final class AlternativeThumbnailsPatch {
                 return true; // Previously verified as existing.
             }
 
-            final boolean fastQuality = SettingsEnum.ALT_THUMBNAIL_STILLS_FAST.getBoolean();
+            final boolean fastQuality = Settings.ALT_THUMBNAIL_STILLS_FAST.get();
             if (lowestQualityNotAvailable != null && lowestQualityNotAvailable.ordinal() <= quality.ordinal()) {
                 if (fastQuality || System.currentTimeMillis() < timeToReVerifyLowestQuality) {
                     return false; // Previously verified as not existing.
                 }
                 // Enough time has passed, and should re-verify again.
-                LogHelper.printDebug(() -> "Resetting lowest verified quality for: " + videoId);
+                Logger.printDebug(() -> "Resetting lowest verified quality for: " + videoId);
                 lowestQualityNotAvailable = null;
             }
 
@@ -513,11 +513,11 @@ public final class AlternativeThumbnailsPatch {
 
             boolean imageFileFound;
             try {
-                LogHelper.printDebug(() -> "Verifying image: " + imageUrl);
+                Logger.printDebug(() -> "Verifying image: " + imageUrl);
                 // This hooked code is running on a low priority thread, and it's slightly faster
                 // to run the url connection thru the integrations thread pool which runs at the highest priority.
                 final long start = System.currentTimeMillis();
-                imageFileFound = ReVancedUtils.submitOnBackgroundThread(() -> {
+                imageFileFound = Utils.submitOnBackgroundThread(() -> {
                     HttpURLConnection connection = (HttpURLConnection) new URL(imageUrl).openConnection();
                     connection.setConnectTimeout(5000);
                     connection.setReadTimeout(5000);
@@ -531,13 +531,13 @@ public final class AlternativeThumbnailsPatch {
                         return (contentType != null && contentType.startsWith("image"));
                     }
                     if (responseCode != HttpURLConnection.HTTP_NOT_FOUND) {
-                        LogHelper.printDebug(() -> "Unexpected response code: " + responseCode + " for url: " + imageUrl);
+                        Logger.printDebug(() -> "Unexpected response code: " + responseCode + " for url: " + imageUrl);
                     }
                     return false;
                 }).get();
-                LogHelper.printDebug(() -> "Alt verification took: " + (System.currentTimeMillis() - start) + "ms");
+                Logger.printDebug(() -> "Alt verification took: " + (System.currentTimeMillis() - start) + "ms");
             } catch (ExecutionException | InterruptedException ex) {
-                LogHelper.printInfo(() -> "Could not verify alt url: " + imageUrl, ex);
+                Logger.printInfo(() -> "Could not verify alt url: " + imageUrl, ex);
                 imageFileFound = false;
             }
 

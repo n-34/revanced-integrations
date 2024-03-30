@@ -2,7 +2,7 @@ package app.revanced.integrations.youtube.swipecontrols.controller.gesture
 
 import android.view.MotionEvent
 import app.revanced.integrations.youtube.patches.swipe.SwipeControlsPatch.isEngagementOverlayVisible
-import app.revanced.integrations.youtube.settings.SettingsEnum
+import app.revanced.integrations.youtube.settings.Settings
 import app.revanced.integrations.youtube.shared.LockModeState
 import app.revanced.integrations.youtube.swipecontrols.SwipeControlsHostActivity
 import app.revanced.integrations.youtube.swipecontrols.controller.gesture.core.BaseGestureController
@@ -59,7 +59,7 @@ class PressToSwipeController(
         distanceY: Double
     ): Boolean {
         // cancel if locked
-        if (!SettingsEnum.SWIPE_LOCK_MODE.boolean && LockModeState.current.isLocked())
+        if (!Settings.SWIPE_LOCK_MODE.get() && LockModeState.current.isLocked())
             return false
         // cancel if not in swipe session or vertical
         if (!isInSwipeSession || currentSwipe != SwipeDetector.SwipeDirection.VERTICAL)

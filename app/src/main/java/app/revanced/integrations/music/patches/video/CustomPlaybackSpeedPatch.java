@@ -1,12 +1,12 @@
 package app.revanced.integrations.music.patches.video;
 
-import static app.revanced.integrations.music.utils.StringRef.str;
+import static app.revanced.integrations.shared.utils.StringRef.str;
 
 import java.util.Arrays;
 
-import app.revanced.integrations.music.settings.SettingsEnum;
-import app.revanced.integrations.music.utils.LogHelper;
-import app.revanced.integrations.music.utils.ReVancedUtils;
+import app.revanced.integrations.music.settings.Settings;
+import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.Utils;
 
 @SuppressWarnings("unused")
 public class CustomPlaybackSpeedPatch {
@@ -38,16 +38,16 @@ public class CustomPlaybackSpeedPatch {
 
     private static void resetCustomSpeeds(boolean shouldWarning) {
         if (shouldWarning) {
-            ReVancedUtils.showToastShort(getWarningMessage());
+            Utils.showToastShort(getWarningMessage());
         }
 
-        ReVancedUtils.showToastShort(str("revanced_custom_playback_speeds_invalid"));
-        SettingsEnum.CUSTOM_PLAYBACK_SPEEDS.resetToDefault();
+        Utils.showToastShort(str("revanced_custom_playback_speeds_invalid"));
+        Settings.CUSTOM_PLAYBACK_SPEEDS.resetToDefault();
     }
 
     public static void loadCustomSpeeds() {
         try {
-            String[] speedStrings = SettingsEnum.CUSTOM_PLAYBACK_SPEEDS.getString().split("\\s+");
+            String[] speedStrings = Settings.CUSTOM_PLAYBACK_SPEEDS.get().split("\\s+");
             Arrays.sort(speedStrings);
             if (speedStrings.length == 0) {
                 throw new IllegalArgumentException();
@@ -66,7 +66,7 @@ public class CustomPlaybackSpeedPatch {
                 customPlaybackSpeeds[i] = speed;
             }
         } catch (Exception ex) {
-            LogHelper.printInfo(() -> "parse error", ex);
+            Logger.printInfo(() -> "parse error", ex);
             resetCustomSpeeds(false);
             loadCustomSpeeds();
         }

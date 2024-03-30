@@ -1,9 +1,9 @@
 package app.revanced.integrations.music.patches.player;
 
-import static app.revanced.integrations.music.utils.ReVancedUtils.hideViewUnderCondition;
-import static app.revanced.integrations.music.utils.ReVancedUtils.showToastShort;
-import static app.revanced.integrations.music.utils.ResourceUtils.identifier;
-import static app.revanced.integrations.music.utils.StringRef.str;
+import static app.revanced.integrations.shared.utils.ResourceUtils.identifier;
+import static app.revanced.integrations.shared.utils.StringRef.str;
+import static app.revanced.integrations.shared.utils.Utils.hideViewUnderCondition;
+import static app.revanced.integrations.shared.utils.Utils.showToastShort;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -19,11 +19,10 @@ import androidx.annotation.NonNull;
 import java.util.Arrays;
 
 import app.revanced.integrations.music.patches.utils.CheckMusicVideoPatch;
-import app.revanced.integrations.music.settings.SettingsEnum;
-import app.revanced.integrations.music.shared.PlayerType;
+import app.revanced.integrations.music.settings.Settings;
 import app.revanced.integrations.music.shared.VideoType;
-import app.revanced.integrations.music.utils.ResourceType;
-import app.revanced.integrations.music.utils.VideoHelpers;
+import app.revanced.integrations.music.utils.VideoUtils;
+import app.revanced.integrations.shared.utils.ResourceType;
 
 @SuppressWarnings("unused")
 public class PlayerPatch {
@@ -35,46 +34,46 @@ public class PlayerPatch {
     public static View nextButton;
 
     public static boolean enableColorMatchPlayer() {
-        return SettingsEnum.ENABLE_COLOR_MATCH_PLAYER.getBoolean();
+        return Settings.ENABLE_COLOR_MATCH_PLAYER.get();
     }
 
     public static boolean enableForceMinimizedPlayer(boolean original) {
-        return SettingsEnum.ENABLE_FORCE_MINIMIZED_PLAYER.getBoolean() || original;
+        return Settings.ENABLE_FORCE_MINIMIZED_PLAYER.get() || original;
     }
 
     public static boolean enableMiniPlayerNextButton(boolean original) {
-        return !SettingsEnum.ENABLE_MINI_PLAYER_NEXT_BUTTON.getBoolean() && original;
+        return !Settings.ENABLE_MINI_PLAYER_NEXT_BUTTON.get() && original;
     }
 
     public static boolean enableOldPlayerBackground(boolean original) {
-        if (!SettingsEnum.SETTINGS_INITIALIZED.getBoolean()) {
+        if (!Settings.SETTINGS_INITIALIZED.get()) {
             return original;
         }
-        return !SettingsEnum.ENABLE_OLD_PLAYER_BACKGROUND.getBoolean();
+        return !Settings.ENABLE_OLD_PLAYER_BACKGROUND.get();
     }
 
     public static boolean enableOldPlayerLayout(boolean original) {
-        if (!SettingsEnum.SETTINGS_INITIALIZED.getBoolean()) {
+        if (!Settings.SETTINGS_INITIALIZED.get()) {
             return original;
         }
-        return !SettingsEnum.ENABLE_OLD_PLAYER_LAYOUT.getBoolean();
+        return !Settings.ENABLE_OLD_PLAYER_LAYOUT.get();
     }
 
     public static boolean enableSwipeToDismissMiniPlayer() {
-        return SettingsEnum.ENABLE_SWIPE_TO_DISMISS_MINI_PLAYER.getBoolean();
+        return Settings.ENABLE_SWIPE_TO_DISMISS_MINI_PLAYER.get();
     }
 
     public static boolean enableSwipeToDismissMiniPlayer(boolean original) {
-        return !SettingsEnum.ENABLE_SWIPE_TO_DISMISS_MINI_PLAYER.getBoolean() && original;
+        return !Settings.ENABLE_SWIPE_TO_DISMISS_MINI_PLAYER.get() && original;
     }
 
     public static Object enableSwipeToDismissMiniPlayer(Object object) {
-        return SettingsEnum.ENABLE_SWIPE_TO_DISMISS_MINI_PLAYER.getBoolean() ? null : object;
+        return Settings.ENABLE_SWIPE_TO_DISMISS_MINI_PLAYER.get() ? null : object;
     }
 
     public static int enableZenMode(int originalColor) {
-        if (SettingsEnum.ENABLE_ZEN_MODE.getBoolean() && originalColor == MUSIC_VIDEO_ORIGINAL_BACKGROUND_COLOR) {
-            if (SettingsEnum.ENABLE_ZEN_MODE_PODCAST.getBoolean() || !VideoType.getCurrent().isPodCast()) {
+        if (Settings.ENABLE_ZEN_MODE.get() && originalColor == MUSIC_VIDEO_ORIGINAL_BACKGROUND_COLOR) {
+            if (Settings.ENABLE_ZEN_MODE_PODCAST.get() || !VideoType.getCurrent().isPodCast()) {
                 return MUSIC_VIDEO_GREY_BACKGROUND_COLOR;
             }
         }
@@ -82,7 +81,7 @@ public class PlayerPatch {
     }
 
     public static int getShuffleState() {
-        return SettingsEnum.SHUFFLE_SATE.getInt();
+        return Settings.SHUFFLE_SATE.get();
     }
 
     public static View[] getViewArray(View[] oldViewArray) {
@@ -106,7 +105,7 @@ public class PlayerPatch {
     }
 
     public static int hideFullscreenShareButton(int original) {
-        return SettingsEnum.HIDE_FULLSCREEN_SHARE_BUTTON.getBoolean() ? 0 : original;
+        return Settings.HIDE_FULLSCREEN_SHARE_BUTTON.get() ? 0 : original;
     }
 
     private static void prepareOpenMusic(@NonNull Context context) {
@@ -119,19 +118,19 @@ public class PlayerPatch {
             showToastShort(str("revanced_playlist_error"));
             return;
         }
-        VideoHelpers.openInMusic(context, songId);
+        VideoUtils.openInMusic(context, songId);
     }
 
     public static boolean rememberRepeatState(boolean original) {
-        return SettingsEnum.REMEMBER_REPEAT_SATE.getBoolean() || original;
+        return Settings.REMEMBER_REPEAT_SATE.get() || original;
     }
 
     public static boolean rememberShuffleState() {
-        return SettingsEnum.REMEMBER_SHUFFLE_SATE.getBoolean();
+        return Settings.REMEMBER_SHUFFLE_SATE.get();
     }
 
     public static void replaceCastButton(Activity activity, ViewGroup viewGroup, View originalView) {
-        if (!SettingsEnum.REPLACE_PLAYER_CAST_BUTTON.getBoolean()) {
+        if (!Settings.REPLACE_PLAYER_CAST_BUTTON.get()) {
             viewGroup.addView(originalView);
             return;
         }
@@ -149,7 +148,7 @@ public class PlayerPatch {
             return;
 
         hideViewUnderCondition(
-                !SettingsEnum.ENABLE_MINI_PLAYER_NEXT_BUTTON.getBoolean(),
+                !Settings.ENABLE_MINI_PLAYER_NEXT_BUTTON.get(),
                 nextButtonView
         );
 
@@ -158,7 +157,7 @@ public class PlayerPatch {
 
     // rest of the implementation added by patch.
     private static void setNextButtonOnClickListener(View view) {
-        if (SettingsEnum.ENABLE_MINI_PLAYER_NEXT_BUTTON.getBoolean())
+        if (Settings.ENABLE_MINI_PLAYER_NEXT_BUTTON.get())
             view.getClass();
     }
 
@@ -167,7 +166,7 @@ public class PlayerPatch {
             return;
 
         hideViewUnderCondition(
-                !SettingsEnum.ENABLE_MINI_PLAYER_PREVIOUS_BUTTON.getBoolean(),
+                !Settings.ENABLE_MINI_PLAYER_PREVIOUS_BUTTON.get(),
                 previousButtonView
         );
 
@@ -176,13 +175,13 @@ public class PlayerPatch {
 
     // rest of the implementation added by patch.
     private static void setPreviousButtonOnClickListener(View view) {
-        if (SettingsEnum.ENABLE_MINI_PLAYER_PREVIOUS_BUTTON.getBoolean())
+        if (Settings.ENABLE_MINI_PLAYER_PREVIOUS_BUTTON.get())
             view.getClass();
     }
 
     public static void setShuffleState(int buttonState) {
-        if (!SettingsEnum.REMEMBER_SHUFFLE_SATE.getBoolean())
+        if (!Settings.REMEMBER_SHUFFLE_SATE.get())
             return;
-        SettingsEnum.SHUFFLE_SATE.saveValue(buttonState);
+        Settings.SHUFFLE_SATE.save(buttonState);
     }
 }

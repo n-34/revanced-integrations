@@ -1,14 +1,16 @@
 package app.revanced.integrations.youtube.patches.components;
 
-import app.revanced.integrations.youtube.settings.SettingsEnum;
+import app.revanced.integrations.shared.patches.components.Filter;
+import app.revanced.integrations.shared.patches.components.StringFilterGroup;
+import app.revanced.integrations.youtube.settings.Settings;
 
 @SuppressWarnings("unused")
-final class CaptionsFilter extends Filter {
+public final class CaptionsFilter extends Filter {
 
     public CaptionsFilter() {
-        pathFilterGroupList.addAll(
+        addPathCallbacks(
                 new StringFilterGroup(
-                        SettingsEnum.HIDE_CAPTIONS_BUTTON,
+                        Settings.HIDE_CAPTIONS_BUTTON,
                         "captions_button.eml"
                 )
         );
