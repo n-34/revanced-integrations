@@ -28,9 +28,9 @@ public class InitializationPatch {
         Utils.runOnMainThreadDelayed(() -> BaseSettings.SETTINGS_INITIALIZED.save(true), 1000);
     }
 
-    public static void setDeviceInformation(@NonNull Context context) {
-        ExtendedUtils.setPackageName(context);
-        ExtendedUtils.setApplicationLabel(context);
-        ExtendedUtils.setVersionName(context);
+    public static void setDeviceInformation(@NonNull Activity mActivity) {
+        ExtendedUtils.setPackageName(mActivity);
+        ExtendedUtils.setApplicationLabel(mActivity);
+        ExtendedUtils.setVersionName(mActivity);
     }
 }
