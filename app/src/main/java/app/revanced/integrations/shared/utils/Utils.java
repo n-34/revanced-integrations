@@ -1,5 +1,7 @@
 package app.revanced.integrations.shared.utils;
 
+import static app.revanced.integrations.shared.utils.ResourceUtils.getIdIdentifier;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ClipboardManager;
@@ -41,6 +43,7 @@ import java.util.concurrent.TimeUnit;
 import app.revanced.integrations.shared.settings.BooleanSetting;
 import kotlin.text.Regex;
 
+/** @noinspection deprecation*/
 public class Utils {
 
     @SuppressLint("StaticFieldLeak")
@@ -181,8 +184,26 @@ public class Utils {
         boolean matches(T object);
     }
 
+    public static <R extends View> R getChildView(@NonNull Activity activity, @NonNull String str) {
+        final View decorView = activity.getWindow().getDecorView();
+        return getChildView(decorView, str);
+    }
+
+    /**
+     * @noinspection unchecked
+     */
+    public static <R extends View> R getChildView(@NonNull View view, @NonNull String str) {
+        view = view.findViewById(getIdIdentifier(str));
+        if (view != null) {
+            return (R) view;
+        } else {
+            throw new IllegalArgumentException("View with name" + str +" not found");
+        }
+    }
+
     /**
      * @return The first child view that matches the filter.
+     * @noinspection rawtypes, unchecked
      */
     @Nullable
     public static <T extends View> T getChildView(@NonNull ViewGroup viewGroup, @NonNull MatchFilter filter) {
@@ -475,9 +496,9 @@ public class Utils {
 
     /**
      * Sort a PreferenceGroup and all it's sub groups by title or key.
-     *
+     * <p>
      * Sort order is determined by the preferences key {@link Sort} suffix.
-     *
+     * <p>
      * If a preference has no key or no {@link Sort} suffix,
      * then the preferences are left unsorted.
      */

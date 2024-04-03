@@ -1,6 +1,6 @@
 package app.revanced.integrations.music.patches.flyout;
 
-import static app.revanced.integrations.shared.utils.ResourceUtils.identifier;
+import static app.revanced.integrations.shared.utils.ResourceUtils.getIdentifier;
 import static app.revanced.integrations.shared.utils.StringRef.str;
 import static app.revanced.integrations.shared.utils.Utils.clickView;
 import static app.revanced.integrations.shared.utils.Utils.runOnMainThreadDelayed;
@@ -22,7 +22,7 @@ import app.revanced.integrations.music.patches.video.PlaybackSpeedPatch;
 import app.revanced.integrations.music.settings.Settings;
 import app.revanced.integrations.music.utils.VideoUtils;
 import app.revanced.integrations.shared.utils.Logger;
-import app.revanced.integrations.shared.utils.ResourceType;
+import app.revanced.integrations.shared.utils.ResourceUtils.ResourceType;
 import app.revanced.integrations.shared.utils.Utils;
 
 @SuppressWarnings("unused")
@@ -88,7 +88,7 @@ public class FlyoutPatch {
 
         runOnMainThreadDelayed(() -> {
                     textView.setText(str("revanced_flyout_panel_watch_on_youtube"));
-                    imageView.setImageResource(identifier("yt_outline_youtube_logo_icon_vd_theme_24", ResourceType.DRAWABLE, clickAbleArea.getContext()));
+                    imageView.setImageResource(getIdentifier("yt_outline_youtube_logo_icon_vd_theme_24", ResourceType.DRAWABLE, clickAbleArea.getContext()));
                     clickAbleArea.setOnClickListener(viewGroup -> VideoUtils.openInYouTube(viewGroup.getContext()));
                 }, 0L
         );
@@ -106,7 +106,7 @@ public class FlyoutPatch {
 
         runOnMainThreadDelayed(() -> {
                     textView.setText(str("playback_rate_title"));
-                    imageView.setImageResource(identifier("yt_outline_play_arrow_half_circle_black_24", ResourceType.DRAWABLE, clickAbleArea.getContext()));
+                    imageView.setImageResource(getIdentifier("yt_outline_play_arrow_half_circle_black_24", ResourceType.DRAWABLE, clickAbleArea.getContext()));
                     imageView.setColorFilter(cf);
                     clickAbleArea.setOnClickListener(view -> {
                         clickView(touchOutSideView);

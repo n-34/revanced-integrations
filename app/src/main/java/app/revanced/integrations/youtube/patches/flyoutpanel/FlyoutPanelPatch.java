@@ -8,7 +8,6 @@ import android.widget.TextView;
 
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.ResourceUtils;
-import app.revanced.integrations.shared.utils.StringRef;
 import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.patches.components.VideoQualityMenuFilter;
 import app.revanced.integrations.youtube.settings.Settings;
@@ -38,15 +37,8 @@ public class FlyoutPanelPatch {
         );
     }
 
-    /**
-     * The toggle's strings must follow the language set in the YouTube app.
-     * So use {@link ResourceUtils#string(String)} instead of {@link StringRef#str(String)}.
-     *
-     * @param str identifier.
-     * @return toggle's strings.
-     */
     public static String getToggleString(String str) {
-        return ResourceUtils.string(str);
+        return ResourceUtils.getString(str);
     }
 
     /**

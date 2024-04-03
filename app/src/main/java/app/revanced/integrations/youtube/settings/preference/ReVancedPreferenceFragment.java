@@ -2,7 +2,7 @@ package app.revanced.integrations.youtube.settings.preference;
 
 import static app.revanced.integrations.shared.settings.preference.AbstractPreferenceFragment.showRestartDialog;
 import static app.revanced.integrations.shared.settings.preference.AbstractPreferenceFragment.updateListPreferenceSummary;
-import static app.revanced.integrations.shared.utils.ResourceUtils.identifier;
+import static app.revanced.integrations.shared.utils.ResourceUtils.getXmlIdentifier;
 import static app.revanced.integrations.shared.utils.StringRef.str;
 import static app.revanced.integrations.shared.utils.Utils.showToastShort;
 import static app.revanced.integrations.youtube.settings.Settings.DEFAULT_PLAYBACK_SPEED;
@@ -39,7 +39,6 @@ import java.util.Objects;
 import app.revanced.integrations.shared.settings.BooleanSetting;
 import app.revanced.integrations.shared.settings.Setting;
 import app.revanced.integrations.shared.utils.Logger;
-import app.revanced.integrations.shared.utils.ResourceType;
 import app.revanced.integrations.youtube.patches.video.CustomPlaybackSpeedPatch;
 import app.revanced.integrations.youtube.utils.ExtendedUtils;
 
@@ -127,7 +126,7 @@ public class ReVancedPreferenceFragment extends PreferenceFragment {
             final PreferenceManager mPreferenceManager = getPreferenceManager();
             mPreferenceManager.setSharedPreferencesName(Setting.preferences.name);
             mSharedPreferences = mPreferenceManager.getSharedPreferences();
-            addPreferencesFromResource(identifier("revanced_prefs", ResourceType.XML));
+            addPreferencesFromResource(getXmlIdentifier("revanced_prefs"));
 
             setPreferenceManager(mPreferenceManager);
             enableDisablePreferences();

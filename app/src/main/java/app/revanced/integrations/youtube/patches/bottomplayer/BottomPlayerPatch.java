@@ -1,22 +1,17 @@
 package app.revanced.integrations.youtube.patches.bottomplayer;
 
-import static app.revanced.integrations.shared.utils.ResourceUtils.identifier;
+import static app.revanced.integrations.shared.utils.ResourceUtils.getIdIdentifier;
 
 import android.view.View;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 
-import app.revanced.integrations.shared.utils.ResourceType;
 import app.revanced.integrations.youtube.settings.Settings;
 
 @SuppressWarnings("unused")
 public class BottomPlayerPatch {
-    private static final int inlineExtraButtonId;
-
-    static {
-        inlineExtraButtonId = identifier("inline_extra_buttons", ResourceType.ID);
-    }
+    private static final int inlineExtraButtonId = getIdIdentifier("inline_extra_buttons");
 
     public static void changeEmojiPickerOpacity(ImageView imageView) {
         if (!Settings.HIDE_EMOJI_PICKER.get())

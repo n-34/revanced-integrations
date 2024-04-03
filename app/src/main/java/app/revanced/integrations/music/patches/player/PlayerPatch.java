@@ -1,6 +1,6 @@
 package app.revanced.integrations.music.patches.player;
 
-import static app.revanced.integrations.shared.utils.ResourceUtils.identifier;
+import static app.revanced.integrations.shared.utils.ResourceUtils.getLayoutIdentifier;
 import static app.revanced.integrations.shared.utils.StringRef.str;
 import static app.revanced.integrations.shared.utils.Utils.hideViewUnderCondition;
 import static app.revanced.integrations.shared.utils.Utils.showToastShort;
@@ -22,7 +22,6 @@ import app.revanced.integrations.music.patches.utils.CheckMusicVideoPatch;
 import app.revanced.integrations.music.settings.Settings;
 import app.revanced.integrations.music.shared.VideoType;
 import app.revanced.integrations.music.utils.VideoUtils;
-import app.revanced.integrations.shared.utils.ResourceType;
 
 @SuppressWarnings("unused")
 public class PlayerPatch {
@@ -135,7 +134,7 @@ public class PlayerPatch {
             return;
         }
 
-        LinearLayout linearLayout = (LinearLayout) LayoutInflater.from(activity).inflate(identifier("open_music_button", ResourceType.LAYOUT), null);
+        LinearLayout linearLayout = (LinearLayout) LayoutInflater.from(activity).inflate(getLayoutIdentifier("open_music_button"), null);
         ImageView musicButtonView = (ImageView) linearLayout.getChildAt(0);
 
         musicButtonView.setOnClickListener(imageView -> prepareOpenMusic(imageView.getContext()));

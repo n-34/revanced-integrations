@@ -1,8 +1,8 @@
 package app.revanced.integrations.youtube.settings.preference;
 
 import static app.revanced.integrations.shared.settings.preference.AbstractPreferenceFragment.showRestartDialog;
+import static app.revanced.integrations.shared.utils.ResourceUtils.getStringArray;
 import static app.revanced.integrations.shared.utils.StringRef.str;
-import static app.revanced.integrations.youtube.utils.ExtendedUtils.getStringArray;
 import static app.revanced.integrations.youtube.utils.ExtendedUtils.isPackageEnabled;
 import static app.revanced.integrations.youtube.utils.ExtendedUtils.isSpoofingToLessThan;
 
@@ -217,9 +217,9 @@ public class ReVancedSettingsPreference extends ReVancedPreferenceFragment {
             if (externalDownloaderPreferenceScreen == null)
                 return;
 
-            final String[] labelArray = getStringArray(activity, EXTERNAL_DOWNLOADER_PREFERENCE_KEY + "_label");
-            final String[] packageNameArray = getStringArray(activity, EXTERNAL_DOWNLOADER_PREFERENCE_KEY + "_package_name");
-            final String[] websiteArray = getStringArray(activity, EXTERNAL_DOWNLOADER_PREFERENCE_KEY + "_website");
+            final String[] labelArray = getStringArray(EXTERNAL_DOWNLOADER_PREFERENCE_KEY + "_label");
+            final String[] packageNameArray = getStringArray(EXTERNAL_DOWNLOADER_PREFERENCE_KEY + "_package_name");
+            final String[] websiteArray = getStringArray(EXTERNAL_DOWNLOADER_PREFERENCE_KEY + "_website");
 
             final String[] mEntries = {str("revanced_external_downloader_download"), str("revanced_external_downloader_set"), str("accessibility_bottom_sheet_close_button")};
 

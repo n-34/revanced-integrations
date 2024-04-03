@@ -1,6 +1,7 @@
 package app.revanced.integrations.youtube.sponsorblock.ui;
 
-import static app.revanced.integrations.shared.utils.ResourceUtils.identifier;
+import static app.revanced.integrations.shared.utils.ResourceUtils.getLayoutIdentifier;
+import static app.revanced.integrations.shared.utils.Utils.getChildView;
 import static app.revanced.integrations.youtube.utils.ExtendedUtils.isFullscreenHidden;
 
 import android.content.Context;
@@ -16,7 +17,6 @@ import java.lang.ref.WeakReference;
 import java.util.Objects;
 
 import app.revanced.integrations.shared.utils.Logger;
-import app.revanced.integrations.shared.utils.ResourceType;
 import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.shared.PlayerType;
 import app.revanced.integrations.youtube.sponsorblock.objects.SponsorSegment;
@@ -62,7 +62,7 @@ public class SponsorBlockViewController {
             Context context = Utils.getContext();
             RelativeLayout layout = new RelativeLayout(context);
             layout.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,RelativeLayout.LayoutParams.MATCH_PARENT));
-            LayoutInflater.from(context).inflate(identifier("revanced_sb_inline_sponsor_overlay", ResourceType.LAYOUT), layout);
+            LayoutInflater.from(context).inflate(getLayoutIdentifier("revanced_sb_inline_sponsor_overlay"), layout);
             inlineSponsorOverlayRef = new WeakReference<>(layout);
 
             viewGroup.addView(layout);
@@ -82,11 +82,11 @@ public class SponsorBlockViewController {
             youtubeOverlaysLayoutRef = new WeakReference<>(viewGroup);
 
             skipHighlightButtonRef = new WeakReference<>(
-                    Objects.requireNonNull(layout.findViewById(identifier("revanced_sb_skip_highlight_button", ResourceType.ID))));
+                    Objects.requireNonNull(getChildView(layout, "revanced_sb_skip_highlight_button")));
             skipSponsorButtonRef = new WeakReference<>(
-                    Objects.requireNonNull(layout.findViewById(identifier("revanced_sb_skip_sponsor_button", ResourceType.ID))));
+                    Objects.requireNonNull(getChildView(layout, "revanced_sb_skip_sponsor_button")));
             newSegmentLayoutRef = new WeakReference<>(
-                    Objects.requireNonNull(layout.findViewById(identifier("revanced_sb_new_segment_view", ResourceType.ID))));
+                    Objects.requireNonNull(getChildView(layout, "revanced_sb_new_segment_view")));
 
             newSegmentLayoutVisible = false;
             skipHighlight = null;

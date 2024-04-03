@@ -1,9 +1,10 @@
 package app.revanced.integrations.youtube.sponsorblock.ui;
 
-import static app.revanced.integrations.shared.utils.ResourceUtils.identifier;
+import static app.revanced.integrations.shared.utils.ResourceUtils.getDimension;
+import static app.revanced.integrations.shared.utils.ResourceUtils.getIdIdentifier;
+import static app.revanced.integrations.shared.utils.ResourceUtils.getLayoutIdentifier;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +16,6 @@ import androidx.annotation.NonNull;
 
 import java.util.Objects;
 
-import app.revanced.integrations.shared.utils.ResourceType;
 import app.revanced.integrations.youtube.sponsorblock.SegmentPlaybackController;
 import app.revanced.integrations.youtube.sponsorblock.objects.SponsorSegment;
 
@@ -41,13 +41,12 @@ public class SkipSponsorButton extends FrameLayout {
     public SkipSponsorButton(Context context, AttributeSet attributeSet, int defStyleAttr, int defStyleRes) {
         super(context, attributeSet, defStyleAttr, defStyleRes);
 
-        LayoutInflater.from(context).inflate(identifier("revanced_sb_skip_sponsor_button", ResourceType.LAYOUT, context), this, true);  // layout:skip_ad_button
-        Resources resources = context.getResources();
-        setMinimumHeight(resources.getDimensionPixelSize(identifier("ad_skip_ad_button_min_height", ResourceType.DIMEN, context)));  // dimen:ad_skip_ad_button_min_height
-        final LinearLayout skipSponsorBtnContainer = (LinearLayout) Objects.requireNonNull((View) findViewById(identifier("revanced_sb_skip_sponsor_button_container", ResourceType.ID, context)));  // id:skip_ad_button_container
-        skipSponsorTextView = (TextView) Objects.requireNonNull((View) findViewById(identifier("revanced_sb_skip_sponsor_button_text", ResourceType.ID, context)));  // id:sb_skip_sponsor_button_text;
-        defaultBottomMargin = resources.getDimensionPixelSize(identifier("skip_button_default_bottom_margin", ResourceType.DIMEN, context));  // dimen:skip_button_default_bottom_margin
-        ctaBottomMargin = resources.getDimensionPixelSize(identifier("skip_button_cta_bottom_margin", ResourceType.DIMEN, context));  // dimen:skip_button_cta_bottom_margin
+        LayoutInflater.from(context).inflate(getLayoutIdentifier("revanced_sb_skip_sponsor_button"), this, true);  // layout:revanced_sb_skip_sponsor_button
+        setMinimumHeight(getDimension("ad_skip_ad_button_min_height"));  // dimen:ad_skip_ad_button_min_height
+        final LinearLayout skipSponsorBtnContainer = (LinearLayout) Objects.requireNonNull((View) findViewById(getIdIdentifier("revanced_sb_skip_sponsor_button_container")));  // id:revanced_sb_skip_sponsor_button_container
+        skipSponsorTextView = (TextView) Objects.requireNonNull((View) findViewById(getIdIdentifier("revanced_sb_skip_sponsor_button_text")));  // id:revanced_sb_skip_sponsor_button_text;
+        defaultBottomMargin = getDimension("brand_interaction_default_bottom_margin");  // dimen:skip_button_default_bottom_margin
+        ctaBottomMargin = getDimension("brand_interaction_cta_bottom_margin");  // dimen:skip_button_cta_bottom_margin
         hiddenBottomMargin = (int) Math.round((ctaBottomMargin) * 0.5);  // margin when the button container is hidden
 
         skipSponsorBtnContainer.setOnClickListener(v -> {

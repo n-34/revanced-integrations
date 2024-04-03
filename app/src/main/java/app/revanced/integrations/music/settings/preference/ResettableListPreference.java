@@ -1,7 +1,7 @@
 package app.revanced.integrations.music.settings.preference;
 
 import static app.revanced.integrations.music.utils.ExtendedUtils.getDialogBuilder;
-import static app.revanced.integrations.music.utils.ExtendedUtils.getStringArray;
+import static app.revanced.integrations.shared.utils.ResourceUtils.getStringArray;
 import static app.revanced.integrations.shared.utils.StringRef.str;
 
 import android.app.Activity;
@@ -22,8 +22,8 @@ public class ResettableListPreference {
 
             final String entryKey = settingsKey + "_entry";
             final String entryValueKey = settingsKey + "_entry_value";
-            final String[] mEntries = getStringArray(mActivity, entryKey);
-            final String[] mEntryValues = getStringArray(mActivity, entryValueKey);
+            final String[] mEntries = getStringArray(entryKey);
+            final String[] mEntryValues = getStringArray(entryValueKey);
 
             final int findIndex = Arrays.binarySearch(mEntryValues, setting.get());
             mClickedDialogEntryIndex = findIndex >= 0 ? findIndex : defaultIndex;

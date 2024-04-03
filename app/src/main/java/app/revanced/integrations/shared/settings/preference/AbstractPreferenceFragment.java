@@ -1,6 +1,6 @@
 package app.revanced.integrations.shared.settings.preference;
 
-import static app.revanced.integrations.shared.utils.ResourceUtils.identifier;
+import static app.revanced.integrations.shared.utils.ResourceUtils.getXmlIdentifier;
 import static app.revanced.integrations.shared.utils.StringRef.str;
 
 import android.annotation.SuppressLint;
@@ -24,7 +24,6 @@ import androidx.annotation.Nullable;
 import app.revanced.integrations.shared.settings.BooleanSetting;
 import app.revanced.integrations.shared.settings.Setting;
 import app.revanced.integrations.shared.utils.Logger;
-import app.revanced.integrations.shared.utils.ResourceType;
 import app.revanced.integrations.shared.utils.Utils;
 
 /**
@@ -82,7 +81,7 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragment {
      * so all app specific {@link Setting} instances are loaded before this method returns.
      */
     protected void initialize() {
-        final int id = identifier("revanced_prefs", ResourceType.XML);
+        final int id = getXmlIdentifier("revanced_prefs");
 
         if (id == 0) return;
         addPreferencesFromResource(id);

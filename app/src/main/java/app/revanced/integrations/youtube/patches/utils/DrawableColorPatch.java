@@ -1,12 +1,6 @@
 package app.revanced.integrations.youtube.patches.utils;
 
-import static app.revanced.integrations.shared.utils.ResourceUtils.identifier;
-
-import android.annotation.SuppressLint;
-import android.content.Context;
-
-import app.revanced.integrations.shared.utils.ResourceType;
-import app.revanced.integrations.shared.utils.Utils;
+import app.revanced.integrations.shared.utils.ResourceUtils;
 
 @SuppressWarnings("unused")
 public class DrawableColorPatch {
@@ -38,25 +32,13 @@ public class DrawableColorPatch {
     }
 
     private static int getBlackColor() {
-        if (blackColor == 0) blackColor = getColor("yt_black1");
+        if (blackColor == 0) blackColor = ResourceUtils.getColor("yt_black1");
         return blackColor;
     }
 
     private static int getWhiteColor() {
-        if (whiteColor == 0) whiteColor = getColor("yt_white1");
+        if (whiteColor == 0) whiteColor = ResourceUtils.getColor("yt_white1");
         return whiteColor;
-    }
-
-    /**
-     * Determines the color for a color resource.
-     *
-     * @param name The color resource name.
-     * @return The value of the color.
-     */
-    @SuppressLint("DiscouragedApi")
-    private static int getColor(String name) {
-        final Context context = Utils.getContext();
-        return context != null ? context.getColor(identifier(name, ResourceType.COLOR)) : 0;
     }
 
     private static boolean anyEquals(int value, int... of) {

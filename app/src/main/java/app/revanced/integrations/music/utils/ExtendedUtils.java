@@ -1,7 +1,5 @@
 package app.revanced.integrations.music.utils;
 
-import static app.revanced.integrations.shared.utils.ResourceUtils.identifier;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -17,7 +15,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import app.revanced.integrations.shared.utils.Logger;
-import app.revanced.integrations.shared.utils.ResourceType;
 
 public class ExtendedUtils {
     public static String applicationLabel = "RVX_Music";
@@ -92,10 +89,5 @@ public class ExtendedUtils {
         params.setMargins(left_margin, top_margin, right_margin, bottom_margin);
 
         return params;
-    }
-
-    @NonNull
-    public static String[] getStringArray(@NonNull Context context, @NonNull String key) {
-        return context.getResources().getStringArray(identifier(key, ResourceType.ARRAY));
     }
 }

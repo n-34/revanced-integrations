@@ -1,8 +1,8 @@
 package app.revanced.integrations.youtube.patches.overlaybutton;
 
-import static app.revanced.integrations.shared.utils.ResourceUtils.anim;
-import static app.revanced.integrations.shared.utils.ResourceUtils.findView;
-import static app.revanced.integrations.shared.utils.ResourceUtils.integer;
+import static app.revanced.integrations.shared.utils.ResourceUtils.getAnimation;
+import static app.revanced.integrations.shared.utils.ResourceUtils.getInteger;
+import static app.revanced.integrations.shared.utils.Utils.getChildView;
 
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,11 +30,11 @@ public abstract class BottomControlButton {
 
     static {
         // TODO: check if these durations are correct.
-        fadeIn = anim("fade_in");
-        fadeIn.setDuration(integer("fade_duration_fast"));
+        fadeIn = getAnimation("fade_in");
+        fadeIn.setDuration(getInteger("fade_duration_fast"));
 
-        fadeOut = anim("fade_out");
-        fadeOut.setDuration(integer("fade_duration_scheduled"));
+        fadeOut = getAnimation("fade_out");
+        fadeOut.setDuration(getInteger("fade_duration_scheduled"));
     }
 
     public BottomControlButton(@NonNull ViewGroup bottomControlsViewGroup, @NonNull String imageViewButtonId,
@@ -52,7 +52,7 @@ public abstract class BottomControlButton {
         setting = booleanSetting;
 
         // Create the button.
-        ImageView imageView = Objects.requireNonNull(findView(bottomControlsViewGroup, imageViewButtonId));
+        ImageView imageView = Objects.requireNonNull(getChildView(bottomControlsViewGroup, imageViewButtonId));
         if (interactionSetting != null) {
             this.interactionSetting = interactionSetting;
             imageView.setSelected(interactionSetting.get());

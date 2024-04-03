@@ -11,9 +11,9 @@ import static app.revanced.integrations.music.settings.Settings.SETTINGS_IMPORT_
 import static app.revanced.integrations.music.settings.Settings.SPOOF_APP_VERSION_TARGET;
 import static app.revanced.integrations.music.utils.ExtendedUtils.getDialogBuilder;
 import static app.revanced.integrations.music.utils.ExtendedUtils.getLayoutParams;
-import static app.revanced.integrations.music.utils.ExtendedUtils.getStringArray;
 import static app.revanced.integrations.music.utils.RestartUtils.showRestartDialog;
 import static app.revanced.integrations.shared.settings.Setting.getSettingFromPath;
+import static app.revanced.integrations.shared.utils.ResourceUtils.getStringArray;
 import static app.revanced.integrations.shared.utils.StringRef.str;
 import static app.revanced.integrations.shared.utils.Utils.showToastShort;
 
@@ -161,7 +161,7 @@ public class ReVancedPreferenceFragment extends PreferenceFragment {
     private void importExportListDialogBuilder() {
         try {
             final Activity activity = getActivity();
-            final String[] mEntries = getStringArray(activity, IMPORT_EXPORT_SETTINGS_ENTRY_KEY);
+            final String[] mEntries = getStringArray(IMPORT_EXPORT_SETTINGS_ENTRY_KEY);
 
             getDialogBuilder(activity)
                     .setTitle(str("revanced_extended_settings_import_export_title"))

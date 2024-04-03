@@ -64,10 +64,6 @@ public class FullscreenPatch {
         return Settings.HIDE_END_SCREEN_OVERLAY.get();
     }
 
-    public static int hideFullscreenPanels() {
-        return Settings.HIDE_FULLSCREEN_PANELS.get() ? 8 : 0;
-    }
-
     public static void hideFullscreenPanels(CoordinatorLayout coordinatorLayout) {
         if (!Settings.HIDE_FULLSCREEN_PANELS.get()) return;
         coordinatorLayout.setVisibility(View.GONE);

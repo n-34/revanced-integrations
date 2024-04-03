@@ -11,8 +11,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.TextView
-import app.revanced.integrations.shared.utils.ResourceType
-import app.revanced.integrations.shared.utils.ResourceUtils.identifier
+import app.revanced.integrations.shared.utils.ResourceUtils.ResourceType
+import app.revanced.integrations.shared.utils.ResourceUtils.getIdentifier
 import app.revanced.integrations.shared.utils.StringRef.str
 import app.revanced.integrations.youtube.settings.Settings
 import app.revanced.integrations.youtube.swipecontrols.SwipeControlsConfigurationProvider
@@ -42,7 +42,7 @@ class SwipeControlsOverlayLayout(
 
     private fun getDrawable(name: String, width: Int, height: Int): Drawable {
         return resources.getDrawable(
-            identifier(name, ResourceType.DRAWABLE, context),
+            getIdentifier(name, ResourceType.DRAWABLE, context),
             context.theme
         ).apply {
             setTint(config.overlayForegroundColor)

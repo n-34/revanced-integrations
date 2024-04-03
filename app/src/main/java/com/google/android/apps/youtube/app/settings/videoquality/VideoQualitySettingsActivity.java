@@ -1,6 +1,7 @@
 package com.google.android.apps.youtube.app.settings.videoquality;
 
-import static app.revanced.integrations.shared.utils.ResourceUtils.identifier;
+import static app.revanced.integrations.shared.utils.ResourceUtils.getIdIdentifier;
+import static app.revanced.integrations.shared.utils.ResourceUtils.getLayoutIdentifier;
 import static app.revanced.integrations.shared.utils.Utils.getChildView;
 import static app.revanced.integrations.youtube.utils.ThemeUtils.setBackButtonDrawable;
 
@@ -14,7 +15,7 @@ import android.widget.TextView;
 import java.util.Objects;
 
 import app.revanced.integrations.shared.utils.Logger;
-import app.revanced.integrations.shared.utils.ResourceType;
+import app.revanced.integrations.shared.utils.ResourceUtils;
 import app.revanced.integrations.youtube.settings.preference.ReVancedPreferenceFragment;
 import app.revanced.integrations.youtube.settings.preference.ReturnYouTubeDislikePreferenceFragment;
 import app.revanced.integrations.youtube.settings.preference.SponsorBlockPreferenceFragment;
@@ -30,10 +31,10 @@ public class VideoQualitySettingsActivity extends Activity {
         super.onCreate(bundle);
         try {
             setTheme(ThemeUtils.getThemeId());
-            setContentView(identifier("revanced_settings_with_toolbar", ResourceType.LAYOUT));
+            setContentView(getLayoutIdentifier("revanced_settings_with_toolbar"));
 
-            final int fragmentId = identifier("revanced_settings_fragments", ResourceType.ID);
-            final ViewGroup toolBar = Objects.requireNonNull(findViewById(identifier("revanced_toolbar", ResourceType.ID)));
+            final int fragmentId = getIdIdentifier("revanced_settings_fragments");
+            final ViewGroup toolBar = Objects.requireNonNull(findViewById(getIdIdentifier("revanced_toolbar")));
 
             setBackButton(toolBar);
 
@@ -82,6 +83,6 @@ public class VideoQualitySettingsActivity extends Activity {
 
     private void setToolbarTitle(ViewGroup toolBar, String toolbarTitleResourceName) {
         TextView toolbarTextView = Objects.requireNonNull(getChildView(toolBar, view -> view instanceof TextView));
-        toolbarTextView.setText(identifier(toolbarTitleResourceName, ResourceType.STRING));
+        toolbarTextView.setText(ResourceUtils.getString(toolbarTitleResourceName));
     }
 }

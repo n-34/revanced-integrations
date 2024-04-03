@@ -1,6 +1,8 @@
 package app.revanced.integrations.youtube.sponsorblock.ui;
 
-import static app.revanced.integrations.shared.utils.ResourceUtils.identifier;
+import static app.revanced.integrations.shared.utils.ResourceUtils.getDimension;
+import static app.revanced.integrations.shared.utils.ResourceUtils.getIdentifier;
+import static app.revanced.integrations.shared.utils.ResourceUtils.getLayoutIdentifier;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -12,7 +14,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
 import app.revanced.integrations.shared.utils.Logger;
-import app.revanced.integrations.shared.utils.ResourceType;
+import app.revanced.integrations.shared.utils.ResourceUtils;
 import app.revanced.integrations.youtube.patches.video.VideoInformation;
 import app.revanced.integrations.youtube.settings.Settings;
 import app.revanced.integrations.youtube.sponsorblock.SponsorBlockUtils;
@@ -43,7 +45,7 @@ public final class NewSegmentLayout extends FrameLayout {
                             final int defStyleAttr, final int defStyleRes) {
         super(context, attributeSet, defStyleAttr, defStyleRes);
 
-        LayoutInflater.from(context).inflate(identifier("revanced_sb_new_segment", ResourceType.LAYOUT, context), this, true);
+        LayoutInflater.from(context).inflate(getLayoutIdentifier("revanced_sb_new_segment"), this, true);
 
 
         TypedValue rippleEffect = new TypedValue();
@@ -92,8 +94,8 @@ public final class NewSegmentLayout extends FrameLayout {
                 "Publish button clicked"
         );
 
-        defaultBottomMargin = context.getResources().getDimensionPixelSize(identifier("brand_interaction_default_bottom_margin", ResourceType.DIMEN, context));
-        ctaBottomMargin = context.getResources().getDimensionPixelSize(identifier("brand_interaction_cta_bottom_margin", ResourceType.DIMEN, context));
+        defaultBottomMargin = getDimension("brand_interaction_default_bottom_margin");  // dimen:skip_button_default_bottom_margin
+        ctaBottomMargin = getDimension("brand_interaction_cta_bottom_margin");  // dimen:skip_button_cta_bottom_margin
         hiddenBottomMargin = (int) Math.round((ctaBottomMargin) * 0.5);  // margin when the button container is hidden
     }
 
@@ -107,7 +109,7 @@ public final class NewSegmentLayout extends FrameLayout {
      */
     private void initializeButton(final Context context, final String resourceIdentifierName,
                                   final ButtonOnClickHandlerFunction handler, final String debugMessage) {
-        final ImageButton button = findViewById(identifier(resourceIdentifierName, ResourceType.ID, context));
+        final ImageButton button = findViewById(getIdentifier(resourceIdentifierName, ResourceUtils.ResourceType.ID, context));
 
         // Add ripple effect
         button.setBackgroundResource(rippleEffectId);

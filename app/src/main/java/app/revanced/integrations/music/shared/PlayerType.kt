@@ -51,8 +51,4 @@ enum class PlayerType {
         @JvmStatic
         val onChange = Event<PlayerType>()
     }
-
-    fun isDismissedOrMinimized(): Boolean {
-        return this == DISMISSED || this == MINIMIZED
-    }
 }

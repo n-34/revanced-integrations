@@ -43,6 +43,7 @@ import app.revanced.integrations.shared.utils.StringRef;
 import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.settings.Settings;
 
+/** @noinspection deprecation*/
 public enum SegmentCategory {
     SPONSOR("sponsor", sf("revanced_sb_segments_sponsor"), sf("revanced_sb_segments_sponsor_sum"), sf("revanced_sb_skip_button_sponsor"), sf("revanced_sb_skipped_sponsor"),
             SB_CATEGORY_SPONSOR, SB_CATEGORY_SPONSOR_COLOR),

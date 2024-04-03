@@ -1,6 +1,6 @@
 package app.revanced.integrations.youtube.patches.general;
 
-import static app.revanced.integrations.shared.utils.ResourceUtils.identifier;
+import static app.revanced.integrations.shared.utils.ResourceUtils.getIdIdentifier;
 import static app.revanced.integrations.shared.utils.StringRef.str;
 import static app.revanced.integrations.shared.utils.Utils.hideViewBy0dpUnderCondition;
 import static app.revanced.integrations.shared.utils.Utils.hideViewUnderCondition;
@@ -17,7 +17,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -25,7 +24,6 @@ import androidx.annotation.NonNull;
 import java.util.Objects;
 
 import app.revanced.integrations.shared.utils.Logger;
-import app.revanced.integrations.shared.utils.ResourceType;
 import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.settings.Settings;
 
@@ -40,7 +38,7 @@ public class GeneralPatch {
             "FAB_CAMERA",       // Create button (Tablet)
             "TAB_ACTIVITY"      // Notification button
     };
-    private static final int resultId = identifier("results", ResourceType.ID);
+    private static final int resultId = getIdIdentifier("results");
     private static FrameLayout.LayoutParams layoutParams;
     private static int minimumHeight = 1;
     private static int paddingLeft = 12;
@@ -303,14 +301,8 @@ public class GeneralPatch {
         );
     }
 
-    public static void hideTrendingSearches(ImageView imageView, boolean isTrendingSearches) {
-        View parent = (View) imageView.getParent();
-
-        if (Settings.HIDE_TRENDING_SEARCHES.get() && isTrendingSearches)
-            parent.setVisibility(View.GONE);
-        else
-            parent.setVisibility(View.VISIBLE);
-
+    public static boolean hideTrendingSearches(boolean original) {
+        return Settings.HIDE_TRENDING_SEARCHES.get() || original;
     }
 
     public static void newVideoStarted(@NonNull String newlyLoadedVideoId) {

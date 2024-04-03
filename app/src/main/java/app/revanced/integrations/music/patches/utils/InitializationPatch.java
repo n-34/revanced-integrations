@@ -3,7 +3,6 @@ package app.revanced.integrations.music.patches.utils;
 import static app.revanced.integrations.music.utils.RestartUtils.showRestartDialog;
 
 import android.app.Activity;
-import android.content.Context;
 
 import androidx.annotation.NonNull;
 

@@ -92,6 +92,6 @@ public class StringRef {
     @Override
     @NonNull
     public String toString() {
-        return ResourceUtils.string(value);
+        return ResourceUtils.getString(value);
     }
 }

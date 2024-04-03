@@ -20,13 +20,12 @@ public class FullscreenAdsPatch {
         );
     }
 
-    /*
-    public static void confirmDialog(final Button button) {
-        if (Settings.HIDE_FULLSCREEN_ADS.get() && button != null) {
-            button.setSoundEffectsEnabled(false);
-            button.performClick();
-        }
-    }
-     */
+    //
+    // public static void confirmDialog(final Button button) {
+    //     if (Settings.HIDE_FULLSCREEN_ADS.get() && button != null) {
+    //         button.setSoundEffectsEnabled(false);
+    //         button.performClick();
+    //     }
+    // }
 
 }

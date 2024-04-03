@@ -1,19 +1,18 @@
 package app.revanced.integrations.youtube.patches.player;
 
-import static app.revanced.integrations.shared.utils.ResourceUtils.identifier;
+import static app.revanced.integrations.shared.utils.ResourceUtils.getIdIdentifier;
 import static app.revanced.integrations.shared.utils.StringRef.str;
 
 import android.annotation.SuppressLint;
 import android.view.View;
 import android.widget.ImageView;
 
-import app.revanced.integrations.shared.utils.ResourceType;
 import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.settings.Settings;
 
 @SuppressWarnings("unused")
 public class PlayerPatch {
-    private static final int collapseButtonId = identifier("player_collapse_button", ResourceType.ID);
+    private static final int collapseButtonId = getIdIdentifier("player_collapse_button");
     @SuppressLint("StaticFieldLeak")
     private static ImageView lastView;
     public static void changePlayerOpacity(ImageView imageView) {
@@ -22,7 +21,7 @@ public class PlayerPatch {
         if (opacity < 0 || opacity > 100) {
             Utils.showToastShort(str("revanced_custom_player_overlay_opacity_warning"));
             Settings.CUSTOM_PLAYER_OVERLAY_OPACITY.resetToDefault();
-            opacity = (int) Settings.CUSTOM_PLAYER_OVERLAY_OPACITY.defaultValue;
+            opacity = Settings.CUSTOM_PLAYER_OVERLAY_OPACITY.defaultValue;
         }
 
         imageView.setImageAlpha((opacity * 255) / 100);
@@ -68,8 +67,8 @@ public class PlayerPatch {
         Utils.hideViewByLayoutParams(view);
     }
 
-    public static boolean hideChannelWatermark() {
-        return !Settings.HIDE_CHANNEL_WATERMARK.get();
+    public static boolean hideChannelWatermark(boolean original) {
+        return !Settings.HIDE_CHANNEL_WATERMARK.get() && original;
     }
 
     public static void hideEndScreenCards(View view) {

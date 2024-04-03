@@ -1,10 +1,10 @@
 package app.revanced.integrations.youtube.utils;
 
+import static app.revanced.integrations.shared.utils.ResourceUtils.getStringArray;
 import static app.revanced.integrations.shared.utils.StringRef.str;
 import static app.revanced.integrations.shared.utils.Utils.showToastShort;
 import static app.revanced.integrations.youtube.patches.video.PlaybackSpeedPatch.overrideSpeed;
 import static app.revanced.integrations.youtube.patches.video.PlaybackSpeedPatch.userChangedSpeed;
-import static app.revanced.integrations.youtube.utils.ExtendedUtils.getStringArray;
 import static app.revanced.integrations.youtube.utils.ExtendedUtils.isPackageEnabled;
 
 import android.annotation.SuppressLint;
@@ -99,8 +99,8 @@ public class VideoUtils {
             final String EXTERNAL_DOWNLOADER_LABEL_PREFERENCE_KEY = "revanced_external_downloader_label";
             final String EXTERNAL_DOWNLOADER_PACKAGE_NAME_PREFERENCE_KEY = "revanced_external_downloader_package_name";
 
-            final String[] labelArray = getStringArray(context, EXTERNAL_DOWNLOADER_LABEL_PREFERENCE_KEY);
-            final String[] packageNameArray = getStringArray(context, EXTERNAL_DOWNLOADER_PACKAGE_NAME_PREFERENCE_KEY);
+            final String[] labelArray = getStringArray(EXTERNAL_DOWNLOADER_LABEL_PREFERENCE_KEY);
+            final String[] packageNameArray = getStringArray(EXTERNAL_DOWNLOADER_PACKAGE_NAME_PREFERENCE_KEY);
 
             final int findIndex = Arrays.binarySearch(packageNameArray, packageName);
 

@@ -33,6 +33,7 @@ import app.revanced.integrations.youtube.sponsorblock.ui.SponsorBlockViewControl
 
 /**
  * Not thread safe. All fields/methods must be accessed from the main thread.
+ * @noinspection deprecation
  */
 public class SponsorBlockUtils {
     private static final String MANUAL_EDIT_TIME_FORMAT = "HH:mm:ss.SSS";

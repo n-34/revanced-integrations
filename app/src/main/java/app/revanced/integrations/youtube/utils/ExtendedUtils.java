@@ -1,7 +1,5 @@
 package app.revanced.integrations.youtube.utils;
 
-import static app.revanced.integrations.shared.utils.ResourceUtils.identifier;
-
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -13,7 +11,6 @@ import androidx.annotation.Nullable;
 import app.revanced.integrations.shared.settings.BooleanSetting;
 import app.revanced.integrations.shared.settings.Setting;
 import app.revanced.integrations.shared.utils.Logger;
-import app.revanced.integrations.shared.utils.ResourceType;
 import app.revanced.integrations.youtube.settings.Settings;
 
 public class ExtendedUtils {
@@ -42,11 +39,6 @@ public class ExtendedUtils {
     @NonNull
     private static PackageManager getPackageManager(@NonNull Context context) {
         return context.getPackageManager();
-    }
-
-    @NonNull
-    public static String[] getStringArray(@NonNull Context context, @NonNull String key) {
-        return context.getResources().getStringArray(identifier(key, ResourceType.ARRAY));
     }
 
     private static boolean isAdditionalSettingsEnabled() {
