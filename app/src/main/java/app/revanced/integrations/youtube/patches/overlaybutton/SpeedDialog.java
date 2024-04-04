@@ -48,15 +48,8 @@ public class SpeedDialog extends BottomControlButton {
     /**
      * Injection point.
      */
-    public static void changeVisibility(boolean showing) {
-        if (instance != null) instance.setVisibility(showing);
-    }
-
-    /**
-     * Injection point.
-     */
-    public static void changeVisibilityNegatedImmediate(boolean scrubbing) {
-        if (instance != null && scrubbing) instance.setVisibilityNegatedImmediate();
+    public static void changeVisibility(boolean showing, boolean animation) {
+        if (instance != null) instance.setVisibility(showing, animation);
     }
 
 }

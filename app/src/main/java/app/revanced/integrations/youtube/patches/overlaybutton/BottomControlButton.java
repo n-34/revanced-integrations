@@ -26,7 +26,6 @@ public abstract class BottomControlButton {
     private final BooleanSetting setting;
     private final BooleanSetting interactionSetting;
     protected boolean isVisible;
-    protected boolean isScrubbed = false;
 
     static {
         // TODO: check if these durations are correct.
@@ -34,7 +33,17 @@ public abstract class BottomControlButton {
         fadeIn.setDuration(getInteger("fade_duration_fast"));
 
         fadeOut = getAnimation("fade_out");
-        fadeOut.setDuration(getInteger("fade_duration_scheduled"));
+        fadeOut.setDuration(getInteger("fade_overlay_fade_duration"));
+    }
+
+    @NonNull
+    public static Animation getButtonFadeIn() {
+        return fadeIn;
+    }
+
+    @NonNull
+    public static Animation getButtonFadeOut() {
+        return fadeOut;
     }
 
     public BottomControlButton(@NonNull ViewGroup bottomControlsViewGroup, @NonNull String imageViewButtonId,
@@ -64,7 +73,6 @@ public abstract class BottomControlButton {
             imageView.setOnLongClickListener(longClickListener);
         }
         imageView.setVisibility(View.GONE);
-
         buttonRef = new WeakReference<>(imageView);
     }
 
@@ -77,35 +85,20 @@ public abstract class BottomControlButton {
         if (!onlyView) interactionSetting.save(selected);
     }
 
-    public void setVisibility(boolean visible) {
-        if (isVisible == visible)
-            return;
+    public void setVisibility(boolean visible, boolean animation) {
+        ImageView imageView = buttonRef.get();
+        if (imageView == null || isVisible == visible) return;
         isVisible = visible;
 
-        ImageView imageView = buttonRef.get();
-        if (imageView == null)
-            return;
-
         imageView.clearAnimation();
-        if (isScrubbed && setting.get()) {
-            isScrubbed = false;
+        if (visible && setting.get()) {
             imageView.setVisibility(View.VISIBLE);
-        } else if (visible && setting.get()) {
-            imageView.setVisibility(View.VISIBLE);
-            imageView.startAnimation(fadeIn);
-        } else if (imageView.getVisibility() == View.VISIBLE) {
-            imageView.startAnimation(fadeOut);
+            if (animation) imageView.startAnimation(fadeIn);
+            return;
+        }
+        if (imageView.getVisibility() == View.VISIBLE) {
+            if (animation) imageView.startAnimation(fadeOut);
             imageView.setVisibility(View.GONE);
         }
-    }
-
-    public void setVisibilityNegatedImmediate() {
-        ImageView imageView = buttonRef.get();
-        if (imageView == null)
-            return;
-
-        isVisible = false;
-        isScrubbed = true;
-        imageView.setVisibility(View.GONE);
     }
 }
