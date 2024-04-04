@@ -106,36 +106,4 @@ public class PlayerPatch {
     public static boolean hideSeekUndoMessage() {
         return Settings.HIDE_SEEK_UNDO_MESSAGE.get();
     }
-    public static void hideSuggestedVideoOverlay(final ImageView imageView) {
-        if (!Settings.HIDE_SUGGESTED_VIDEO_OVERLAY.get())
-            return;
-
-        // Prevent adding the listener multiple times.
-        if (lastView == imageView)
-            return;
-
-        lastView = imageView;
-
-        imageView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-            if (imageView.isShown()) imageView.callOnClick();
-        });
-    }
-
-    public static boolean hideSuggestedVideoOverlay() {
-        return Settings.HIDE_SUGGESTED_VIDEO_OVERLAY.get()
-                && !Settings.HIDE_SUGGESTED_VIDEO_OVERLAY_AUTO_PLAY.get();
-    }
-
-    public static void hideSuggestedVideoOverlayAutoPlay(View view) {
-        if (!Settings.HIDE_SUGGESTED_VIDEO_OVERLAY.get())
-            return;
-
-        if (!Settings.HIDE_SUGGESTED_VIDEO_OVERLAY_AUTO_PLAY.get())
-            return;
-
-        if (view != null) {
-            view.setSoundEffectsEnabled(false);
-            view.performClick();
-        }
-    }
 }

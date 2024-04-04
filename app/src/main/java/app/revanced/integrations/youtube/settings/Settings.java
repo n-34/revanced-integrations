@@ -278,8 +278,8 @@ public class Settings extends BaseSettings {
 
     // Experimental Flags
     public static final BooleanSetting HIDE_FILMSTRIP_OVERLAY = new BooleanSetting("revanced_hide_filmstrip_overlay", FALSE, true);
-    public static final BooleanSetting HIDE_SUGGESTED_VIDEO_OVERLAY = new BooleanSetting("revanced_hide_suggested_video_overlay", FALSE, true);
-    public static final BooleanSetting HIDE_SUGGESTED_VIDEO_OVERLAY_AUTO_PLAY = new BooleanSetting("revanced_hide_suggested_video_overlay_auto_play", FALSE, true);
+    @Deprecated
+    public static final BooleanSetting HIDE_SUGGESTED_VIDEO_END_SCREEN = new BooleanSetting("revanced_hide_suggested_video_end_screen", FALSE);
 
     // Haptic Feedback
     public static final BooleanSetting DISABLE_HAPTIC_FEEDBACK_CHAPTERS = new BooleanSetting("revanced_disable_haptic_feedback_chapters", FALSE);
