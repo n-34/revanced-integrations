@@ -105,7 +105,7 @@ public class VideoUtils {
         context.startActivity(intent);
     }
 
-    public static void playbackSpeedDialogListener(@NonNull Context context) {
+    public static void showPlaybackSpeedDialog(@NonNull Context context) {
         final String[] playbackSpeedWithAutoEntries = CustomPlaybackSpeedPatch.getListEntries();
         final String[] playbackSpeedWithAutoEntryValues = CustomPlaybackSpeedPatch.getListEntryValues();
 
@@ -123,6 +123,10 @@ public class VideoUtils {
                     mDialog.dismiss();
                 })
                 .show();
+    }
+
+    public static void showPlaybackSpeedFlyoutPanel() {
+        Logger.printDebug(() -> "Playback speed flyout panel opened");
     }
 
     public static String getFormattedQualityString(@Nullable String prefix) {

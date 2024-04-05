@@ -23,7 +23,7 @@ public class SpeedDialog extends BottomControlButton {
                 bottomControlsViewGroup,
                 "speed_dialog_button",
                 Settings.OVERLAY_BUTTON_SPEED_DIALOG,
-                view -> VideoUtils.playbackSpeedDialogListener(view.getContext()),
+                view -> VideoUtils.showPlaybackSpeedDialog(view.getContext()),
                 view -> {
                     VideoInformation.overridePlaybackSpeed(1.0f);
                     showToastShort(str("revanced_overlay_button_speed_dialog_reset"));

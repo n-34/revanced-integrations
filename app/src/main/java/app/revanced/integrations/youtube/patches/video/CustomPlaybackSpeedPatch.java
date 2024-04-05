@@ -40,14 +40,23 @@ public class CustomPlaybackSpeedPatch {
         loadSpeeds();
     }
 
+    /**
+     * Injection point.
+     */
     public static float[] getArray(float[] original) {
         return isCustomPlaybackSpeedEnabled() ? playbackSpeeds : original;
     }
 
+    /**
+     * Injection point.
+     */
     public static int getLength(int original) {
         return isCustomPlaybackSpeedEnabled() ? playbackSpeeds.length : original;
     }
 
+    /**
+     * Injection point.
+     */
     public static int getSize(int original) {
         return isCustomPlaybackSpeedEnabled() ? 0 : original;
     }
@@ -59,7 +68,7 @@ public class CustomPlaybackSpeedPatch {
 
     private static void loadSpeeds() {
         try {
-            if (!isCustomPlaybackSpeedEnabled()) return;
+            if (!Settings.ENABLE_CUSTOM_PLAYBACK_SPEED.get()) return;
 
             String[] speedStrings = Settings.CUSTOM_PLAYBACK_SPEEDS.get().split("\\s+");
             Arrays.sort(speedStrings);
@@ -123,7 +132,7 @@ public class CustomPlaybackSpeedPatch {
     }
 
     private static boolean isCustomPlaybackSpeedEnabled() {
-        return Settings.ENABLE_CUSTOM_PLAYBACK_SPEED.get();
+        return Settings.ENABLE_CUSTOM_PLAYBACK_SPEED.get() && playbackSpeeds != null;
     }
 
     public static void onFlyoutMenuCreate(final RecyclerView recyclerView) {
@@ -192,16 +201,11 @@ public class CustomPlaybackSpeedPatch {
 
         if (Settings.CUSTOM_PLAYBACK_SPEED_PANEL_TYPE.get()) {
             // Open playback speed dialog
-            VideoUtils.playbackSpeedDialogListener(context);
+            VideoUtils.showPlaybackSpeedDialog(context);
         } else {
             // Open old style flyout panel
-            showOldPlaybackSpeedMenu();
+            VideoUtils.showPlaybackSpeedFlyoutPanel();
         }
-    }
-
-    private static void showOldPlaybackSpeedMenu() {
-        Settings.ENABLE_CUSTOM_PLAYBACK_SPEED.get();
-        // Rest of the implementation added by patch.
     }
 
 }
