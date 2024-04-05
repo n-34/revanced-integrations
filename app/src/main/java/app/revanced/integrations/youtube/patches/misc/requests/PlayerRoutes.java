@@ -13,13 +13,6 @@ import app.revanced.integrations.shared.requests.Route;
 import app.revanced.integrations.shared.utils.Logger;
 
 public final class PlayerRoutes {
-    public static final Route.CompiledRoute GET_CHANNEL_INFORMATION = new Route(
-            Route.Method.POST,
-            "player" +
-                    "?fields=videoDetails.channelId," +
-                    "videoDetails.author"
-    ).compile();
-
     public static final Route.CompiledRoute GET_STORYBOARD_SPEC_RENDERER = new Route(
             Route.Method.POST,
             "player" +
