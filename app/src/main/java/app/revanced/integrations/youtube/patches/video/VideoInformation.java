@@ -1,12 +1,16 @@
 package app.revanced.integrations.youtube.patches.video;
 
+import static app.revanced.integrations.shared.utils.ResourceUtils.getString;
 import static app.revanced.integrations.shared.utils.StringRef.str;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import app.revanced.integrations.shared.utils.Logger;
@@ -20,6 +24,8 @@ import app.revanced.integrations.youtube.shared.VideoState;
  */
 public final class VideoInformation {
     private static final float DEFAULT_YOUTUBE_PLAYBACK_SPEED = 1.0f;
+    private static final int DEFAULT_YOUTUBE_VIDEO_QUALITY = -2;
+    private static final String DEFAULT_YOUTUBE_VIDEO_QUALITY_STRING = getString("quality_auto");
     private static final String SEEK_METHOD_NAME = "seekTo";
     /**
      * Prefix present in all Short player parameters signature.
@@ -45,6 +51,19 @@ public final class VideoInformation {
      * The current playback speed
      */
     private static float playbackSpeed = DEFAULT_YOUTUBE_PLAYBACK_SPEED;
+    /**
+     * The current video quality
+     */
+    private static int videoQuality = DEFAULT_YOUTUBE_VIDEO_QUALITY;
+    /**
+     * The current video quality string
+     */
+    private static String videoQualityString = DEFAULT_YOUTUBE_VIDEO_QUALITY_STRING;
+    /**
+     * The available qualities of the current video in human readable form: [1080, 720, 480]
+     */
+    @Nullable
+    private static List<Integer> videoQualities;
 
     /**
      * Injection point.
@@ -227,14 +246,9 @@ public final class VideoInformation {
 
     /**
      * Overrides the current playback speed.
-     * <p>
-     * <b> Used exclusively by {@link PlaybackSpeedPatch} </b>
      */
     public static void overridePlaybackSpeed(float speedOverride) {
-        if (playbackSpeed != speedOverride) {
-            Logger.printDebug(() -> "Overriding playback speed to: " + speedOverride);
-            playbackSpeed = speedOverride;
-        }
+        Logger.printDebug(() -> "Overriding playback speed to: " + speedOverride);
     }
 
     /**
@@ -245,10 +259,100 @@ public final class VideoInformation {
     }
 
     /**
-     * Overrides the current playback speed.
+     * Injection point.
+     *
+     * @param newlyLoadedPlaybackSpeed The current playback speed.
      */
-    public static void setPlaybackSpeed(float speedOverride) {
-        playbackSpeed = speedOverride;
+    public static void setPlaybackSpeed(float newlyLoadedPlaybackSpeed) {
+        playbackSpeed = newlyLoadedPlaybackSpeed;
+    }
+
+    /**
+     * Overrides the current quality.
+     */
+    public static void overrideVideoQuality(int qualityOverride) {
+        Logger.printDebug(() -> "Overriding video quality to: " + qualityOverride);
+    }
+
+    /**
+     * @return The current video quality.
+     */
+    public static int getVideoQuality() {
+        return videoQuality;
+    }
+
+    /**
+     * @return The current video quality string.
+     */
+    public static String getVideoQualityString() {
+        return videoQualityString;
+    }
+
+    /**
+     * Injection point.
+     *
+     * @param newlyLoadedQuality The current video quality string.
+     */
+    public static void setVideoQuality(String newlyLoadedQuality) {
+        if (newlyLoadedQuality == null) {
+            return;
+        }
+        try {
+            String splitVideoQuality;
+            if (newlyLoadedQuality.contains("p")) {
+                splitVideoQuality = newlyLoadedQuality.split("p")[0];
+                videoQuality = Integer.parseInt(splitVideoQuality);
+                videoQualityString = splitVideoQuality + "p";
+            } else if (newlyLoadedQuality.contains("s")) {
+                splitVideoQuality = newlyLoadedQuality.split("s")[0];
+                videoQuality = Integer.parseInt(splitVideoQuality);
+                videoQualityString = splitVideoQuality + "s";
+            } else {
+                videoQuality = DEFAULT_YOUTUBE_VIDEO_QUALITY;
+                videoQualityString = DEFAULT_YOUTUBE_VIDEO_QUALITY_STRING;
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    /**
+     * @return available video quality.
+     */
+    public static int getAvailableVideoQuality(int preferredQuality) {
+        if (videoQualities != null) {
+            int qualityToUse = videoQualities.get(0); // first element is automatic mode
+            for (Integer quality : videoQualities) {
+                if (quality <= preferredQuality && qualityToUse < quality) {
+                    qualityToUse = quality;
+                }
+            }
+            preferredQuality = qualityToUse;
+        }
+        return preferredQuality;
+    }
+
+    /**
+     * Injection point.
+     *
+     * @param qualities Video qualities available, ordered from largest to smallest, with index 0 being the 'automatic' value of -2
+     */
+    public static void setVideoQualityList(Object[] qualities) {
+        try {
+            if (videoQualities == null || videoQualities.size() != qualities.length) {
+                videoQualities = new ArrayList<>(qualities.length);
+                for (Object streamQuality : qualities) {
+                    for (Field field : streamQuality.getClass().getFields()) {
+                        if (field.getType().isAssignableFrom(Integer.TYPE)
+                                && field.getName().length() <= 2) {
+                            videoQualities.add(field.getInt(streamQuality));
+                        }
+                    }
+                }
+                Logger.printDebug(() -> "videoQualities: " + videoQualities);
+            }
+        } catch (Exception ex) {
+            Logger.printException(() -> "Failed to set quality list", ex);
+        }
     }
 
     /**

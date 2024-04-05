@@ -22,20 +22,10 @@ import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.patches.video.CustomPlaybackSpeedPatch;
 import app.revanced.integrations.youtube.patches.video.VideoInformation;
-import app.revanced.integrations.youtube.patches.video.VideoQualityPatch;
 import app.revanced.integrations.youtube.settings.Settings;
 
 @SuppressWarnings("unused")
 public class VideoUtils {
-
-    /**
-     * Injection point.
-     */
-    public static String currentQuality = "";
-    /**
-     * Injection point.
-     */
-    public static String qualityAutoString = "Auto";
     private static volatile boolean isPiPAvailable = true;
 
     public static void copyUrl(boolean withTimestamp) {
@@ -136,7 +126,7 @@ public class VideoUtils {
     }
 
     public static String getFormattedQualityString(@Nullable String prefix) {
-        final String qualityString = getQualityString();
+        final String qualityString = VideoInformation.getVideoQualityString();
 
         return prefix == null ? qualityString : String.format("%s\u2009•\u2009%s", prefix, qualityString);
     }
@@ -151,26 +141,10 @@ public class VideoUtils {
         return prefix == null ? playbackSpeedString : String.format("%s\u2009•\u2009%s", prefix, playbackSpeedString);
     }
 
+    /**
+     * Injection point.
+     */
     public static boolean isPiPAvailable(boolean original) {
         return original && isPiPAvailable;
-    }
-
-    public static int getCurrentQuality(int original) {
-        try {
-            return Integer.parseInt(currentQuality.split("p")[0]);
-        } catch (Exception ignored) {
-        }
-        return original;
-    }
-
-    public static String getQualityString() {
-        if (currentQuality.isEmpty()) {
-            VideoQualityPatch.overrideQuality(720);
-            return qualityAutoString;
-        } else if (currentQuality.equals(qualityAutoString)) {
-            return qualityAutoString;
-        }
-
-        return currentQuality.split("p")[0] + "p";
     }
 }
