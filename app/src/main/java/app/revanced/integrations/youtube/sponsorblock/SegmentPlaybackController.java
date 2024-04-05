@@ -29,7 +29,6 @@ import app.revanced.integrations.youtube.sponsorblock.objects.SegmentCategory;
 import app.revanced.integrations.youtube.sponsorblock.objects.SponsorSegment;
 import app.revanced.integrations.youtube.sponsorblock.requests.SBRequester;
 import app.revanced.integrations.youtube.sponsorblock.ui.SponsorBlockViewController;
-import app.revanced.integrations.youtube.utils.VideoUtils;
 
 /**
  * Handles showing, scheduling, and skipping of all {@link SponsorSegment} for the current video.
@@ -263,7 +262,7 @@ public class SegmentPlaybackController {
                             return;
                         }
                         highlightSegmentInitialShowEndTime = System.currentTimeMillis() + Math.min(
-                                (long) (timeUntilHighlight / VideoUtils.getCurrentSpeed()),
+                                (long) (timeUntilHighlight / VideoInformation.getPlaybackSpeed()),
                                 DURATION_TO_SHOW_SKIP_BUTTON);
                     }
                 }
@@ -292,7 +291,7 @@ public class SegmentPlaybackController {
 
             updateHiddenSegments(millis);
 
-            final float playbackSpeed = VideoUtils.getCurrentSpeed();
+            final float playbackSpeed = VideoInformation.getPlaybackSpeed();
             // Amount of time to look ahead for the next segment,
             // and the threshold to determine if a scheduled show/hide is at the correct video time when it's run.
             //
@@ -526,7 +525,7 @@ public class SegmentPlaybackController {
                 // (especially if the video does not end on a whole second boundary).
                 // This causes additional segment skip attempts, even though it cannot seek any closer to the desired time.
                 // Check for and ignore repeated skip attempts of the same segment over a small time period.
-                final long minTimeBetweenSkippingSameSegment = Math.max(500, (long) (500 / VideoUtils.getCurrentSpeed()));
+                final long minTimeBetweenSkippingSameSegment = Math.max(500, (long) (500 / VideoInformation.getPlaybackSpeed()));
                 if (now - lastSegmentSkippedTime < minTimeBetweenSkippingSameSegment) {
                     Logger.printDebug(() -> "Ignoring skip segment request (already skipped as close as possible): " + segmentToSkip);
                     return;

@@ -13,23 +13,18 @@ import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.settings.Settings;
 import app.revanced.integrations.youtube.shared.VideoState;
-import app.revanced.integrations.youtube.utils.VideoUtils;
 
 /**
  * Hooking class for the current playing video.
+ * @noinspection unused
  */
-@SuppressWarnings("unused")
 public final class VideoInformation {
+    private static final float DEFAULT_YOUTUBE_PLAYBACK_SPEED = 1.0f;
     private static final String SEEK_METHOD_NAME = "seekTo";
     /**
      * Prefix present in all Short player parameters signature.
      */
     private static final String SHORTS_PLAYER_PARAMETERS = "8AEB";
-
-    /**
-     * Injection point.
-     */
-    public static boolean isLiveStream = false;
 
     private static WeakReference<Object> playerControllerRef;
     private static Method seekMethod;
@@ -43,7 +38,13 @@ public final class VideoInformation {
     @NonNull
     private static volatile String playerResponseVideoId = "";
     private static volatile boolean playerResponseVideoIdIsShort;
+    private static volatile boolean videoIsLiveStream;
     private static volatile boolean videoIdIsShort;
+
+    /**
+     * The current playback speed
+     */
+    private static float playbackSpeed = DEFAULT_YOUTUBE_PLAYBACK_SPEED;
 
     /**
      * Injection point.
@@ -104,11 +105,11 @@ public final class VideoInformation {
     }
 
     public static void reloadVideo() {
-        if (videoLength < 10000 || isLiveStream)
+        if (videoLength < 10000 || videoIsLiveStream)
             return;
 
         final long lastVideoTime = videoTime;
-        final float playbackSpeed = VideoUtils.getCurrentSpeed();
+        final float playbackSpeed = getPlaybackSpeed();
         final long speedAdjustedTimeThreshold = (long) (playbackSpeed * 1000);
         seekTo(10000);
         seekTo(lastVideoTime + speedAdjustedTimeThreshold);
@@ -148,6 +149,14 @@ public final class VideoInformation {
             return;
 
         videoId = newlyLoadedVideoId;
+    }
+
+    public static boolean getLiveStreamState() {
+        return videoIsLiveStream;
+    }
+
+    public static void setLiveStreamState(final String newlyLoadedVideoCpn, boolean newlyLoadedValue) {
+        videoIsLiveStream = newlyLoadedValue;
     }
 
     /**
@@ -194,7 +203,7 @@ public final class VideoInformation {
      * Injection point.
      */
     @Nullable
-    public static String newPlayerParameter(@NonNull String videoId, @Nullable String playerParameter, boolean isShortAndOpeningOrPlaying) {
+    public static String newPlayerResponseParameter(@NonNull String videoId, @Nullable String playerParameter, boolean isShortAndOpeningOrPlaying) {
         final boolean isShort = playerParametersAreShort(playerParameter);
         playerResponseVideoIdIsShort = isShort;
         if (!isShort || isShortAndOpeningOrPlaying) {
@@ -214,6 +223,32 @@ public final class VideoInformation {
         if (!playerResponseVideoId.equals(videoId)) {
             playerResponseVideoId = videoId;
         }
+    }
+
+    /**
+     * Overrides the current playback speed.
+     * <p>
+     * <b> Used exclusively by {@link PlaybackSpeedPatch} </b>
+     */
+    public static void overridePlaybackSpeed(float speedOverride) {
+        if (playbackSpeed != speedOverride) {
+            Logger.printDebug(() -> "Overriding playback speed to: " + speedOverride);
+            playbackSpeed = speedOverride;
+        }
+    }
+
+    /**
+     * @return The current playback speed.
+     */
+    public static float getPlaybackSpeed() {
+        return playbackSpeed;
+    }
+
+    /**
+     * Overrides the current playback speed.
+     */
+    public static void setPlaybackSpeed(float speedOverride) {
+        playbackSpeed = speedOverride;
     }
 
     /**

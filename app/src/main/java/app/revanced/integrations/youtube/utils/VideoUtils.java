@@ -3,8 +3,7 @@ package app.revanced.integrations.youtube.utils;
 import static app.revanced.integrations.shared.utils.ResourceUtils.getStringArray;
 import static app.revanced.integrations.shared.utils.StringRef.str;
 import static app.revanced.integrations.shared.utils.Utils.showToastShort;
-import static app.revanced.integrations.youtube.patches.video.PlaybackSpeedPatch.overrideSpeed;
-import static app.revanced.integrations.youtube.patches.video.PlaybackSpeedPatch.userChangedSpeed;
+import static app.revanced.integrations.youtube.patches.video.PlaybackSpeedPatch.userSelectedPlaybackSpeed;
 import static app.revanced.integrations.youtube.utils.ExtendedUtils.isPackageEnabled;
 
 import android.annotation.SuppressLint;
@@ -33,10 +32,6 @@ public class VideoUtils {
      * Injection point.
      */
     public static String currentQuality = "";
-    /**
-     * Injection point.
-     */
-    public static float currentSpeed;
     /**
      * Injection point.
      */
@@ -127,11 +122,14 @@ public class VideoUtils {
         final String[] playbackSpeedEntries = Arrays.copyOfRange(playbackSpeedWithAutoEntries, 1, playbackSpeedWithAutoEntries.length);
         final String[] playbackSpeedEntryValues = Arrays.copyOfRange(playbackSpeedWithAutoEntryValues, 1, playbackSpeedWithAutoEntryValues.length);
 
-        final int index = Arrays.binarySearch(playbackSpeedEntryValues, String.valueOf(currentSpeed));
+        final float playbackSpeed = VideoInformation.getPlaybackSpeed();
+        final int index = Arrays.binarySearch(playbackSpeedEntryValues, String.valueOf(playbackSpeed));
 
         new AlertDialog.Builder(context)
                 .setSingleChoiceItems(playbackSpeedEntries, index, (mDialog, mIndex) -> {
-                    overrideSpeedBridge(Float.parseFloat(playbackSpeedEntryValues[mIndex] + "f"));
+                    final float selectedPlaybackSpeed = Float.parseFloat(playbackSpeedEntryValues[mIndex] + "f");
+                    VideoInformation.overridePlaybackSpeed(selectedPlaybackSpeed);
+                    userSelectedPlaybackSpeed(selectedPlaybackSpeed);
                     mDialog.dismiss();
                 })
                 .show();
@@ -144,24 +142,17 @@ public class VideoUtils {
     }
 
     public static String getFormattedSpeedString(@Nullable String prefix) {
-        final String speedString = Utils.isRightToLeftTextLayout()
-                ? "\u2066x\u2069" + currentSpeed
-                : currentSpeed + "x";
+        final float playbackSpeed = VideoInformation.getPlaybackSpeed();
 
-        return prefix == null ? speedString : String.format("%s\u2009•\u2009%s", prefix, speedString);
-    }
+        final String playbackSpeedString = Utils.isRightToLeftTextLayout()
+                ? "\u2066x\u2069" + playbackSpeed
+                : playbackSpeed + "x";
 
-    private static void overrideSpeedBridge(final float speed) {
-        overrideSpeed(speed);
-        userChangedSpeed(speed);
+        return prefix == null ? playbackSpeedString : String.format("%s\u2009•\u2009%s", prefix, playbackSpeedString);
     }
 
     public static boolean isPiPAvailable(boolean original) {
         return original && isPiPAvailable;
-    }
-
-    public static float getCurrentSpeed() {
-        return currentSpeed;
     }
 
     public static int getCurrentQuality(int original) {
