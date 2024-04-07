@@ -142,7 +142,7 @@ public class Settings extends BaseSettings {
 
 
     // Video
-    public static final StringSetting CUSTOM_PLAYBACK_SPEEDS = new StringSetting("revanced_custom_playback_speeds", "0.25\n0.5\n0.75\n1.0\n1.25\n1.5\n1.75\n2.0", true);
+    public static final StringSetting CUSTOM_PLAYBACK_SPEEDS = new StringSetting("revanced_custom_playback_speeds", "0.5\n0.8\n1.0\n1.2\n1.5\n1.8\n2.0", true);
     public static final BooleanSetting ENABLE_SAVE_PLAYBACK_SPEED = new BooleanSetting("revanced_enable_save_playback_speed", TRUE);
     public static final BooleanSetting ENABLE_SAVE_VIDEO_QUALITY = new BooleanSetting("revanced_enable_save_video_quality", TRUE);
     public static final FloatSetting DEFAULT_PLAYBACK_SPEED = new FloatSetting("revanced_default_playback_speed", 1.0f);
