@@ -1,7 +1,10 @@
 package app.revanced.integrations.youtube.settings.preference;
 
 import static android.text.Html.fromHtml;
+import static app.revanced.integrations.shared.utils.ResourceUtils.getIdIdentifier;
+import static app.revanced.integrations.shared.utils.ResourceUtils.getLayoutIdentifier;
 import static app.revanced.integrations.shared.utils.StringRef.str;
+import static app.revanced.integrations.shared.utils.Utils.getChildView;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -21,13 +24,19 @@ import android.preference.SwitchPreference;
 import android.text.Html;
 import android.text.InputType;
 import android.util.TypedValue;
+import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.util.Objects;
+
 import app.revanced.integrations.shared.settings.Setting;
 import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.ResourceUtils;
 import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.settings.Settings;
 import app.revanced.integrations.youtube.sponsorblock.SegmentPlaybackController;
@@ -60,6 +69,8 @@ public class SponsorBlockPreferenceFragment extends PreferenceFragment {
 
     private PreferenceCategory statsCategory;
     private PreferenceCategory segmentCategory;
+
+    private final int preferencesCategoryLayout = getLayoutIdentifier("revanced_settings_preferences_category");
 
     private void updateUI() {
         try {
@@ -134,6 +145,13 @@ public class SponsorBlockPreferenceFragment extends PreferenceFragment {
 
             SponsorBlockSettings.initialize();
 
+            // SponsorBlock category
+
+            PreferenceCategory sbCategory = new PreferenceCategory(context);
+            preferenceScreen.addPreference(sbCategory);
+            sbCategory.setLayoutResource(preferencesCategoryLayout);
+            sbCategory.setTitle(str("revanced_sb_settings_title"));
+
             sbEnabled = new SwitchPreference(context);
             sbEnabled.setTitle(str("revanced_sb_enable_sb"));
             sbEnabled.setSummary(str("revanced_sb_enable_sb_sum"));
@@ -148,6 +166,7 @@ public class SponsorBlockPreferenceFragment extends PreferenceFragment {
 
             segmentCategory = new PreferenceCategory(context);
             segmentCategory.setTitle(str("revanced_sb_diff_segments"));
+            segmentCategory.setLayoutResource(preferencesCategoryLayout);
             preferenceScreen.addPreference(segmentCategory);
             updateSegmentCategories();
 
@@ -156,6 +175,7 @@ public class SponsorBlockPreferenceFragment extends PreferenceFragment {
             addGeneralCategory(context, preferenceScreen);
 
             statsCategory = new PreferenceCategory(context);
+            statsCategory.setLayoutResource(preferencesCategoryLayout);
             statsCategory.setTitle(str("revanced_sb_stats"));
             preferenceScreen.addPreference(statsCategory);
             fetchAndDisplayStats();
@@ -168,9 +188,19 @@ public class SponsorBlockPreferenceFragment extends PreferenceFragment {
         }
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        final ViewGroup toolBarParent = Objects.requireNonNull(getActivity().findViewById(getIdIdentifier("revanced_toolbar_parent")));
+        Toolbar toolbar = (Toolbar) toolBarParent.getChildAt(0);
+        TextView toolbarTextView = Objects.requireNonNull(getChildView(toolbar, view -> view instanceof TextView));
+        toolbarTextView.setText(ResourceUtils.getString("revanced_extended_settings_title"));
+    }
+
     private void addAppearanceCategory(Context context, PreferenceScreen screen) {
         PreferenceCategory category = new PreferenceCategory(context);
         screen.addPreference(category);
+        category.setLayoutResource(preferencesCategoryLayout);
         category.setTitle(str("revanced_sb_appearance_category"));
 
         votingEnabled = new SwitchPreference(context);
@@ -236,6 +266,7 @@ public class SponsorBlockPreferenceFragment extends PreferenceFragment {
     private void addCreateSegmentCategory(Context context, PreferenceScreen screen) {
         PreferenceCategory category = new PreferenceCategory(context);
         screen.addPreference(category);
+        category.setLayoutResource(preferencesCategoryLayout);
         category.setTitle(str("revanced_sb_create_segment_category"));
 
         addNewSegment = new SwitchPreference(context);
@@ -288,6 +319,7 @@ public class SponsorBlockPreferenceFragment extends PreferenceFragment {
     private void addGeneralCategory(final Context context, PreferenceScreen screen) {
         PreferenceCategory category = new PreferenceCategory(context);
         screen.addPreference(category);
+        category.setLayoutResource(preferencesCategoryLayout);
         category.setTitle(str("revanced_sb_general"));
 
         toastOnConnectionError = new SwitchPreference(context);
@@ -416,6 +448,7 @@ public class SponsorBlockPreferenceFragment extends PreferenceFragment {
     private void addAboutCategory(Context context, PreferenceScreen screen) {
         PreferenceCategory category = new PreferenceCategory(context);
         screen.addPreference(category);
+        category.setLayoutResource(preferencesCategoryLayout);
         category.setTitle(str("revanced_sb_about"));
 
         {
