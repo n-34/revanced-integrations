@@ -24,16 +24,25 @@ public class CustomPlaybackSpeedPatch {
         loadCustomSpeeds();
     }
 
+    /**
+     * Injection point.
+     */
     public static float[] getArray(float[] original) {
-        return customPlaybackSpeeds;
+        return userChangedCustomPlaybackSpeed() ? customPlaybackSpeeds : original;
     }
 
+    /**
+     * Injection point.
+     */
     public static int getLength(int original) {
-        return customPlaybackSpeeds.length;
+        return userChangedCustomPlaybackSpeed() ? customPlaybackSpeeds.length : original;
     }
 
+    /**
+     * Injection point.
+     */
     public static int getSize(int original) {
-        return 0;
+        return userChangedCustomPlaybackSpeed() ? 0 : original;
     }
 
     private static void resetCustomSpeeds(boolean shouldWarning) {
@@ -70,6 +79,10 @@ public class CustomPlaybackSpeedPatch {
             resetCustomSpeeds(false);
             loadCustomSpeeds();
         }
+    }
+
+    private static boolean userChangedCustomPlaybackSpeed() {
+        return !Settings.CUSTOM_PLAYBACK_SPEEDS.isSetToDefault() && customPlaybackSpeeds != null;
     }
 
     private static boolean arrayContains(float[] array, float value) {
