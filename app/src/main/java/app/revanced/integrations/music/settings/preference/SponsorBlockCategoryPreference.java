@@ -88,6 +88,7 @@ public class SponsorBlockCategoryPreference {
 
             builder.setPositiveButton(android.R.string.ok, (dialog, which) -> {
                 category.behaviour = CategoryBehaviourEntryValues[mClickedDialogEntryIndex];
+                category.setBehaviour(category.behaviour);
                 SegmentCategory.updateEnabledCategories();
 
                 String colorString = mEditText.getText().toString();
