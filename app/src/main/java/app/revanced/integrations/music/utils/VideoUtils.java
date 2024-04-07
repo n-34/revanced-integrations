@@ -13,16 +13,10 @@ import androidx.annotation.NonNull;
 
 import app.revanced.integrations.music.patches.video.VideoInformation;
 import app.revanced.integrations.music.settings.Settings;
+import app.revanced.integrations.shared.utils.Logger;
 
+@SuppressWarnings("unused")
 public class VideoUtils {
-    /**
-     * Injection point.
-     */
-    public static String currentQuality = "";
-    /**
-     * Injection point.
-     */
-    public static float currentSpeed = 1.0f;
 
     public static void downloadMusic(@NonNull Context context) {
         String downloaderPackageName = Settings.EXTERNAL_DOWNLOADER_PACKAGE_NAME.get();
@@ -81,15 +75,10 @@ public class VideoUtils {
         context.startActivity(intent);
     }
 
-    public static float getCurrentSpeed() {
-        return currentSpeed;
-    }
-
-    public static int getCurrentQuality(int original) {
-        try {
-            return Integer.parseInt(currentQuality.split("p")[0]);
-        } catch (Exception ignored) {
-        }
-        return original;
+    /**
+     * Rest of the implementation added by patch.
+     */
+    public static void showPlaybackSpeedFlyoutPanel() {
+        Logger.printDebug(() -> "Playback speed flyout panel opened");
     }
 }

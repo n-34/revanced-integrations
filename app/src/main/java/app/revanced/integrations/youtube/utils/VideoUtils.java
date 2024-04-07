@@ -125,6 +125,9 @@ public class VideoUtils {
                 .show();
     }
 
+    /**
+     * Rest of the implementation added by patch.
+     */
     public static void showPlaybackSpeedFlyoutPanel() {
         Logger.printDebug(() -> "Playback speed flyout panel opened");
     }

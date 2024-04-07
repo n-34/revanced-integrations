@@ -44,8 +44,8 @@ public final class VideoInformation {
     @NonNull
     private static volatile String playerResponseVideoId = "";
     private static volatile boolean playerResponseVideoIdIsShort;
-    private static volatile boolean videoIsLiveStream;
     private static volatile boolean videoIdIsShort;
+    private static volatile boolean videoIsLiveStream;
 
     /**
      * The current playback speed
@@ -246,6 +246,7 @@ public final class VideoInformation {
 
     /**
      * Overrides the current playback speed.
+     * Rest of the implementation added by patch.
      */
     public static void overridePlaybackSpeed(float speedOverride) {
         Logger.printDebug(() -> "Overriding playback speed to: " + speedOverride);
@@ -269,6 +270,7 @@ public final class VideoInformation {
 
     /**
      * Overrides the current quality.
+     * Rest of the implementation added by patch.
      */
     public static void overrideVideoQuality(int qualityOverride) {
         Logger.printDebug(() -> "Overriding video quality to: " + qualityOverride);

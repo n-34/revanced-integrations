@@ -7,29 +7,20 @@ import app.revanced.integrations.music.settings.Settings;
 
 @SuppressWarnings("unused")
 public class PlaybackSpeedPatch {
-    private static float selectedSpeed = 1.0f;
 
-    public static float getPlaybackSpeed() {
+    public static float getPlaybackSpeed(final float playbackSpeed) {
         try {
             return Settings.DEFAULT_PLAYBACK_SPEED.get();
         } catch (Exception ignored) {
         }
-        return selectedSpeed;
+        return playbackSpeed;
     }
 
-    /** @noinspection ResultOfMethodCallIgnored*/
-    public static void showPlaybackSpeedMenu() {
-        Settings.REPLACE_FLYOUT_PANEL_REPORT.get();
-        // Rest of the implementation added by patch.
-    }
-
-    public static void userChangedSpeed(final float speed) {
-        selectedSpeed = speed;
-
+    public static void userSelectedPlaybackSpeed(final float playbackSpeed) {
         if (!Settings.ENABLE_SAVE_PLAYBACK_SPEED.get())
             return;
 
-        Settings.DEFAULT_PLAYBACK_SPEED.save(speed);
-        showToastShort(str("revanced_save_playback_speed", speed + "x"));
+        Settings.DEFAULT_PLAYBACK_SPEED.save(playbackSpeed);
+        showToastShort(str("revanced_save_playback_speed", playbackSpeed + "x"));
     }
 }

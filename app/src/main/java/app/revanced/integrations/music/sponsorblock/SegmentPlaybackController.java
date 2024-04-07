@@ -17,7 +17,6 @@ import app.revanced.integrations.music.settings.Settings;
 import app.revanced.integrations.music.sponsorblock.objects.CategoryBehaviour;
 import app.revanced.integrations.music.sponsorblock.objects.SponsorSegment;
 import app.revanced.integrations.music.sponsorblock.requests.SBRequester;
-import app.revanced.integrations.music.utils.VideoUtils;
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.Utils;
 
@@ -152,7 +151,7 @@ public class SegmentPlaybackController {
             }
             Logger.printDebug(() -> "setVideoTime: " + millis);
 
-            final float playbackSpeed = VideoUtils.getCurrentSpeed();
+            final float playbackSpeed = VideoInformation.getPlaybackSpeed();
             // Amount of time to look ahead for the next segment,
             // and the threshold to determine if a scheduled show/hide is at the correct video time when it's run.
             //

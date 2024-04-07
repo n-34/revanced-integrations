@@ -18,7 +18,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import app.revanced.integrations.music.patches.video.PlaybackSpeedPatch;
 import app.revanced.integrations.music.settings.Settings;
 import app.revanced.integrations.music.utils.VideoUtils;
 import app.revanced.integrations.shared.utils.Logger;
@@ -110,7 +109,7 @@ public class FlyoutPatch {
                     imageView.setColorFilter(cf);
                     clickAbleArea.setOnClickListener(view -> {
                         clickView(touchOutSideView);
-                        PlaybackSpeedPatch.showPlaybackSpeedMenu();
+                        VideoUtils.showPlaybackSpeedFlyoutPanel();
                     });
                 }, 0L
         );
