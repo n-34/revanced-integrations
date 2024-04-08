@@ -9,7 +9,6 @@ import android.app.Activity;
 import androidx.annotation.NonNull;
 
 import app.revanced.integrations.shared.settings.BaseSettings;
-import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.utils.ExtendedUtils;
 
 @SuppressWarnings("unused")
@@ -30,13 +29,8 @@ public class InitializationPatch {
     }
 
     public static void setDeviceInformation(@NonNull Activity mActivity) {
-        ExtendedUtils.setPackageName(mActivity);
-        ExtendedUtils.setApplicationLabel(mActivity);
-        ExtendedUtils.setIsTablet(mActivity);
-        ExtendedUtils.setVersionName(mActivity);
-    }
-
-    public static void setMainActivity(@NonNull Activity mActivity) {
-        Utils.activity = mActivity;
+        ExtendedUtils.setApplicationLabel();
+        ExtendedUtils.setSmallestScreenWidthDp();
+        ExtendedUtils.setVersionName();
     }
 }

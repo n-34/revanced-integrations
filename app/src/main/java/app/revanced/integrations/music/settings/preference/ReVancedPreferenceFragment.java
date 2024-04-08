@@ -192,7 +192,7 @@ public class ReVancedPreferenceFragment extends PreferenceFragment {
             textView.setTextSize(TypedValue.COMPLEX_UNIT_PT, 8); // Use a smaller font to reduce text wrap.
 
             TextInputLayout textInputLayout = new TextInputLayout(activity);
-            textInputLayout.setLayoutParams(getLayoutParams(activity));
+            textInputLayout.setLayoutParams(getLayoutParams());
             textInputLayout.addView(textView);
 
             FrameLayout container = new FrameLayout(activity);
@@ -217,8 +217,8 @@ public class ReVancedPreferenceFragment extends PreferenceFragment {
         @SuppressLint("SimpleDateFormat")
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        var appName = ExtendedUtils.applicationLabel;
-        var versionName = ExtendedUtils.appVersionName;
+        var appName = ExtendedUtils.getApplicationLabel();
+        var versionName = ExtendedUtils.getVersionName();
         var formatDate = dateFormat.format(new Date(System.currentTimeMillis()));
         var fileName = String.format("%s_v%s_%s.txt", appName, versionName, formatDate);
 

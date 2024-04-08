@@ -28,7 +28,7 @@ public class ResettableEditTextPreference {
             textView.setText(setting.get());
 
             TextInputLayout textInputLayout = new TextInputLayout(mActivity);
-            textInputLayout.setLayoutParams(getLayoutParams(mActivity));
+            textInputLayout.setLayoutParams(getLayoutParams());
             textInputLayout.addView(textView);
 
             FrameLayout container = new FrameLayout(mActivity);

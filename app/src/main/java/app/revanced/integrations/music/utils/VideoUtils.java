@@ -1,58 +1,51 @@
 package app.revanced.integrations.music.utils;
 
 import static app.revanced.integrations.shared.utils.StringRef.str;
-import static app.revanced.integrations.shared.utils.Utils.showToastShort;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.media.AudioManager;
-import android.net.Uri;
 
 import androidx.annotation.NonNull;
 
 import app.revanced.integrations.music.patches.video.VideoInformation;
 import app.revanced.integrations.music.settings.Settings;
+import app.revanced.integrations.shared.utils.IntentUtils;
 import app.revanced.integrations.shared.utils.Logger;
 
 @SuppressWarnings("unused")
-public class VideoUtils {
+public class VideoUtils extends IntentUtils {
 
-    public static void downloadMusic(@NonNull Context context) {
-        String downloaderPackageName = Settings.EXTERNAL_DOWNLOADER_PACKAGE_NAME.get();
+    public static void launchExternalDownloader() {
+        launchExternalDownloader(VideoInformation.getVideoId());
+    }
+
+    public static void launchExternalDownloader(@NonNull String videoId) {
+        String downloaderPackageName = Settings.EXTERNAL_DOWNLOADER_PACKAGE_NAME.get().trim();
 
         if (downloaderPackageName.isEmpty()) {
             Settings.EXTERNAL_DOWNLOADER_PACKAGE_NAME.resetToDefault();
             downloaderPackageName = Settings.EXTERNAL_DOWNLOADER_PACKAGE_NAME.defaultValue;
         }
 
-        if (!ExtendedUtils.isPackageEnabled(context, downloaderPackageName)) {
+        if (!ExtendedUtils.isPackageEnabled(downloaderPackageName)) {
             showToastShort(str("revanced_external_downloader_not_installed_warning", downloaderPackageName));
             return;
         }
 
-        startDownloaderActivity(context, downloaderPackageName, String.format("https://music.youtube.com/watch?v=%s", VideoInformation.getVideoId()));
-    }
-
-    public static void startDownloaderActivity(@NonNull Context context, @NonNull String downloaderPackageName, @NonNull String content) {
-        Intent intent = new Intent("android.intent.action.SEND");
-        intent.setType("text/plain");
-        intent.setPackage(downloaderPackageName);
-        intent.putExtra("android.intent.extra.TEXT", content);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
+        final String content = String.format("https://music.youtube.com/watch?v=%s", videoId);
+        launchExternalDownloader(content, downloaderPackageName);
     }
 
     @SuppressLint("IntentReset")
-    public static void openInYouTube(@NonNull Context context) {
-        AudioManager audioManager = (AudioManager) context.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+    public static void openInYouTube() {
         final String videoId = VideoInformation.getVideoId();
         if (videoId.isEmpty()) {
             showToastShort(str("revanced_watch_on_youtube_warning"));
             return;
         }
 
-        if (audioManager != null) {
+        if (context.getApplicationContext().getSystemService(Context.AUDIO_SERVICE) instanceof AudioManager audioManager) {
             audioManager.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
         }
 
@@ -62,17 +55,12 @@ public class VideoUtils {
             url += String.format("?t=%s", seconds);
         }
 
-        Intent intent = new Intent("android.intent.action.VIEW", Uri.parse(url));
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
+        launchView(url);
     }
 
-    public static void openInMusic(@NonNull Context context, @NonNull String songId) {
+    public static void openInYouTubeMusic(@NonNull String songId) {
         final String url = String.format("vnd.youtube.music://%s", songId);
-        Intent intent = new Intent("android.intent.action.VIEW", Uri.parse(url));
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setPackage(ExtendedUtils.packageName);
-        context.startActivity(intent);
+        launchView(url, context.getPackageName());
     }
 
     /**

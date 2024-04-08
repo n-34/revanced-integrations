@@ -1,91 +1,32 @@
 package app.revanced.integrations.music.utils;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.os.Build;
 import android.util.TypedValue;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
-import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.PackageUtils;
 
-public class ExtendedUtils {
-    public static String applicationLabel = "RVX_Music";
-    public static String packageName = "app.rvx.android.apps.youtube.music";
-    public static String appVersionName = "6.21.52";
+public class ExtendedUtils extends PackageUtils {
 
-    private ExtendedUtils() {
-    } // utility class
-
-    @Nullable
-    private static PackageInfo getPackageInfo(@NonNull Context context) {
-        try {
-            final PackageManager packageManager = getPackageManager(context);
-            final String packageName = context.getPackageName();
-            return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-                    ? packageManager.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(0))
-                    : packageManager.getPackageInfo(packageName, 0);
-        } catch (PackageManager.NameNotFoundException e) {
-            Logger.printException(() -> "Failed to get package Info!" + e);
-        }
-        return null;
-    }
-
-    @NonNull
-    private static PackageManager getPackageManager(@NonNull Context context) {
-        return context.getPackageManager();
-    }
-
-    public static boolean isPackageEnabled(@NonNull Context context, @NonNull String packageName) {
-        try {
-            return getPackageManager(context).getApplicationInfo(packageName, 0).enabled;
-        } catch (PackageManager.NameNotFoundException ignored) {
-        }
-
-        return false;
-    }
-
-    public static void setApplicationLabel(@NonNull Context context) {
-        final PackageInfo packageInfo = getPackageInfo(context);
-        if (packageInfo != null) {
-            applicationLabel = (String) packageInfo.applicationInfo.loadLabel(getPackageManager(context));
-        }
-    }
-
-    public static void setPackageName(@NonNull Context context) {
-        packageName = context.getPackageName();
-    }
-
-    public static void setVersionName(@NonNull Context context) {
-        final PackageInfo packageInfo = getPackageInfo(context);
-        if (packageInfo != null) {
-            appVersionName = packageInfo.versionName;
-        }
-    }
-
-    private static int dpToPx(float dp, Resources resources) {
-        float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources.getDisplayMetrics());
-        return (int) px;
+    private static int dpToPx(float dp) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());
     }
 
     public static AlertDialog.Builder getDialogBuilder(@NonNull Context context) {
         return new AlertDialog.Builder(context, android.R.style.Theme_DeviceDefault_Dialog_Alert);
     }
 
-    public static FrameLayout.LayoutParams getLayoutParams(@NonNull Activity activity) {
+    public static FrameLayout.LayoutParams getLayoutParams() {
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
-        int left_margin = dpToPx(20, activity.getResources());
-        int top_margin = dpToPx(10, activity.getResources());
-        int right_margin = dpToPx(20, activity.getResources());
-        int bottom_margin = dpToPx(4, activity.getResources());
+        int left_margin = dpToPx(20);
+        int top_margin = dpToPx(10);
+        int right_margin = dpToPx(20);
+        int bottom_margin = dpToPx(4);
         params.setMargins(left_margin, top_margin, right_margin, bottom_margin);
 
         return params;

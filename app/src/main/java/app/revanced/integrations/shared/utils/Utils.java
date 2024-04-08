@@ -29,6 +29,7 @@ import android.widget.Toolbar;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.lang.ref.WeakReference;
 import java.text.Bidi;
 import java.util.Locale;
 import java.util.Objects;
@@ -46,15 +47,14 @@ import kotlin.text.Regex;
 /** @noinspection deprecation*/
 public class Utils {
 
-    @SuppressLint("StaticFieldLeak")
-    public static Activity activity;
+    private static WeakReference<Activity> activityRef = new WeakReference<>(null);
 
     @SuppressLint("StaticFieldLeak")
-    private static Context context;
+    public static Context context;
 
     private static String versionName;
 
-    private Utils() {
+    protected Utils() {
     } // utility class
 
     public static void clickView(View view) {
@@ -229,7 +229,7 @@ public class Utils {
     }
 
     public static Activity getActivity() {
-        return activity;
+        return activityRef.get();
     }
 
     public static Context getContext() {
@@ -241,6 +241,10 @@ public class Utils {
 
     public static Resources getResources() {
         return context.getResources();
+    }
+
+    public static void setActivity(Activity mainActivity) {
+        activityRef = new WeakReference<>(mainActivity);
     }
 
     public static void setContext(Context appContext) {

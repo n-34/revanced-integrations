@@ -88,7 +88,7 @@ public class FlyoutPatch {
         runOnMainThreadDelayed(() -> {
                     textView.setText(str("revanced_flyout_panel_watch_on_youtube"));
                     imageView.setImageResource(getIdentifier("yt_outline_youtube_logo_icon_vd_theme_24", ResourceType.DRAWABLE, clickAbleArea.getContext()));
-                    clickAbleArea.setOnClickListener(viewGroup -> VideoUtils.openInYouTube(viewGroup.getContext()));
+                    clickAbleArea.setOnClickListener(viewGroup -> VideoUtils.openInYouTube());
                 }, 0L
         );
     }

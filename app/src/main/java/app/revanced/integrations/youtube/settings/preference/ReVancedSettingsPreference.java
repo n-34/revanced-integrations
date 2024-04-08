@@ -1,6 +1,7 @@
 package app.revanced.integrations.youtube.settings.preference;
 
 import static app.revanced.integrations.shared.settings.preference.AbstractPreferenceFragment.showRestartDialog;
+import static app.revanced.integrations.shared.utils.ResourceUtils.getLayoutIdentifier;
 import static app.revanced.integrations.shared.utils.ResourceUtils.getStringArray;
 import static app.revanced.integrations.shared.utils.StringRef.str;
 import static app.revanced.integrations.youtube.utils.ExtendedUtils.isPackageEnabled;
@@ -12,7 +13,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.preference.Preference;
-import android.preference.PreferenceManager;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
 
@@ -30,11 +31,7 @@ import app.revanced.integrations.youtube.utils.ExtendedUtils;
  */
 public class ReVancedSettingsPreference extends ReVancedPreferenceFragment {
     private static final String EXTERNAL_DOWNLOADER_PREFERENCE_KEY = "revanced_external_downloader";
-    private static PreferenceManager mPreferenceManager;
 
-    public static void setPreferenceManager(PreferenceManager mPreferenceManager) {
-        ReVancedSettingsPreference.mPreferenceManager = mPreferenceManager;
-    }
 
     public static void enableDisablePreferences() {
         for (Setting<?> setting : Setting.allLoadedSettings()) {
@@ -85,12 +82,12 @@ public class ReVancedSettingsPreference extends ReVancedPreferenceFragment {
      */
     private static void LayoutOverrideLinks() {
         enableDisablePreferences(
-                ExtendedUtils.isTablet,
+                ExtendedUtils.isTablet(),
                 Settings.ENABLE_TABLET_LAYOUT,
                 Settings.FORCE_FULLSCREEN
         );
         enableDisablePreferences(
-                !ExtendedUtils.isTablet,
+                !ExtendedUtils.isTablet(),
                 Settings.ENABLE_PHONE_LAYOUT
         );
     }
@@ -99,7 +96,7 @@ public class ReVancedSettingsPreference extends ReVancedPreferenceFragment {
      * Enable/Disable Preferences not working in tablet layout
      */
     private static void TabletLayoutLinks() {
-        final boolean isTabletDevice = ExtendedUtils.isTablet &&
+        final boolean isTabletDevice = ExtendedUtils.isTablet() &&
                 !Settings.ENABLE_PHONE_LAYOUT.get();
         final boolean isEnabledTabletLayout = Settings.ENABLE_TABLET_LAYOUT.get();
 
@@ -213,8 +210,7 @@ public class ReVancedSettingsPreference extends ReVancedPreferenceFragment {
      */
     private static void setExternalDownloaderPreference(@NonNull Activity activity) {
         try {
-            final PreferenceScreen externalDownloaderPreferenceScreen = (PreferenceScreen) mPreferenceManager.findPreference("external_downloader");
-            if (externalDownloaderPreferenceScreen == null)
+            if (!(mPreferenceManager.findPreference("external_downloader") instanceof PreferenceScreen externalDownloaderPreferenceScreen))
                 return;
 
             final String[] labelArray = getStringArray(EXTERNAL_DOWNLOADER_PREFERENCE_KEY + "_label");
@@ -228,7 +224,7 @@ public class ReVancedSettingsPreference extends ReVancedPreferenceFragment {
                 final String packageName = packageNameArray[index];
                 final Uri uri = Uri.parse(websiteArray[index]);
 
-                final String installedMessage = isPackageEnabled(activity, packageName)
+                final String installedMessage = isPackageEnabled(packageName)
                         ? str("revanced_external_downloader_installed")
                         : str("revanced_external_downloader_not_installed");
 
@@ -263,9 +259,9 @@ public class ReVancedSettingsPreference extends ReVancedPreferenceFragment {
             if (isSpoofingToLessThan("18.24.00"))
                 return;
 
-            Preference experimentalPreference = new Preference(activity);
-            experimentalPreference.setTitle(" ");
-            experimentalPreference.setSummary(str("revanced_experimental_flag"));
+            PreferenceCategory experimentalPreferenceCategory = new PreferenceCategory(activity);
+            experimentalPreferenceCategory.setTitle(str("revanced_experimental_flag"));
+            experimentalPreferenceCategory.setLayoutResource(getLayoutIdentifier("revanced_settings_preferences_category"));
 
             SwitchPreference hookDownloadButtonPreference = new SwitchPreference(activity);
             hookDownloadButtonPreference.setTitle(str("revanced_hook_download_button_title"));
@@ -273,7 +269,7 @@ public class ReVancedSettingsPreference extends ReVancedPreferenceFragment {
             hookDownloadButtonPreference.setKey("revanced_hook_download_button");
             hookDownloadButtonPreference.setDefaultValue(false);
 
-            externalDownloaderPreferenceScreen.addPreference(experimentalPreference);
+            externalDownloaderPreferenceScreen.addPreference(experimentalPreferenceCategory);
             externalDownloaderPreferenceScreen.addPreference(hookDownloadButtonPreference);
         } catch (Throwable th) {
             Logger.printException(() -> "Error setting setExternalDownloaderPreference" + th);

@@ -44,7 +44,7 @@ public class ActionBarPatch {
         }
 
         if (buttonType.equals(ActionButton.DOWNLOAD.name))
-            view.setOnClickListener(imageView -> VideoUtils.downloadMusic(imageView.getContext()));
+            view.setOnClickListener(imageView -> VideoUtils.launchExternalDownloader());
     }
 
     public static void setButtonType(@NonNull Object obj) {

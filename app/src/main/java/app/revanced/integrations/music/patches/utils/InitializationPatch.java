@@ -28,8 +28,7 @@ public class InitializationPatch {
     }
 
     public static void setDeviceInformation(@NonNull Activity mActivity) {
-        ExtendedUtils.setPackageName(mActivity);
-        ExtendedUtils.setApplicationLabel(mActivity);
-        ExtendedUtils.setVersionName(mActivity);
+        ExtendedUtils.setApplicationLabel();
+        ExtendedUtils.setVersionName();
     }
 }

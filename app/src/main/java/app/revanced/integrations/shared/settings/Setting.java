@@ -22,7 +22,6 @@ import java.util.Objects;
 import app.revanced.integrations.shared.settings.preference.SharedPrefCategory;
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.Utils;
-import app.revanced.integrations.youtube.sponsorblock.SponsorBlockSettings;
 
 /**
  * @noinspection rawtypes
@@ -350,7 +349,7 @@ public abstract class Setting<T> {
                 }
             }
             if (alertDialogContext != null) {
-                SponsorBlockSettings.showExportWarningIfNeeded(alertDialogContext);
+                app.revanced.integrations.youtube.sponsorblock.SponsorBlockSettings.showExportWarningIfNeeded(alertDialogContext);
             }
 
             if (json.length() == 0) {
@@ -407,7 +406,7 @@ public abstract class Setting<T> {
             // "String <-> Enum" logic or by adding an event hook of when settings are imported.
             // But for now this is simple and works.
             if (isYouTube) {
-                SponsorBlockSettings.updateFromImportedSettings();
+                app.revanced.integrations.youtube.sponsorblock.SponsorBlockSettings.updateFromImportedSettings();
             } else {
                 app.revanced.integrations.music.sponsorblock.SponsorBlockSettings.updateFromImportedSettings();
             }

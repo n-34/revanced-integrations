@@ -12,7 +12,6 @@ import static app.revanced.integrations.youtube.settings.Settings.DOUBLE_BACK_TI
 import static app.revanced.integrations.youtube.settings.Settings.HIDE_PREVIEW_COMMENT;
 import static app.revanced.integrations.youtube.settings.Settings.HIDE_PREVIEW_COMMENT_TYPE;
 import static app.revanced.integrations.youtube.settings.preference.ReVancedSettingsPreference.enableDisablePreferences;
-import static app.revanced.integrations.youtube.settings.preference.ReVancedSettingsPreference.setPreferenceManager;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -55,9 +54,10 @@ import app.revanced.integrations.youtube.utils.ThemeUtils;
  * @noinspection ALL
  */
 public class ReVancedPreferenceFragment extends PreferenceFragment {
-    public static boolean settingImportInProgress = false;
     private final int READ_REQUEST_CODE = 42;
     private final int WRITE_REQUEST_CODE = 43;
+    public static boolean settingImportInProgress = false;
+
     @SuppressLint("SuspiciousIndentation")
     private final SharedPreferences.OnSharedPreferenceChangeListener listener = (sharedPreferences, str) -> {
         try {
@@ -122,12 +122,14 @@ public class ReVancedPreferenceFragment extends PreferenceFragment {
             Logger.printException(() -> "OnSharedPreferenceChangeListener failure", ex);
         }
     };
+
+    public static PreferenceManager mPreferenceManager;
     private SharedPreferences mSharedPreferences;
 
     public ReVancedPreferenceFragment() {
     }
 
-    public void setPreferenceFragmentToolbar(final PreferenceManager mPreferenceManager, final String key) {
+    public void setPreferenceFragmentToolbar(final String key) {
         PreferenceFragment fragment;
         switch (key) {
             case "revanced_ryd_settings" -> {
@@ -163,7 +165,7 @@ public class ReVancedPreferenceFragment extends PreferenceFragment {
         });
     }
 
-    public void setPreferenceScreenToolbar(final PreferenceManager mPreferenceManager) {
+    public void setPreferenceScreenToolbar() {
         final String[] preferenceScreenKey = {
                 "ads",
                 "alt_thumbnails",
@@ -208,16 +210,15 @@ public class ReVancedPreferenceFragment extends PreferenceFragment {
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         try {
-            final PreferenceManager mPreferenceManager = getPreferenceManager();
+            mPreferenceManager = getPreferenceManager();
             mPreferenceManager.setSharedPreferencesName(Setting.preferences.name);
             mSharedPreferences = mPreferenceManager.getSharedPreferences();
             addPreferencesFromResource(getXmlIdentifier("revanced_prefs"));
 
-            setPreferenceFragmentToolbar(mPreferenceManager, "revanced_ryd_settings");
-            setPreferenceFragmentToolbar(mPreferenceManager, "revanced_sb_settings");
-            setPreferenceScreenToolbar(mPreferenceManager);
+            setPreferenceFragmentToolbar("revanced_ryd_settings");
+            setPreferenceFragmentToolbar("revanced_sb_settings");
+            setPreferenceScreenToolbar();
 
-            setPreferenceManager(mPreferenceManager);
             enableDisablePreferences();
 
             setBackupRestorePreference();
@@ -278,8 +279,8 @@ public class ReVancedPreferenceFragment extends PreferenceFragment {
         @SuppressLint("SimpleDateFormat")
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        var appName = ExtendedUtils.applicationLabel;
-        var versionName = ExtendedUtils.appVersionName;
+        var appName = ExtendedUtils.getApplicationLabel();
+        var versionName = ExtendedUtils.getVersionName();
         var formatDate = dateFormat.format(new Date(System.currentTimeMillis()));
         var fileName = String.format("%s_v%s_%s.txt", appName, versionName, formatDate);
 

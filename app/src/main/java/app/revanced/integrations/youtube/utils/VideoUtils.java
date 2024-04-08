@@ -2,7 +2,6 @@ package app.revanced.integrations.youtube.utils;
 
 import static app.revanced.integrations.shared.utils.ResourceUtils.getStringArray;
 import static app.revanced.integrations.shared.utils.StringRef.str;
-import static app.revanced.integrations.shared.utils.Utils.showToastShort;
 import static app.revanced.integrations.youtube.patches.video.PlaybackSpeedPatch.userSelectedPlaybackSpeed;
 import static app.revanced.integrations.youtube.utils.ExtendedUtils.isPackageEnabled;
 
@@ -10,7 +9,6 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,14 +16,14 @@ import androidx.annotation.Nullable;
 import java.time.Duration;
 import java.util.Arrays;
 
+import app.revanced.integrations.shared.utils.IntentUtils;
 import app.revanced.integrations.shared.utils.Logger;
-import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.patches.video.CustomPlaybackSpeedPatch;
 import app.revanced.integrations.youtube.patches.video.VideoInformation;
 import app.revanced.integrations.youtube.settings.Settings;
 
 @SuppressWarnings("unused")
-public class VideoUtils {
+public class VideoUtils extends IntentUtils {
     private static volatile boolean isPiPAvailable = true;
 
     public static void copyUrl(boolean withTimestamp) {
@@ -37,7 +35,7 @@ public class VideoUtils {
             builder.append(currentVideoTimeInSeconds);
         }
 
-        Utils.setClipboard(builder.toString(), withTimestamp
+        setClipboard(builder.toString(), withTimestamp
                 ? str("revanced_share_copy_url_timestamp_success")
                 : str("revanced_share_copy_url_success")
         );
@@ -57,29 +55,11 @@ public class VideoUtils {
                 ? String.format("%02d:%02d:%02d", h, m, s)
                 : String.format("%02d:%02d", m, s);
 
-        Utils.setClipboard(timeStamp, str("revanced_share_copy_timestamp_success", timeStamp));
-    }
-
-    public static void downloadVideo(@NonNull Context context) {
-        String downloaderPackageName = Settings.EXTERNAL_DOWNLOADER_PACKAGE_NAME.get().trim();
-
-        if (downloaderPackageName.isEmpty()) {
-            Settings.EXTERNAL_DOWNLOADER_PACKAGE_NAME.resetToDefault();
-            downloaderPackageName = Settings.EXTERNAL_DOWNLOADER_PACKAGE_NAME.defaultValue;
-        }
-
-        if (!isPackageEnabled(context, downloaderPackageName)) {
-            showToastShort(str("revanced_external_downloader_not_installed_warning", getExternalDownloaderName(context, downloaderPackageName)));
-            return;
-        }
-
-        isPiPAvailable = false;
-        startDownloaderActivity(context, downloaderPackageName, String.format("https://youtu.be/%s", VideoInformation.getVideoId()));
-        Utils.runOnMainThreadDelayed(() -> isPiPAvailable = true, 500L);
+        setClipboard(timeStamp, str("revanced_share_copy_timestamp_success", timeStamp));
     }
 
     @NonNull
-    private static String getExternalDownloaderName(@NonNull Context context, @NonNull String packageName) {
+    private static String getExternalDownloaderAppName(@NonNull Context context, @NonNull String packageName) {
         try {
             final String EXTERNAL_DOWNLOADER_LABEL_PREFERENCE_KEY = "revanced_external_downloader_label";
             final String EXTERNAL_DOWNLOADER_PACKAGE_NAME_PREFERENCE_KEY = "revanced_external_downloader_package_name";
@@ -96,13 +76,27 @@ public class VideoUtils {
         return packageName;
     }
 
-    public static void startDownloaderActivity(@NonNull Context context, @NonNull String downloaderPackageName, @NonNull String content) {
-        Intent intent = new Intent("android.intent.action.SEND");
-        intent.setType("text/plain");
-        intent.setPackage(downloaderPackageName);
-        intent.putExtra("android.intent.extra.TEXT", content);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
+    public static void launchExternalDownloader() {
+        launchExternalDownloader(VideoInformation.getVideoId());
+    }
+
+    public static void launchExternalDownloader(@NonNull String videoId) {
+        String downloaderPackageName = Settings.EXTERNAL_DOWNLOADER_PACKAGE_NAME.get().trim();
+
+        if (downloaderPackageName.isEmpty()) {
+            Settings.EXTERNAL_DOWNLOADER_PACKAGE_NAME.resetToDefault();
+            downloaderPackageName = Settings.EXTERNAL_DOWNLOADER_PACKAGE_NAME.defaultValue;
+        }
+
+        if (!isPackageEnabled(downloaderPackageName)) {
+            showToastShort(str("revanced_external_downloader_not_installed_warning", getExternalDownloaderAppName(context, downloaderPackageName)));
+            return;
+        }
+
+        isPiPAvailable = false;
+        final String content = String.format("https://youtu.be/%s", videoId);
+        launchExternalDownloader(content, downloaderPackageName);
+        runOnMainThreadDelayed(() -> isPiPAvailable = true, 500L);
     }
 
     public static void showPlaybackSpeedDialog(@NonNull Context context) {
@@ -141,7 +135,7 @@ public class VideoUtils {
     public static String getFormattedSpeedString(@Nullable String prefix) {
         final float playbackSpeed = VideoInformation.getPlaybackSpeed();
 
-        final String playbackSpeedString = Utils.isRightToLeftTextLayout()
+        final String playbackSpeedString = isRightToLeftTextLayout()
                 ? "\u2066x\u2069" + playbackSpeed
                 : playbackSpeed + "x";
 

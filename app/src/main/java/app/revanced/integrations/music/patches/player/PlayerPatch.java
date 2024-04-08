@@ -7,14 +7,11 @@ import static app.revanced.integrations.shared.utils.Utils.showToastShort;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-
-import androidx.annotation.NonNull;
 
 import java.util.Arrays;
 
@@ -107,7 +104,7 @@ public class PlayerPatch {
         return Settings.HIDE_FULLSCREEN_SHARE_BUTTON.get() ? 0 : original;
     }
 
-    private static void prepareOpenMusic(@NonNull Context context) {
+    private static void prepareOpenMusic() {
         if (!VideoType.getCurrent().isMusicVideo()) {
             showToastShort(str("revanced_playlist_dismiss"));
             return;
@@ -117,7 +114,7 @@ public class PlayerPatch {
             showToastShort(str("revanced_playlist_error"));
             return;
         }
-        VideoUtils.openInMusic(context, songId);
+        VideoUtils.openInYouTubeMusic(songId);
     }
 
     public static boolean rememberRepeatState(boolean original) {
@@ -137,7 +134,7 @@ public class PlayerPatch {
         LinearLayout linearLayout = (LinearLayout) LayoutInflater.from(activity).inflate(getLayoutIdentifier("open_music_button"), null);
         ImageView musicButtonView = (ImageView) linearLayout.getChildAt(0);
 
-        musicButtonView.setOnClickListener(imageView -> prepareOpenMusic(imageView.getContext()));
+        musicButtonView.setOnClickListener(imageView -> prepareOpenMusic());
 
         viewGroup.addView(linearLayout);
     }
