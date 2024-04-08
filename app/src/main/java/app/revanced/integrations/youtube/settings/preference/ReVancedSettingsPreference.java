@@ -196,11 +196,11 @@ public class ReVancedSettingsPreference extends ReVancedPreferenceFragment {
      */
     private static void NavigationPreferenceLinks() {
         enableDisablePreferences(
-                Settings.SWITCH_CREATE_NOTIFICATION.get(),
+                Settings.SWITCH_CREATE_WITH_NOTIFICATIONS_BUTTON.get(),
                 Settings.HIDE_CREATE_BUTTON
         );
         enableDisablePreferences(
-                !Settings.SWITCH_CREATE_NOTIFICATION.get(),
+                !Settings.SWITCH_CREATE_WITH_NOTIFICATIONS_BUTTON.get(),
                 Settings.HIDE_NOTIFICATIONS_BUTTON
         );
     }

@@ -10,6 +10,10 @@ import static java.lang.Boolean.FALSE;
  */
 public class BaseSettings {
     public static final BooleanSetting ENABLE_DEBUG_LOGGING = new BooleanSetting("revanced_enable_debug_logging", FALSE);
+    /**
+     * When enabled, share the debug logs with care.
+     * The buffer contains select user data, including the client ip address and information that could identify the YT account.
+     */
     public static final BooleanSetting ENABLE_DEBUG_BUFFER_LOGGING = new BooleanSetting("revanced_enable_debug_buffer_logging", FALSE);
     public static final BooleanSetting SETTINGS_INITIALIZED = new BooleanSetting("revanced_settings_initialized", FALSE, false, false);
 

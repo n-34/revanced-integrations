@@ -1,7 +1,5 @@
 package app.revanced.integrations.youtube.patches.misc.requests;
 
-import static app.revanced.integrations.youtube.utils.ExtendedUtils.appVersionName;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -11,6 +9,7 @@ import java.net.HttpURLConnection;
 import app.revanced.integrations.shared.requests.Requester;
 import app.revanced.integrations.shared.requests.Route;
 import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.PackageUtils;
 
 public final class PlayerRoutes {
     public static final Route.CompiledRoute GET_STORYBOARD_SPEC_RENDERER = new Route(
@@ -41,7 +40,7 @@ public final class PlayerRoutes {
 
             JSONObject client = new JSONObject();
             client.put("clientName", "ANDROID");
-            client.put("clientVersion", appVersionName);
+            client.put("clientVersion", PackageUtils.getVersionName());
             client.put("androidSdkVersion", 34);
 
             context.put("client", client);
@@ -111,7 +110,7 @@ public final class PlayerRoutes {
 
         connection.setRequestProperty(
                 "User-Agent", "com.google.android.youtube/" +
-                        appVersionName +
+                        PackageUtils.getVersionName() +
                         " (Linux; U; Android 12; GB) gzip"
         );
         connection.setRequestProperty("X-Goog-Api-Format-Version", "2");

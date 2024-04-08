@@ -43,3 +43,4 @@ public final class ByteTrieSearch extends TrieSearch<byte[]> {
         super(new ByteTrieNode(), patterns);
     }
 }
+

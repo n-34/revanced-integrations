@@ -7,8 +7,6 @@ import android.app.Activity;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -52,8 +50,6 @@ public class Utils {
     @SuppressLint("StaticFieldLeak")
     public static Context context;
 
-    private static String versionName;
-
     protected Utils() {
     } // utility class
 
@@ -61,32 +57,6 @@ public class Utils {
         if (view == null) return;
         view.setSoundEffectsEnabled(false);
         view.performClick();
-    }
-
-    public static String getVersionName() {
-        if (versionName != null) return versionName;
-
-        PackageInfo packageInfo;
-        try {
-            final var packageName = Objects.requireNonNull(getContext()).getPackageName();
-
-            PackageManager packageManager = context.getPackageManager();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                packageInfo = packageManager.getPackageInfo(
-                        packageName,
-                        PackageManager.PackageInfoFlags.of(0)
-                );
-            else
-                packageInfo = packageManager.getPackageInfo(
-                        packageName,
-                        0
-                );
-        } catch (PackageManager.NameNotFoundException e) {
-            Logger.printException(() -> "Failed to get package info", e);
-            return null;
-        }
-
-        return versionName = packageInfo.versionName;
     }
 
     /**
@@ -146,25 +116,6 @@ public class Utils {
         return backgroundThreadPool.submit(call);
     }
 
-    /**
-     * Simulates a delay by doing meaningless calculations.
-     * Used for debugging to verify UI timeout logic.
-     */
-    @SuppressWarnings("UnusedReturnValue")
-    public static long doNothingForDuration(long amountOfTimeToWaste) {
-        final long timeCalculationStarted = System.currentTimeMillis();
-        Logger.printDebug(() -> "Artificially creating delay of: " + amountOfTimeToWaste + "ms");
-
-        long meaninglessValue = 0;
-        while (System.currentTimeMillis() - timeCalculationStarted < amountOfTimeToWaste) {
-            // could do a thread sleep, but that will trigger an exception if the thread is interrupted
-            meaninglessValue += Long.numberOfLeadingZeros((long) Math.exp(Math.random()));
-        }
-        // return the value, otherwise the compiler or VM might optimize and remove the meaningless time wasting work,
-        // leaving an empty loop that hammers on the System.currentTimeMillis native call
-        return meaninglessValue;
-    }
-
 
     public static boolean containsAny(@NonNull String value, @NonNull String... targets) {
         return indexOfFirstFound(value, targets) >= 0;
@@ -199,6 +150,29 @@ public class Utils {
         } else {
             throw new IllegalArgumentException("View with name" + str +" not found");
         }
+    }
+
+    /**
+     * @param searchRecursively If children ViewGroups should also be
+     *                          recursively searched using depth first search.
+     * @return The first child view that matches the filter.
+     */
+    @Nullable
+    public static <T extends View> T getChildView(@NonNull ViewGroup viewGroup, boolean searchRecursively,
+                                                  @NonNull MatchFilter<View> filter) {
+        for (int i = 0, childCount = viewGroup.getChildCount(); i < childCount; i++) {
+            View childAt = viewGroup.getChildAt(i);
+            if (filter.matches(childAt)) {
+                //noinspection unchecked
+                return (T) childAt;
+            }
+            // Must do recursive after filter check, in case the filter is looking for a ViewGroup.
+            if (searchRecursively && childAt instanceof ViewGroup) {
+                T match = getChildView((ViewGroup) childAt, true, filter);
+                if (match != null) return match;
+            }
+        }
+        return null;
     }
 
     /**
@@ -277,10 +251,6 @@ public class Utils {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2 && toastMessage != null) {
             showToastShort(toastMessage);
         }
-    }
-
-    public static boolean isTablet() {
-        return context.getResources().getConfiguration().smallestScreenWidthDp >= 600;
     }
 
     @Nullable

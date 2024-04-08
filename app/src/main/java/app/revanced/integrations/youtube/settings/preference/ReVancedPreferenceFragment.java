@@ -180,6 +180,7 @@ public class ReVancedPreferenceFragment extends PreferenceFragment {
                 "overlay_button",
                 "patches_information",
                 "player",
+                "revanced_hide_keyword_content_screen", // TODO: After refactoring the Preference Screen, rename the settings to be consistent.
                 "seekbar",
                 "shorts",
                 "swipe_controls",

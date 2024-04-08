@@ -1,31 +1,48 @@
 package app.revanced.integrations.youtube.patches.navigation;
 
 import static app.revanced.integrations.shared.utils.Utils.hideViewUnderCondition;
+import static app.revanced.integrations.youtube.shared.NavigationBar.NavigationButton;
 
 import android.view.View;
 import android.widget.TextView;
+
+import java.util.EnumMap;
+import java.util.Map;
 
 import app.revanced.integrations.youtube.settings.Settings;
 
 @SuppressWarnings("unused")
 public class NavigationPatch {
-    public static Enum<?> lastPivotTab;
+    private static final Map<NavigationButton, Boolean> shouldHideMap = new EnumMap<>(NavigationButton.class) {
+        {
+            put(NavigationButton.HOME, Settings.HIDE_HOME_BUTTON.get());
+            put(NavigationButton.SHORTS, Settings.HIDE_SHORTS_BUTTON.get());
+            put(NavigationButton.SUBSCRIPTIONS, Settings.HIDE_SUBSCRIPTIONS_BUTTON.get());
+            put(NavigationButton.CREATE, Settings.HIDE_CREATE_BUTTON.get());
+            put(NavigationButton.NOTIFICATIONS, Settings.HIDE_NOTIFICATIONS_BUTTON.get());
 
-    public static boolean switchCreateNotification(boolean original) {
-        return Settings.SWITCH_CREATE_NOTIFICATION.get() || original;
+            put(NavigationButton.LIBRARY_LOGGED_OUT, Settings.HIDE_LIBRARY_BUTTON.get());
+            put(NavigationButton.LIBRARY_INCOGNITO, Settings.HIDE_LIBRARY_BUTTON.get());
+            put(NavigationButton.LIBRARY_OLD_UI, Settings.HIDE_LIBRARY_BUTTON.get());
+            put(NavigationButton.LIBRARY_PIVOT_UNKNOWN, Settings.HIDE_LIBRARY_BUTTON.get());
+            put(NavigationButton.LIBRARY_YOU, Settings.HIDE_LIBRARY_BUTTON.get());
+        }
+    };
+
+    /**
+     * Injection point.
+     */
+    public static boolean switchCreateWithNotificationButton(boolean original) {
+        return Settings.SWITCH_CREATE_WITH_NOTIFICATIONS_BUTTON.get() || original;
     }
 
-    public static void hideCreateButton(View view) {
-        hideViewUnderCondition(Settings.HIDE_CREATE_BUTTON.get(), view);
-    }
-
-    public static void hideNavigationButton(View view) {
-        if (lastPivotTab == null)
-            return;
-
-        for (NavigationButton button : NavigationButton.values())
-            if (button.name.equals(lastPivotTab.name()))
-                hideViewUnderCondition(button.enabled, view);
+    /**
+     * Injection point.
+     */
+    public static void navigationTabCreated(NavigationButton button, View tabView) {
+        if (Boolean.TRUE.equals(shouldHideMap.get(button))) {
+            tabView.setVisibility(View.GONE);
+        }
     }
 
     public static void hideNavigationLabel(TextView view) {
@@ -34,21 +51,5 @@ public class NavigationPatch {
 
     public static boolean enableTabletNavBar(boolean original) {
         return Settings.ENABLE_TABLET_NAVIGATION_BAR.get() || original;
-    }
-
-    private enum NavigationButton {
-        HOME("PIVOT_HOME", Settings.HIDE_HOME_BUTTON.get()),
-        SHORTS("TAB_SHORTS", Settings.HIDE_SHORTS_BUTTON.get()),
-        SUBSCRIPTIONS("PIVOT_SUBSCRIPTIONS", Settings.HIDE_SUBSCRIPTIONS_BUTTON.get()),
-        NOTIFICATIONS("TAB_ACTIVITY", Settings.HIDE_NOTIFICATIONS_BUTTON.get()),
-        LIBRARY("VIDEO_LIBRARY_WHITE", Settings.HIDE_LIBRARY_BUTTON.get());
-
-        private final boolean enabled;
-        private final String name;
-
-        NavigationButton(String name, boolean enabled) {
-            this.enabled = enabled;
-            this.name = name;
-        }
     }
 }

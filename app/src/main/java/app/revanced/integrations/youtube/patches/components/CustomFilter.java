@@ -149,7 +149,7 @@ public final class CustomFilter extends Filter {
 
     @Override
     public boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
-                       StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
+                              StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
         // All callbacks are custom filter groups.
         CustomFilterGroup custom = (CustomFilterGroup) matchedGroup;
         if (custom.startsWith && contentIndex != 0) {
