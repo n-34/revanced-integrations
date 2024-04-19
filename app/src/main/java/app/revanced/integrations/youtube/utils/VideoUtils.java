@@ -1,9 +1,8 @@
 package app.revanced.integrations.youtube.utils;
 
-import static app.revanced.integrations.shared.utils.ResourceUtils.getStringArray;
 import static app.revanced.integrations.shared.utils.StringRef.str;
 import static app.revanced.integrations.youtube.patches.video.PlaybackSpeedPatch.userSelectedPlaybackSpeed;
-import static app.revanced.integrations.youtube.utils.ExtendedUtils.isPackageEnabled;
+import static app.revanced.integrations.youtube.settings.preference.ExternalDownloaderPreference.checkPackageIsEnabled;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -16,15 +15,21 @@ import androidx.annotation.Nullable;
 import java.time.Duration;
 import java.util.Arrays;
 
+import app.revanced.integrations.shared.settings.BooleanSetting;
+import app.revanced.integrations.shared.settings.StringSetting;
 import app.revanced.integrations.shared.utils.IntentUtils;
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.youtube.patches.video.CustomPlaybackSpeedPatch;
-import app.revanced.integrations.youtube.patches.video.VideoInformation;
 import app.revanced.integrations.youtube.settings.Settings;
+import app.revanced.integrations.youtube.shared.VideoInformation;
 
 @SuppressWarnings("unused")
 public class VideoUtils extends IntentUtils {
-    private static volatile boolean isPiPAvailable = true;
+    private static final BooleanSetting externalDownloaderActionButton =
+            Settings.EXTERNAL_DOWNLOADER_ACTION_BUTTON;
+    private static final StringSetting externalDownloaderPackageName =
+            Settings.EXTERNAL_DOWNLOADER_PACKAGE_NAME;
+    private static volatile boolean isExternalDownloaderLaunched = false;
 
     public static void copyUrl(boolean withTimestamp) {
         StringBuilder builder = new StringBuilder("https://youtu.be/");
@@ -58,22 +63,30 @@ public class VideoUtils extends IntentUtils {
         setClipboard(timeStamp, str("revanced_share_copy_timestamp_success", timeStamp));
     }
 
-    @NonNull
-    private static String getExternalDownloaderAppName(@NonNull Context context, @NonNull String packageName) {
+    /**
+     * Injection point.
+     * <p>
+     * Called from the in app download hook,
+     * for both the player action button (below the video)
+     * and the 'Download video' flyout option for feed videos.
+     * <p>
+     * Appears to always be called from the main thread.
+     */
+    public static boolean inAppDownloadButtonOnClick(String videoId) {
         try {
-            final String EXTERNAL_DOWNLOADER_LABEL_PREFERENCE_KEY = "revanced_external_downloader_label";
-            final String EXTERNAL_DOWNLOADER_PACKAGE_NAME_PREFERENCE_KEY = "revanced_external_downloader_package_name";
+            if (!externalDownloaderActionButton.get()) {
+                return false;
+            }
+            if (videoId == null || videoId.isEmpty()) {
+                return false;
+            }
+            launchExternalDownloader(videoId);
 
-            final String[] labelArray = getStringArray(EXTERNAL_DOWNLOADER_LABEL_PREFERENCE_KEY);
-            final String[] packageNameArray = getStringArray(EXTERNAL_DOWNLOADER_PACKAGE_NAME_PREFERENCE_KEY);
-
-            final int findIndex = Arrays.binarySearch(packageNameArray, packageName);
-
-            return findIndex >= 0 ? labelArray[findIndex] : packageName;
-        } catch (Exception e) {
-            Logger.printException(() -> "Failed to set ExternalDownloaderName", e);
+            return true;
+        } catch (Exception ex) {
+            Logger.printException(() -> "inAppDownloadButtonOnClick failure", ex);
         }
-        return packageName;
+        return false;
     }
 
     public static void launchExternalDownloader() {
@@ -81,22 +94,26 @@ public class VideoUtils extends IntentUtils {
     }
 
     public static void launchExternalDownloader(@NonNull String videoId) {
-        String downloaderPackageName = Settings.EXTERNAL_DOWNLOADER_PACKAGE_NAME.get().trim();
+        try {
+            String downloaderPackageName = externalDownloaderPackageName.get().trim();
 
-        if (downloaderPackageName.isEmpty()) {
-            Settings.EXTERNAL_DOWNLOADER_PACKAGE_NAME.resetToDefault();
-            downloaderPackageName = Settings.EXTERNAL_DOWNLOADER_PACKAGE_NAME.defaultValue;
+            if (downloaderPackageName.isEmpty()) {
+                externalDownloaderPackageName.resetToDefault();
+                downloaderPackageName = externalDownloaderPackageName.defaultValue;
+            }
+
+            if (!checkPackageIsEnabled()) {
+                return;
+            }
+
+            isExternalDownloaderLaunched = true;
+            final String content = String.format("https://youtu.be/%s", videoId);
+            launchExternalDownloader(content, downloaderPackageName);
+        } catch (Exception ex) {
+            Logger.printException(() -> "launchExternalDownloader failure", ex);
+        } finally {
+            runOnMainThreadDelayed(() -> isExternalDownloaderLaunched = false, 500L);
         }
-
-        if (!isPackageEnabled(downloaderPackageName)) {
-            showToastShort(str("revanced_external_downloader_not_installed_warning", getExternalDownloaderAppName(context, downloaderPackageName)));
-            return;
-        }
-
-        isPiPAvailable = false;
-        final String content = String.format("https://youtu.be/%s", videoId);
-        launchExternalDownloader(content, downloaderPackageName);
-        runOnMainThreadDelayed(() -> isPiPAvailable = true, 500L);
     }
 
     public static void showPlaybackSpeedDialog(@NonNull Context context) {
@@ -122,8 +139,8 @@ public class VideoUtils extends IntentUtils {
     /**
      * Rest of the implementation added by patch.
      */
-    public static void showPlaybackSpeedFlyoutPanel() {
-        Logger.printDebug(() -> "Playback speed flyout panel opened");
+    public static void showPlaybackSpeedFlyoutMenu() {
+        Logger.printDebug(() -> "Playback speed flyout menu opened");
     }
 
     public static String getFormattedQualityString(@Nullable String prefix) {
@@ -144,8 +161,9 @@ public class VideoUtils extends IntentUtils {
 
     /**
      * Injection point.
+     * Disable PiP mode when an external downloader Intent is started.
      */
-    public static boolean isPiPAvailable(boolean original) {
-        return original && isPiPAvailable;
+    public static boolean getExternalDownloaderLaunchedState(boolean original) {
+        return !isExternalDownloaderLaunched && original;
     }
 }

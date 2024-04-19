@@ -1,14 +1,11 @@
 package app.revanced.integrations.youtube.patches.general;
 
-import static app.revanced.integrations.shared.utils.ResourceUtils.getIdIdentifier;
 import static app.revanced.integrations.shared.utils.StringRef.str;
-import static app.revanced.integrations.shared.utils.Utils.hideViewBy0dpUnderCondition;
 import static app.revanced.integrations.shared.utils.Utils.hideViewUnderCondition;
 
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -16,38 +13,29 @@ import android.view.ViewGroup.MarginLayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.Objects;
 
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.Utils;
+import app.revanced.integrations.youtube.patches.utils.ViewGroupMarginLayoutParamsPatch;
 import app.revanced.integrations.youtube.settings.Settings;
+import app.revanced.integrations.youtube.shared.NavigationBar;
 
 /**
  * @noinspection ALL
  */
 @SuppressWarnings("unused")
 public class GeneralPatch {
+
+    // region [Change start page] patch
+
     private static final String MAIN_ACTIONS = "android.intent.action.MAIN";
-    private static final String[] TOOLBAR_BUTTON_LIST = {
-            "CREATION_ENTRY",   // Create button (Phone)
-            "FAB_CAMERA",       // Create button (Tablet)
-            "TAB_ACTIVITY"      // Notification button
-    };
-    private static final int resultId = getIdIdentifier("results");
-    private static FrameLayout.LayoutParams layoutParams;
-    private static int minimumHeight = 1;
-    private static int paddingLeft = 12;
-    private static int paddingTop = 0;
-    private static int paddingRight = 12;
-    private static int paddingBottom = 0;
-    private static boolean subtitlePrefetched = true;
-    @NonNull
-    private static String videoId = "";
 
     /**
      * Change the start page only when the user starts the app on the launcher.
@@ -76,6 +64,208 @@ public class GeneralPatch {
         }
         Logger.printDebug(() -> "Changing start page to " + startPage);
     }
+
+    // endregion
+
+    // region [Disable auto captions] patch
+
+    private static boolean subtitlePrefetched = true;
+    @NonNull
+    private static String videoId = "";
+
+    public static boolean disableAutoCaptions(boolean original) {
+        if (!Settings.DISABLE_AUTO_CAPTIONS.get())
+            return original;
+
+        return subtitlePrefetched;
+    }
+
+    public static void newVideoStarted(@NonNull String newlyLoadedVideoId) {
+        if (Objects.equals(newlyLoadedVideoId, videoId)) {
+            return;
+        }
+        videoId = newlyLoadedVideoId;
+        subtitlePrefetched = false;
+    }
+
+    public static void prefetchSubtitleTrack() {
+        subtitlePrefetched = true;
+    }
+
+    // endregion
+
+    // region [Disable splash animation] patch
+
+    public static boolean disableSplashAnimation(boolean original) {
+        try {
+            return !Settings.DISABLE_SPLASH_ANIMATION.get() && original;
+        } catch (Exception ex) {
+            Logger.printException(() -> "Failed to load disableSplashAnimation", ex);
+        }
+        return original;
+    }
+
+    // endregion
+
+    // region [Enable gradient loading screen] patch
+
+    public static boolean enableGradientLoadingScreen() {
+        return Settings.ENABLE_GRADIENT_LOADING_SCREEN.get();
+    }
+
+    // endregion
+
+    // region [Enable tablet mini player] patch
+
+    public static boolean enableTabletMiniPlayer(boolean original) {
+        return Settings.ENABLE_TABLET_MINI_PLAYER.get() || original;
+    }
+
+    // endregion
+
+    // region [Enable wide search bar] patch
+
+    public static boolean enableWideSearchBar(boolean original) {
+        return Settings.ENABLE_WIDE_SEARCH_BAR.get() || original;
+    }
+
+    public static boolean enableWideSearchBarInYouTab(boolean original) {
+        if (!Settings.ENABLE_WIDE_SEARCH_BAR.get())
+            return original;
+        else
+            return !Settings.ENABLE_WIDE_SEARCH_BAR_IN_YOU_TAB.get() && original;
+    }
+
+    // endregion
+
+    // region [Hide layout components] patch
+
+    /**
+     * hide account menu in you tab
+     *
+     * @param menuTitleCharSequence menu title
+     */
+    public static void hideAccountList(View view, CharSequence menuTitleCharSequence) {
+        if (!Settings.HIDE_ACCOUNT_MENU.get())
+            return;
+        if (menuTitleCharSequence == null)
+            return;
+        if (!(view.getParent().getParent().getParent() instanceof ViewGroup viewGroup))
+            return;
+
+        hideAccountMenu(viewGroup, menuTitleCharSequence.toString());
+    }
+
+    /**
+     * hide account menu for tablet and old clients
+     *
+     * @param menuTitleCharSequence menu title
+     */
+    public static void hideAccountMenu(View view, CharSequence menuTitleCharSequence) {
+        if (!Settings.HIDE_ACCOUNT_MENU.get())
+            return;
+        if (menuTitleCharSequence == null)
+            return;
+        if (!(view.getParent().getParent() instanceof ViewGroup viewGroup))
+            return;
+
+        hideAccountMenu(viewGroup, menuTitleCharSequence.toString());
+    }
+
+    private static void hideAccountMenu(ViewGroup viewGroup, String menuTitleString) {
+        String[] blockList = Settings.HIDE_ACCOUNT_MENU_FILTER_STRINGS.get().split("\\n");
+
+        for (String filter : blockList) {
+            if (menuTitleString.equals(filter) && !filter.isEmpty()) {
+                if (viewGroup.getLayoutParams() instanceof MarginLayoutParams)
+                    ViewGroupMarginLayoutParamsPatch.hideViewGroupByMarginLayoutParams(viewGroup);
+                else
+                    viewGroup.setLayoutParams(new LayoutParams(0, 0));
+            }
+        }
+    }
+
+    public static int hideCastButton(int original) {
+        return Settings.HIDE_CAST_BUTTON.get() ? View.GONE : original;
+    }
+
+    public static boolean hideFloatingMicrophone(boolean original) {
+        return Settings.HIDE_FLOATING_MICROPHONE.get() || original;
+    }
+
+    public static int hideHandle(int originalValue) {
+        return Settings.HIDE_HANDLE.get() ? 8 : originalValue;
+    }
+
+    public static boolean hideSearchTermThumbnail() {
+        return Settings.HIDE_SEARCH_TERM_THUMBNAIL.get();
+    }
+
+    public static boolean hideSnackBar() {
+        return Settings.HIDE_SNACK_BAR.get();
+    }
+
+    private static final String[] TOOLBAR_BUTTON_LIST = {
+            "CREATION_ENTRY",   // Create button (Phone)
+            "FAB_CAMERA",       // Create button (Tablet)
+            "TAB_ACTIVITY"      // Notification button
+    };
+
+    public static void hideToolBarButton(String enumString, View view) {
+        if (!Settings.HIDE_TOOLBAR_CREATE_NOTIFICATION_BUTTON.get())
+            return;
+
+        hideViewUnderCondition(
+                Utils.containsAny(enumString, TOOLBAR_BUTTON_LIST),
+                view
+        );
+    }
+
+    public static boolean hideTrendingSearches(boolean original) {
+        return Settings.HIDE_TRENDING_SEARCHES.get() || original;
+    }
+
+    // endregion
+
+    // region [Hide navigation bar components] patch
+
+    private static final Map<NavigationBar.NavigationButton, Boolean> shouldHideMap = new EnumMap<>(NavigationBar.NavigationButton.class) {
+        {
+            put(NavigationBar.NavigationButton.HOME, Settings.HIDE_HOME_BUTTON.get());
+            put(NavigationBar.NavigationButton.SHORTS, Settings.HIDE_SHORTS_BUTTON.get());
+            put(NavigationBar.NavigationButton.SUBSCRIPTIONS, Settings.HIDE_SUBSCRIPTIONS_BUTTON.get());
+            put(NavigationBar.NavigationButton.CREATE, Settings.HIDE_CREATE_BUTTON.get());
+            put(NavigationBar.NavigationButton.NOTIFICATIONS, Settings.HIDE_NOTIFICATIONS_BUTTON.get());
+
+            put(NavigationBar.NavigationButton.LIBRARY_LOGGED_OUT, Settings.HIDE_LIBRARY_BUTTON.get());
+            put(NavigationBar.NavigationButton.LIBRARY_INCOGNITO, Settings.HIDE_LIBRARY_BUTTON.get());
+            put(NavigationBar.NavigationButton.LIBRARY_OLD_UI, Settings.HIDE_LIBRARY_BUTTON.get());
+            put(NavigationBar.NavigationButton.LIBRARY_PIVOT_UNKNOWN, Settings.HIDE_LIBRARY_BUTTON.get());
+            put(NavigationBar.NavigationButton.LIBRARY_YOU, Settings.HIDE_LIBRARY_BUTTON.get());
+        }
+    };
+
+    public static boolean enableNarrowNavigationButton(boolean original) {
+        return Settings.ENABLE_NARROW_NAVIGATION_BUTTONS.get() || original;
+    }
+
+    public static boolean switchCreateWithNotificationButton(boolean original) {
+        return Settings.SWITCH_CREATE_WITH_NOTIFICATIONS_BUTTON.get() || original;
+    }
+
+    public static void navigationTabCreated(NavigationBar.NavigationButton button, View tabView) {
+        if (Boolean.TRUE.equals(shouldHideMap.get(button))) {
+            tabView.setVisibility(View.GONE);
+        }
+    }
+
+    public static void hideNavigationLabel(TextView view) {
+        hideViewUnderCondition(Settings.HIDE_NAVIGATION_LABEL.get(), view);
+    }
+
+    // endregion
+
+    // region [Remove viewer discretion dialog] patch
 
     /**
      * Injection point.
@@ -126,217 +316,39 @@ public class GeneralPatch {
         confirmDialog(dialog);
     }
 
-    public static boolean disableAutoCaptions(boolean original) {
-        if (!Settings.DISABLE_AUTO_CAPTIONS.get())
-            return original;
+    // endregion
 
-        return subtitlePrefetched;
-    }
+    // region [Layout switch] patch
 
-    public static void disableDescriptionInteraction(TextView textView, boolean original) {
-        if (textView != null) {
-            textView.setTextIsSelectable(
-                    !Settings.DISABLE_DESCRIPTION_INTERACTION.get() && original
-            );
+    public static boolean enableTabletLayout() {
+        try {
+            return Settings.ENABLE_TABLET_LAYOUT.get();
+        } catch (Exception ex) {
+            Logger.printException(() -> "enableTabletLayout failed", ex);
         }
+        return false;
     }
 
-    public static boolean enableGradientLoadingScreen() {
-        return Settings.ENABLE_GRADIENT_LOADING_SCREEN.get();
-    }
-
-    public static boolean enableSongSearch() {
-        return Settings.ENABLE_SONG_SEARCH.get();
-    }
-
-    public static boolean enableTabletMiniPlayer(boolean original) {
-        return Settings.ENABLE_TABLET_MINI_PLAYER.get() || original;
-    }
-
-    public static boolean enableWideSearchBar(boolean original) {
-        return Settings.ENABLE_WIDE_SEARCH_BAR.get() || original;
-    }
-
-    public static boolean enableWideSearchBarInYouTab(boolean original) {
-        if (!Settings.ENABLE_WIDE_SEARCH_BAR.get())
-            return original;
-        else
-            return !Settings.ENABLE_WIDE_SEARCH_BAR_IN_YOU_TAB.get() && original;
-    }
-
-    public static void hideAccountList(View view, CharSequence charSequence) {
-        if (!Settings.HIDE_ACCOUNT_MENU.get())
-            return;
-
-        if (!(view.getParent().getParent().getParent() instanceof ViewGroup viewGroup))
-            return;
-
-        String[] blockList = Settings.HIDE_ACCOUNT_MENU_FILTER_STRINGS.get().split("\\n");
-        String targetString = charSequence.toString();
-
-        for (String filter : blockList) {
-            if (targetString.equals(filter) && !filter.isEmpty()) {
-                viewGroup.setLayoutParams(new LayoutParams(0, 0));
-            }
+    public static int enablePhoneLayout(int original) {
+        try {
+            return Settings.ENABLE_PHONE_LAYOUT.get() ? 480 : original;
+        } catch (Exception ex) {
+            Logger.printException(() -> "getLayoutOverride failed", ex);
         }
+        return original;
     }
 
-    public static void hideAccountMenu(View view, CharSequence charSequence) {
-        if (!Settings.HIDE_ACCOUNT_MENU.get())
-            return;
+    // endregion
 
-        if (!(view.getParent().getParent() instanceof ViewGroup viewGroup))
-            return;
+    // region [Spoof app version] patch
 
-        String[] blockList = Settings.HIDE_ACCOUNT_MENU_FILTER_STRINGS.get().split("\\n");
-        String targetString = charSequence.toString();
+    public static String getVersionOverride(String appVersion) {
+        if (!Settings.SPOOF_APP_VERSION.get())
+            return appVersion;
 
-        for (String filter : blockList) {
-            if (targetString.equals(filter) && !filter.isEmpty()) {
-                if (viewGroup.getLayoutParams() instanceof MarginLayoutParams)
-                    hideAccountMenu(viewGroup);
-                else
-                    viewGroup.setLayoutParams(new LayoutParams(0, 0));
-            }
-        }
+        return Settings.SPOOF_APP_VERSION_TARGET.get();
     }
 
-    private static void hideAccountMenu(ViewGroup viewGroup) {
-        viewGroup.setVisibility(View.GONE);
-    }
+    // endregion
 
-    public static boolean hideAutoPlayerPopupPanels() {
-        return Settings.HIDE_AUTO_PLAYER_POPUP_PANELS.get();
-    }
-
-    public static int hideCastButton(int original) {
-        return Settings.HIDE_CAST_BUTTON.get() ? View.GONE : original;
-    }
-
-    public static int hideCategoryBarInFeed(int original) {
-        return Settings.HIDE_CATEGORY_BAR_IN_FEED.get() ? 0 : original;
-    }
-
-    public static void hideCategoryBarInRelatedVideo(View view) {
-        hideViewBy0dpUnderCondition(Settings.HIDE_CATEGORY_BAR_IN_RELATED_VIDEO.get(), view);
-    }
-
-    public static int hideCategoryBarInSearchResults(int original) {
-        return Settings.HIDE_CATEGORY_BAR_IN_SEARCH_RESULTS.get() ? 0 : original;
-    }
-
-    public static void hideChannelListSubMenu(View view) {
-        hideViewUnderCondition(Settings.HIDE_CHANNEL_LIST_SUBMENU.get(), view);
-    }
-
-    public static void hideCrowdfundingBox(View view) {
-        hideViewBy0dpUnderCondition(Settings.HIDE_CROWDFUNDING_BOX.get(), view);
-    }
-
-    public static boolean hideFloatingMicrophone(boolean original) {
-        return Settings.HIDE_FLOATING_MICROPHONE.get() || original;
-    }
-
-    public static int hideHandle(int originalValue) {
-        return Settings.HIDE_HANDLE.get() ? 8 : originalValue;
-    }
-
-    public static void hideLatestVideosButton(View view) {
-        hideViewUnderCondition(Settings.HIDE_LATEST_VIDEOS_BUTTON.get(), view);
-    }
-
-    public static void hideLoadMoreButton(View view) {
-        if (!Settings.HIDE_LOAD_MORE_BUTTON.get())
-            return;
-
-        if (!(view instanceof ViewGroup viewGroup))
-            return;
-
-        if (!(viewGroup.getChildAt(0) instanceof ViewGroup expandButtonContainer))
-            return;
-
-        if (layoutParams == null
-                && expandButtonContainer.getLayoutParams() instanceof FrameLayout.LayoutParams lp) {
-            layoutParams = lp;
-            paddingLeft = view.getPaddingLeft();
-            paddingTop = view.getPaddingTop();
-            paddingRight = view.getPaddingRight();
-            paddingBottom = view.getPaddingBottom();
-        }
-
-        Utils.runOnMainThreadDelayed(() -> {
-                    if (minimumHeight == 1) {
-                        minimumHeight = view.getMinimumHeight();
-                    }
-                    if (expandButtonContainer.getChildAt(0).getVisibility() != View.VISIBLE && layoutParams != null) {
-                        view.setMinimumHeight(minimumHeight);
-                        view.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
-                        expandButtonContainer.setLayoutParams(layoutParams);
-                    } else {
-                        view.setMinimumHeight(0);
-                        view.setPadding(0, 0, 0, 0);
-                        expandButtonContainer.setLayoutParams(new FrameLayout.LayoutParams(0, 0));
-                    }
-                },
-                0
-        );
-    }
-
-    public static boolean hideSearchTermThumbnail() {
-        return Settings.HIDE_SEARCH_TERM_THUMBNAIL.get();
-    }
-
-
-    public static boolean hideSnackBar() {
-        return Settings.HIDE_SNACK_BAR.get();
-    }
-
-    public static void hideToolBarButton(String enumString, View view) {
-        if (!Settings.HIDE_TOOLBAR_CREATE_NOTIFICATION_BUTTON.get())
-            return;
-
-        hideViewUnderCondition(
-                Utils.containsAny(enumString, TOOLBAR_BUTTON_LIST),
-                view
-        );
-    }
-
-    public static boolean hideTrendingSearches(boolean original) {
-        return Settings.HIDE_TRENDING_SEARCHES.get() || original;
-    }
-
-    public static void newVideoStarted(@NonNull String newlyLoadedVideoId) {
-        if (Objects.equals(newlyLoadedVideoId, videoId)) {
-            return;
-        }
-        videoId = newlyLoadedVideoId;
-        subtitlePrefetched = false;
-    }
-
-    public static void onDescriptionPanelCreate(RecyclerView recyclerView) {
-        if (!Settings.ALWAYS_EXPAND_PANEL.get())
-            return;
-
-        recyclerView.getViewTreeObserver().addOnDrawListener(() -> {
-            try {
-                if (recyclerView.getId() != resultId)
-                    return;
-                if (!(recyclerView.getChildAt(1) instanceof ViewGroup viewGroup))
-                    return;
-                if (!(viewGroup.getChildAt(0) instanceof TextView mTextView))
-                    return;
-
-                Utils.runOnMainThreadDelayed(() -> {
-                    mTextView.setSoundEffectsEnabled(false);
-                    mTextView.performClick();
-                    }, 500
-                );
-            } catch (Exception ignored) {
-            }
-        });
-    }
-
-    public static void prefetchSubtitleTrack() {
-        subtitlePrefetched = true;
-    }
 }

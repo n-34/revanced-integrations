@@ -1,6 +1,5 @@
 package app.revanced.integrations.youtube.sponsorblock.ui;
 
-import static app.revanced.integrations.shared.utils.ResourceUtils.getDimension;
 import static app.revanced.integrations.shared.utils.ResourceUtils.getIdentifier;
 import static app.revanced.integrations.shared.utils.ResourceUtils.getLayoutIdentifier;
 
@@ -15,8 +14,8 @@ import android.widget.ImageButton;
 
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.ResourceUtils;
-import app.revanced.integrations.youtube.patches.video.VideoInformation;
 import app.revanced.integrations.youtube.settings.Settings;
+import app.revanced.integrations.youtube.shared.VideoInformation;
 import app.revanced.integrations.youtube.sponsorblock.SponsorBlockUtils;
 
 public final class NewSegmentLayout extends FrameLayout {
@@ -24,9 +23,6 @@ public final class NewSegmentLayout extends FrameLayout {
             new int[][]{new int[]{android.R.attr.state_enabled}},
             new int[]{0x33ffffff} // sets the ripple color to white
     );
-    final int defaultBottomMargin;
-    final int ctaBottomMargin;
-    final int hiddenBottomMargin;
     private final int rippleEffectId;
 
     public NewSegmentLayout(final Context context) {
@@ -93,10 +89,6 @@ public final class NewSegmentLayout extends FrameLayout {
                 SponsorBlockUtils::onPublishClicked,
                 "Publish button clicked"
         );
-
-        defaultBottomMargin = getDimension("brand_interaction_default_bottom_margin");  // dimen:skip_button_default_bottom_margin
-        ctaBottomMargin = getDimension("brand_interaction_cta_bottom_margin");  // dimen:skip_button_cta_bottom_margin
-        hiddenBottomMargin = (int) Math.round((ctaBottomMargin) * 0.5);  // margin when the button container is hidden
     }
 
     /**

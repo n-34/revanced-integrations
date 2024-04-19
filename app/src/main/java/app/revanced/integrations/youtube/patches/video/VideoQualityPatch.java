@@ -5,6 +5,7 @@ import static app.revanced.integrations.shared.utils.StringRef.str;
 import app.revanced.integrations.shared.settings.IntegerSetting;
 import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.settings.Settings;
+import app.revanced.integrations.youtube.shared.VideoInformation;
 
 @SuppressWarnings("unused")
 public class VideoQualityPatch {
@@ -43,7 +44,7 @@ public class VideoQualityPatch {
     }
 
     private static void userSelectedVideoQuality(final int defaultQuality) {
-        if (!Settings.ENABLE_SAVE_VIDEO_QUALITY.get())
+        if (!Settings.REMEMBER_VIDEO_QUALITY_LAST_SELECTED.get())
             return;
         if (defaultQuality == DEFAULT_YOUTUBE_VIDEO_QUALITY)
             return;
@@ -52,13 +53,13 @@ public class VideoQualityPatch {
 
         switch (networkType) {
             case NONE -> {
-                Utils.showToastShort(str("revanced_save_video_quality_none"));
+                Utils.showToastShort(str("revanced_remember_video_quality_none"));
                 return;
             }
             case MOBILE -> mobileQualitySetting.save(defaultQuality);
             default -> wifiQualitySetting.save(defaultQuality);
         }
 
-        Utils.showToastShort(str("revanced_save_video_quality_" + networkType.getName(), defaultQuality + "p"));
+        Utils.showToastShort(str("revanced_remember_video_quality_" + networkType.getName(), defaultQuality + "p"));
     }
 }

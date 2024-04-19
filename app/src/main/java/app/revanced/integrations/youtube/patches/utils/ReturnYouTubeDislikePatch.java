@@ -24,10 +24,10 @@ import app.revanced.integrations.shared.returnyoutubedislike.requests.ReturnYouT
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.patches.components.ReturnYouTubeDislikeFilterPatch;
-import app.revanced.integrations.youtube.patches.video.VideoInformation;
 import app.revanced.integrations.youtube.returnyoutubedislike.ReturnYouTubeDislike;
 import app.revanced.integrations.youtube.settings.Settings;
 import app.revanced.integrations.youtube.shared.PlayerType;
+import app.revanced.integrations.youtube.shared.VideoInformation;
 
 /**
  * Handles all interaction of UI patch components.

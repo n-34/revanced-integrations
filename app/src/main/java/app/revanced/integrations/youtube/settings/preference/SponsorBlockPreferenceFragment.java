@@ -145,13 +145,6 @@ public class SponsorBlockPreferenceFragment extends PreferenceFragment {
 
             SponsorBlockSettings.initialize();
 
-            // SponsorBlock category
-
-            PreferenceCategory sbCategory = new PreferenceCategory(context);
-            preferenceScreen.addPreference(sbCategory);
-            sbCategory.setLayoutResource(preferencesCategoryLayout);
-            sbCategory.setTitle(str("revanced_sb_settings_title"));
-
             sbEnabled = new SwitchPreference(context);
             sbEnabled.setTitle(str("revanced_sb_enable_sb"));
             sbEnabled.setSummary(str("revanced_sb_enable_sb_sum"));

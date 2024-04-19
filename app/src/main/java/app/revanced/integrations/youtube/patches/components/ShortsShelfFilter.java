@@ -6,8 +6,8 @@ import app.revanced.integrations.shared.patches.components.ByteArrayFilterGroup;
 import app.revanced.integrations.shared.patches.components.Filter;
 import app.revanced.integrations.shared.patches.components.StringFilterGroup;
 import app.revanced.integrations.shared.utils.Logger;
-import app.revanced.integrations.youtube.patches.utils.BrowseIdPatch;
 import app.revanced.integrations.youtube.settings.Settings;
+import app.revanced.integrations.youtube.shared.BrowseId;
 import app.revanced.integrations.youtube.shared.PlayerType;
 
 @SuppressWarnings("unused")
@@ -58,7 +58,7 @@ public final class ShortsShelfFilter extends Filter {
                        StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
         // 1. opened watch history
         // 2. video doesn't play or the video is minimized
-        if (BrowseIdPatch.isHistory() && PlayerType.getCurrent().isNoneHiddenOrSliding()) {
+        if (BrowseId.isHistory() && PlayerType.getCurrent().isNoneHiddenOrSliding()) {
             if (Settings.HIDE_SHORTS_SHELF_EXCEPTION_HISTORY.get()) {
                 Logger.printDebug(() -> "Ignoring shorts shelf in watch history");
                 return false;

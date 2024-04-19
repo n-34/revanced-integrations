@@ -13,9 +13,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import app.revanced.integrations.shared.utils.Logger;
-import app.revanced.integrations.youtube.patches.video.VideoInformation;
 import app.revanced.integrations.youtube.settings.Settings;
 import app.revanced.integrations.youtube.shared.PlayerType;
+import app.revanced.integrations.youtube.shared.VideoInformation;
 
 /**
  * @noinspection ALL

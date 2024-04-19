@@ -185,25 +185,18 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragment {
     }
 
     public static void updateListPreferenceSummary(ListPreference listPreference, Setting<?> setting) {
-        updateListPreferenceSummary(listPreference, setting, true);
-    }
-
-    public static void updateListPreferenceSummary(ListPreference listPreference, Setting<?> setting, boolean shouldSetSummary) {
         String objectStringValue = setting.get().toString();
         int entryIndex = listPreference.findIndexOfValue(objectStringValue);
         if (entryIndex >= 0) {
             listPreference.setValue(objectStringValue);
             objectStringValue = listPreference.getEntries()[entryIndex].toString();
         }
-
-        if (shouldSetSummary) {
-            listPreference.setSummary(objectStringValue);
-        }
+        listPreference.setSummary(objectStringValue);
     }
 
     public static void showRestartDialog(@NonNull final Context context) {
         if (restartDialogMessage == null) {
-            restartDialogMessage = str("revanced_restart_message");
+            restartDialogMessage = str("revanced_extended_restart_message");
         }
         showRestartDialog(context, restartDialogMessage);
     }

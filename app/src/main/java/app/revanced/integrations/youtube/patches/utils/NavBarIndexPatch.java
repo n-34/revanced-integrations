@@ -28,8 +28,8 @@ public class NavBarIndexPatch {
         Logger.printDebug(() -> "Setting NavBar Index to: " + navBarIndex);
     }
 
-    public static boolean isNotLibraryTab() {
-        return currentNavBarIndex != 4;
+    public static boolean isLibraryTab() {
+        return currentNavBarIndex == 4;
     }
 }
 

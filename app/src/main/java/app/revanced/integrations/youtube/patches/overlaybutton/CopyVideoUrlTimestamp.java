@@ -47,4 +47,9 @@ public class CopyVideoUrlTimestamp extends BottomControlButton {
         if (instance != null) instance.setVisibility(showing, animation);
     }
 
+    public static void changeVisibilityNegatedImmediate() {
+        if (instance != null) instance.setVisibilityNegatedImmediate();
+    }
+
+
 }

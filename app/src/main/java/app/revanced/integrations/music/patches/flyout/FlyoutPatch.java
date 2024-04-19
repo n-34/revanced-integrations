@@ -109,7 +109,7 @@ public class FlyoutPatch {
                     imageView.setColorFilter(cf);
                     clickAbleArea.setOnClickListener(view -> {
                         clickView(touchOutSideView);
-                        VideoUtils.showPlaybackSpeedFlyoutPanel();
+                        VideoUtils.showPlaybackSpeedFlyoutMenu();
                     });
                 }, 0L
         );

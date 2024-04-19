@@ -8,7 +8,6 @@ import static app.revanced.integrations.shared.utils.StringRef.str;
 import static app.revanced.integrations.shared.utils.Utils.getChildView;
 import static app.revanced.integrations.shared.utils.Utils.showToastShort;
 import static app.revanced.integrations.youtube.settings.Settings.DEFAULT_PLAYBACK_SPEED;
-import static app.revanced.integrations.youtube.settings.Settings.DOUBLE_BACK_TIMEOUT;
 import static app.revanced.integrations.youtube.settings.Settings.HIDE_PREVIEW_COMMENT;
 import static app.revanced.integrations.youtube.settings.Settings.HIDE_PREVIEW_COMMENT_TYPE;
 import static app.revanced.integrations.youtube.settings.preference.ReVancedSettingsPreference.enableDisablePreferences;
@@ -79,7 +78,7 @@ public class ReVancedPreferenceFragment extends PreferenceFragment {
                 }
 
                 if (ExtendedUtils.anyMatchSetting(setting)) {
-                    ExtendedUtils.setPlayerFlyoutPanelAdditionalSettings();
+                    ExtendedUtils.setPlayerFlyoutMenuAdditionalSettings();
                 } else if (setting.equals(HIDE_PREVIEW_COMMENT) || setting.equals(HIDE_PREVIEW_COMMENT_TYPE)) {
                     ExtendedUtils.setCommentPreviewSettings();
                 }
@@ -99,12 +98,8 @@ public class ReVancedPreferenceFragment extends PreferenceFragment {
                 if (setting.equals(DEFAULT_PLAYBACK_SPEED)) {
                     listPreference.setEntries(CustomPlaybackSpeedPatch.getListEntries());
                     listPreference.setEntryValues(CustomPlaybackSpeedPatch.getListEntryValues());
-                    updateListPreferenceSummary(listPreference, setting);
-                } else if (setting.equals(DOUBLE_BACK_TIMEOUT)) {
-                    updateListPreferenceSummary(listPreference, setting, false);
-                } else {
-                    updateListPreferenceSummary(listPreference, setting);
                 }
+                updateListPreferenceSummary(listPreference, setting);
             } else {
                 Logger.printException(() -> "Setting cannot be handled: " + mPreference.getClass() + " " + mPreference);
                 return;
@@ -132,10 +127,10 @@ public class ReVancedPreferenceFragment extends PreferenceFragment {
     public void setPreferenceFragmentToolbar(final String key) {
         PreferenceFragment fragment;
         switch (key) {
-            case "revanced_ryd_settings" -> {
+            case "revanced_preference_screen_ryd" -> {
                 fragment = new ReturnYouTubeDislikePreferenceFragment();
             }
-            case "revanced_sb_settings" -> {
+            case "revanced_preference_screen_sb" -> {
                 fragment = new SponsorBlockPreferenceFragment();
             }
             default -> {
@@ -167,24 +162,36 @@ public class ReVancedPreferenceFragment extends PreferenceFragment {
 
     public void setPreferenceScreenToolbar() {
         final String[] preferenceScreenKey = {
-                "ads",
-                "alt_thumbnails",
-                "backup",
-                "bottom_player",
-                "external_downloader",
-                "flyout_menu",
-                "fullscreen",
-                "general",
-                "misc",
-                "navigation",
-                "overlay_button",
-                "patches_information",
-                "player",
-                "revanced_hide_keyword_content_screen", // TODO: After refactoring the Preference Screen, rename the settings to be consistent.
-                "seekbar",
-                "shorts",
-                "swipe_controls",
-                "video"
+                "revanced_preference_screen_ads",
+                "revanced_preference_screen_alt_thumbnails",
+                "revanced_preference_screen_feed",
+                "revanced_preference_screen_category_bar",
+                "revanced_preference_screen_channel_profile",
+                "revanced_preference_screen_community_posts",
+                "revanced_preference_screen_feed_flyout_menu",
+                "revanced_preference_screen_video_filter",
+                "revanced_preference_screen_general",
+                "revanced_preference_screen_account_munu",
+                "revanced_preference_screen_custom_filter",
+                "revanced_preference_screen_navigation_buttons",
+                "revanced_preference_screen_player",
+                "revanced_preference_screen_action_buttons",
+                "revanced_preference_screen_ambient_mode",
+                "revanced_preference_screen_channel_bar",
+                "revanced_preference_screen_comments",
+                "revanced_preference_screen_player_flyout_menu",
+                "revanced_preference_screen_fullscreen",
+                "revanced_preference_screen_haptic_feedback",
+                "revanced_preference_screen_player_buttons",
+                "revanced_preference_screen_seekbar",
+                "revanced_preference_screen_video_description",
+                "revanced_preference_screen_shorts",
+                "revanced_preference_screen_shorts_shelf",
+                "revanced_preference_screen_swipe_controls",
+                "revanced_preference_screen_video",
+                "revanced_preference_screen_misc",
+                "revanced_preference_screen_import_export",
+                "revanced_preference_screen_patch_information"
         };
         for (String key : preferenceScreenKey) {
             if (mPreferenceManager.findPreference(key) instanceof PreferenceScreen mPreferenceScreen) {
@@ -216,8 +223,8 @@ public class ReVancedPreferenceFragment extends PreferenceFragment {
             mSharedPreferences = mPreferenceManager.getSharedPreferences();
             addPreferencesFromResource(getXmlIdentifier("revanced_prefs"));
 
-            setPreferenceFragmentToolbar("revanced_ryd_settings");
-            setPreferenceFragmentToolbar("revanced_sb_settings");
+            setPreferenceFragmentToolbar("revanced_preference_screen_ryd");
+            setPreferenceFragmentToolbar("revanced_preference_screen_sb");
             setPreferenceScreenToolbar();
 
             enableDisablePreferences();
@@ -237,12 +244,8 @@ public class ReVancedPreferenceFragment extends PreferenceFragment {
                     if (setting.equals(DEFAULT_PLAYBACK_SPEED)) {
                         listPreference.setEntries(CustomPlaybackSpeedPatch.getListEntries());
                         listPreference.setEntryValues(CustomPlaybackSpeedPatch.getListEntryValues());
-                        updateListPreferenceSummary(listPreference, setting);
-                    } else if (setting.equals(DOUBLE_BACK_TIMEOUT)) {
-                        updateListPreferenceSummary(listPreference, setting, false);
-                    } else {
-                        updateListPreferenceSummary(listPreference, setting);
                     }
+                    updateListPreferenceSummary(listPreference, setting);
                 }
             }
 
@@ -364,7 +367,7 @@ public class ReVancedPreferenceFragment extends PreferenceFragment {
 
             final boolean restartNeeded = Setting.importFromJSON(sb.toString(), true);
             if (restartNeeded) {
-                showRestartDialog(context);
+                showRestartDialog(getActivity());
             }
         } catch (IOException e) {
             showToastShort(str("revanced_extended_settings_import_failed"));

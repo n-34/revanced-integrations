@@ -1,7 +1,7 @@
 package app.revanced.integrations.youtube.patches.utils;
 
-import static app.revanced.integrations.youtube.patches.seekbar.SeekBarPatch.ORIGINAL_SEEKBAR_COLOR;
-import static app.revanced.integrations.youtube.patches.seekbar.SeekBarPatch.resumedProgressBarColor;
+import static app.revanced.integrations.youtube.patches.player.PlayerPatch.ORIGINAL_SEEKBAR_COLOR;
+import static app.revanced.integrations.youtube.patches.player.PlayerPatch.resumedProgressBarColor;
 
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;

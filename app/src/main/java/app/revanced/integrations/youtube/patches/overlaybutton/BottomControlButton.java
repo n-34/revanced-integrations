@@ -21,6 +21,7 @@ import app.revanced.integrations.shared.utils.Logger;
 public abstract class BottomControlButton {
     private static final Animation fadeIn;
     private static final Animation fadeOut;
+    private static final Animation fadeOutImmediate;
 
     private final WeakReference<ImageView> buttonRef;
     private final BooleanSetting setting;
@@ -28,12 +29,17 @@ public abstract class BottomControlButton {
     protected boolean isVisible;
 
     static {
-        // TODO: check if these durations are correct.
         fadeIn = getAnimation("fade_in");
+        // android.R.integer.config_shortAnimTime, 200
         fadeIn.setDuration(getInteger("fade_duration_fast"));
 
         fadeOut = getAnimation("fade_out");
+        // android.R.integer.config_mediumAnimTime, 400
         fadeOut.setDuration(getInteger("fade_overlay_fade_duration"));
+
+        fadeOutImmediate = getAnimation("abc_fade_out");
+        // android.R.integer.config_shortAnimTime, 200
+        fadeOutImmediate.setDuration(getInteger("fade_duration_fast"));
     }
 
     @NonNull
@@ -44,6 +50,11 @@ public abstract class BottomControlButton {
     @NonNull
     public static Animation getButtonFadeOut() {
         return fadeOut;
+    }
+
+    @NonNull
+    public static Animation getButtonFadeOutImmediate() {
+        return fadeOutImmediate;
     }
 
     public BottomControlButton(@NonNull ViewGroup bottomControlsViewGroup, @NonNull String imageViewButtonId,
@@ -100,5 +111,15 @@ public abstract class BottomControlButton {
             if (animation) imageView.startAnimation(fadeOut);
             imageView.setVisibility(View.GONE);
         }
+    }
+
+    public void setVisibilityNegatedImmediate() {
+        ImageView imageView = buttonRef.get();
+        if (imageView == null) return;
+        if (!setting.get()) return;
+
+        imageView.clearAnimation();
+        imageView.startAnimation(fadeOutImmediate);
+        imageView.setVisibility(View.GONE);
     }
 }

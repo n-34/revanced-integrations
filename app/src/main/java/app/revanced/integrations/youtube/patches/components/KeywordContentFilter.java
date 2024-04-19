@@ -101,6 +101,8 @@ public final class KeywordContentFilter extends Filter {
              "shorts_lockup_cell.eml" // Part of 'shorts_shelf_carousel.eml'
     );
 
+    private final StringFilterGroup commentsFilter;
+
     /**
      * The last value of {@link Settings#HIDE_KEYWORD_CONTENT_PHRASES}
      * parsed and loaded into {@link #bufferSearch}.
@@ -119,9 +121,9 @@ public final class KeywordContentFilter extends Filter {
         }
     }
 
-    private static boolean hideKeywordSettingIsActive(String path) {
+    private static boolean hideKeywordSettingIsActive() {
         // Must check player type first, as search bar can be active behind the player.
-        if (PlayerType.getCurrent().isMaximizedOrFullscreen()) {
+        if (PlayerType.getCurrent().isMaximizedOrFullscreenOrSliding()) {
             // For now, consider the under video results the same as the home feed.
             logNavigationState("Player active");
             return Settings.HIDE_KEYWORD_CONTENT_HOME.get();
@@ -253,8 +255,13 @@ public final class KeywordContentFilter extends Filter {
     }
 
     public KeywordContentFilter() {
+        commentsFilter = new StringFilterGroup(
+                Settings.HIDE_KEYWORD_CONTENT_COMMENTS,
+                "comment_thread.eml"
+        );
+
         // Keywords are parsed on first call to isFiltered()
-        addPathCallbacks(startsWithFilter, containsFilter);
+        addPathCallbacks(startsWithFilter, containsFilter, commentsFilter);
     }
 
     @Override
@@ -264,7 +271,7 @@ public final class KeywordContentFilter extends Filter {
             return false;
         }
 
-        if (!hideKeywordSettingIsActive(path)) return false;
+        if (matchedGroup != commentsFilter && !hideKeywordSettingIsActive()) return false;
 
         // Field is intentionally compared using reference equality.
         //noinspection StringEquality

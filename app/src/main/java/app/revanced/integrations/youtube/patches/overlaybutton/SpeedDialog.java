@@ -9,8 +9,8 @@ import android.view.ViewGroup;
 import androidx.annotation.Nullable;
 
 import app.revanced.integrations.shared.utils.Logger;
-import app.revanced.integrations.youtube.patches.video.VideoInformation;
 import app.revanced.integrations.youtube.settings.Settings;
+import app.revanced.integrations.youtube.shared.VideoInformation;
 import app.revanced.integrations.youtube.utils.VideoUtils;
 
 @SuppressWarnings("unused")
@@ -51,5 +51,10 @@ public class SpeedDialog extends BottomControlButton {
     public static void changeVisibility(boolean showing, boolean animation) {
         if (instance != null) instance.setVisibility(showing, animation);
     }
+
+    public static void changeVisibilityNegatedImmediate() {
+        if (instance != null) instance.setVisibilityNegatedImmediate();
+    }
+
 
 }

@@ -2,13 +2,14 @@ package app.revanced.integrations.youtube.patches.video;
 
 import static app.revanced.integrations.shared.utils.StringRef.str;
 import static app.revanced.integrations.shared.utils.Utils.showToastShort;
-import static app.revanced.integrations.youtube.patches.video.VideoInformation.getLiveStreamState;
+import static app.revanced.integrations.youtube.shared.VideoInformation.getLiveStreamState;
 
 import java.util.Objects;
 
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.youtube.patches.utils.PatchStatus;
 import app.revanced.integrations.youtube.settings.Settings;
+import app.revanced.integrations.youtube.shared.VideoInformation;
 
 @SuppressWarnings("unused")
 public class PlaybackSpeedPatch {
@@ -60,13 +61,13 @@ public class PlaybackSpeedPatch {
      * @param playbackSpeed The playback speed the user selected
      */
     public static void userSelectedPlaybackSpeed(float playbackSpeed) {
-        if (!Settings.ENABLE_SAVE_PLAYBACK_SPEED.get())
+        if (!Settings.REMEMBER_PLAYBACK_SPEED_LAST_SELECTED.get())
             return;
 
-        if (!PatchStatus.DefaultPlaybackSpeed())
+        if (!PatchStatus.RememberPlaybackSpeed())
             return;
 
         Settings.DEFAULT_PLAYBACK_SPEED.save(playbackSpeed);
-        showToastShort(str("revanced_save_playback_speed", playbackSpeed + "x"));
+        showToastShort(str("revanced_remember_playback_speed_toast", playbackSpeed + "x"));
     }
 }

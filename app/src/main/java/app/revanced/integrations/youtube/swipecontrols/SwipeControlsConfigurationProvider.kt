@@ -3,6 +3,7 @@ package app.revanced.integrations.youtube.swipecontrols
 import android.content.Context
 import android.graphics.Color
 import app.revanced.integrations.youtube.settings.Settings
+import app.revanced.integrations.youtube.shared.LockModeState
 import app.revanced.integrations.youtube.shared.PlayerType
 
 /**
@@ -13,7 +14,8 @@ import app.revanced.integrations.youtube.shared.PlayerType
 class SwipeControlsConfigurationProvider(
     private val context: Context
 ) {
-//region swipe enable
+    // region swipe enable
+
     /**
      * should swipe controls be enabled? (global setting)
      */
@@ -37,17 +39,30 @@ class SwipeControlsConfigurationProvider(
      */
     private val isFullscreenVideo: Boolean
         get() = PlayerType.current == PlayerType.WATCH_WHILE_FULLSCREEN
-//endregion
 
-//region keys enable
+    /**
+     * is the video player currently in lock mode?
+     */
+    val isScreenLocked: Boolean
+        get() = LockModeState.current.isLocked()
+
+    val enableSwipeControlsLockMode: Boolean
+        get() = Settings.SWIPE_LOCK_MODE.get()
+
+    // endregion
+
+    // region keys enable
+
     /**
      * should volume key controls be overwritten? (global setting)
      */
     val overwriteVolumeKeyControls: Boolean
         get() = isFullscreenVideo && enableVolumeControls
-//endregion
 
-//region gesture adjustments
+    // endregion
+
+    // region gesture adjustments
+
     /**
      * should press-to-swipe be enabled?
      */
@@ -60,9 +75,10 @@ class SwipeControlsConfigurationProvider(
      */
     val swipeMagnitudeThreshold: Int
         get() = Settings.SWIPE_MAGNITUDE_THRESHOLD.get()
-//endregion
 
-//region overlay adjustments
+    // endregion
+
+    // region overlay adjustments
 
     /**
      * should the overlay enable haptic feedback?
@@ -94,5 +110,30 @@ class SwipeControlsConfigurationProvider(
     val overlayForegroundColor: Int
         get() = Color.WHITE
 
-//endregion
+    // endregion
+
+    // region behaviour
+
+    /**
+     * whether the last used brightness was auto-brightness
+     */
+    var lastUsedBrightnessIsAuto: Boolean
+        get() = Settings.SWIPE_BRIGHTNESS_AUTO.get()
+        set(value) = Settings.SWIPE_BRIGHTNESS_AUTO.save(value)
+
+    /**
+     * should the auto-brightness be enabled at the lowest value of the brightness gesture
+     */
+    val shouldEnableLowestValueAutoBrightness: Boolean
+        get() = Settings.ENABLE_SWIPE_LOWEST_VALUE_AUTO_BRIGHTNESS.get()
+
+    /**
+     * variable that stores the brightness gesture value
+     */
+    var savedScreenBrightnessValue: Float
+        get() = Settings.SWIPE_BRIGHTNESS_VALUE.get()
+        set(value) = Settings.SWIPE_BRIGHTNESS_VALUE.save(value)
+
+    // endregion
+
 }

@@ -4,11 +4,11 @@ import androidx.annotation.Nullable;
 
 import app.revanced.integrations.shared.patches.components.Filter;
 import app.revanced.integrations.shared.patches.components.StringFilterGroup;
-import app.revanced.integrations.youtube.patches.flyoutpanel.FlyoutPanelPatch;
+import app.revanced.integrations.youtube.patches.video.RestoreOldVideoQualityMenuPatch;
 import app.revanced.integrations.youtube.settings.Settings;
 
 /**
- * Abuse LithoFilter for {@link FlyoutPanelPatch}.
+ * Abuse LithoFilter for {@link RestoreOldVideoQualityMenuPatch}.
  */
 public final class VideoQualityMenuFilter extends Filter {
     // Must be volatile or synchronized, as litho filtering runs off main thread and this field is then access from the main thread.
@@ -17,7 +17,7 @@ public final class VideoQualityMenuFilter extends Filter {
     public VideoQualityMenuFilter() {
         addPathCallbacks(
                 new StringFilterGroup(
-                        Settings.ENABLE_OLD_QUALITY_LAYOUT,
+                        Settings.RESTORE_OLD_VIDEO_QUALITY_MENU,
                         "quick_quality_sheet_content.eml-js"
                 )
         );

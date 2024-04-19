@@ -1,9 +1,5 @@
 package app.revanced.integrations.youtube.patches.components;
 
-import static app.revanced.integrations.shared.utils.Utils.hideViewBy0dpUnderCondition;
-
-import android.view.View;
-
 import app.revanced.integrations.shared.patches.components.Filter;
 import app.revanced.integrations.shared.patches.components.StringFilterGroup;
 import app.revanced.integrations.youtube.settings.Settings;
@@ -16,11 +12,6 @@ public final class AdsFilter extends Filter {
         final StringFilterGroup carouselAd = new StringFilterGroup(
                 Settings.HIDE_GENERAL_ADS,
                 "carousel_ad"
-        );
-
-        final StringFilterGroup imageShelf = new StringFilterGroup(
-                Settings.HIDE_IMAGE_SHELF,
-                "image_shelf"
         );
 
         final StringFilterGroup merchandise = new StringFilterGroup(
@@ -81,7 +72,6 @@ public final class AdsFilter extends Filter {
 
         addPathCallbacks(
                 generalAds,
-                imageShelf,
                 merchandise,
                 paidContent,
                 selfSponsor,
@@ -90,26 +80,5 @@ public final class AdsFilter extends Filter {
         );
 
         addIdentifierCallbacks(carouselAd);
-    }
-
-    /**
-     * Hide the view, which shows ads in the homepage.
-     *
-     * @param view The view, which shows ads.
-     */
-    public static void hideAdAttributionView(View view) {
-        hideViewBy0dpUnderCondition(Settings.HIDE_GENERAL_ADS.get(), view);
-    }
-
-    public static boolean hideFullscreenAds() {
-        return Settings.HIDE_FULLSCREEN_ADS.get();
-    }
-
-    public static void hideFullscreenAds(View view) {
-        hideViewBy0dpUnderCondition(Settings.HIDE_FULLSCREEN_ADS.get(), view);
-    }
-
-    public static boolean hideGetPremium() {
-        return Settings.HIDE_GET_PREMIUM.get();
     }
 }

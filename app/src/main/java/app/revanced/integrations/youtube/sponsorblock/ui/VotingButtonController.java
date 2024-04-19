@@ -10,9 +10,10 @@ import java.lang.ref.WeakReference;
 import java.util.Objects;
 
 import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.patches.overlaybutton.BottomControlButton;
-import app.revanced.integrations.youtube.patches.video.VideoInformation;
 import app.revanced.integrations.youtube.settings.Settings;
+import app.revanced.integrations.youtube.shared.VideoInformation;
 import app.revanced.integrations.youtube.sponsorblock.SponsorBlockUtils;
 
 @SuppressWarnings("unused")
@@ -60,8 +61,32 @@ public class VotingButtonController {
         }
     }
 
+    public static void changeVisibilityNegatedImmediate() {
+        ImageView imageView = buttonReference.get();
+        if (imageView == null) return;
+        if (!shouldBeShown()) return;
+
+
+        imageView.clearAnimation();
+        imageView.startAnimation(BottomControlButton.getButtonFadeOutImmediate());
+        imageView.setVisibility(View.GONE);
+    }
+
     private static boolean shouldBeShown() {
         return Settings.SB_ENABLED.get() && Settings.SB_VOTING_BUTTON.get()
-                && VideoInformation.isNotAtEndOfVideo() && videoHasSegments();
+                && !VideoInformation.isAtEndOfVideo() && videoHasSegments();
+    }
+
+    public static void hide() {
+        if (!isVisible) {
+            return;
+        }
+        Utils.verifyOnMainThread();
+        View v = buttonReference.get();
+        if (v == null) {
+            return;
+        }
+        v.setVisibility(View.GONE);
+        isVisible = false;
     }
 }

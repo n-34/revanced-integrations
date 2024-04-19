@@ -81,7 +81,7 @@ public class CustomPlaybackSpeedPatch {
                 if (speed <= 0 || arrayContains(playbackSpeeds, speed)) {
                     throw new IllegalArgumentException();
                 }
-                if (speed >= MAXIMUM_PLAYBACK_SPEED) {
+                if (speed > MAXIMUM_PLAYBACK_SPEED) {
                     resetCustomSpeeds(str("revanced_custom_playback_speeds_warning", MAXIMUM_PLAYBACK_SPEED + ""));
                     loadSpeeds();
                     return;
@@ -199,12 +199,12 @@ public class CustomPlaybackSpeedPatch {
             return;
         lastTimeUsed = currentTime;
 
-        if (Settings.CUSTOM_PLAYBACK_SPEED_PANEL_TYPE.get()) {
+        if (Settings.CUSTOM_PLAYBACK_SPEED_MENU_TYPE.get()) {
             // Open playback speed dialog
             VideoUtils.showPlaybackSpeedDialog(context);
         } else {
-            // Open old style flyout panel
-            VideoUtils.showPlaybackSpeedFlyoutPanel();
+            // Open old style flyout menu
+            VideoUtils.showPlaybackSpeedFlyoutMenu();
         }
     }
 

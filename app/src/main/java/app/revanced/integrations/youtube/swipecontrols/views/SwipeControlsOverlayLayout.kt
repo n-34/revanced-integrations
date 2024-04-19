@@ -14,7 +14,6 @@ import android.widget.TextView
 import app.revanced.integrations.shared.utils.ResourceUtils.ResourceType
 import app.revanced.integrations.shared.utils.ResourceUtils.getIdentifier
 import app.revanced.integrations.shared.utils.StringRef.str
-import app.revanced.integrations.youtube.settings.Settings
 import app.revanced.integrations.youtube.swipecontrols.SwipeControlsConfigurationProvider
 import app.revanced.integrations.youtube.swipecontrols.misc.SwipeControlsOverlay
 import app.revanced.integrations.youtube.swipecontrols.misc.applyDimension
@@ -125,20 +124,15 @@ class SwipeControlsOverlayLayout(
     }
 
     override fun onBrightnessChanged(brightness: Double) {
-        Settings.SWIPE_BRIGHTNESS_AUTO.save(false)
-        if (!Settings.ENABLE_SWIPE_AUTO_BRIGHTNESS.get()) {
-            if (brightness >= 0) {
-                showFeedbackView("${round(brightness).toInt()}%", manualBrightnessIcon)
-            } else {
-                showFeedbackView("${round(0.0).toInt()}%", manualBrightnessIcon)
-            }
-        } else {
-            if (brightness > 0) {
-                showFeedbackView("${round(brightness).toInt()}%", manualBrightnessIcon)
-            } else {
-                showFeedbackView(str("quality_auto"), autoBrightnessIcon)
-                Settings.SWIPE_BRIGHTNESS_AUTO.save(true)
-            }
+        if (config.shouldEnableLowestValueAutoBrightness && brightness <= 0) {
+            showFeedbackView(
+                str("revanced_swipe_lowest_value_auto_brightness_overlay_text"),
+                autoBrightnessIcon
+            )
+            config.lastUsedBrightnessIsAuto = true
+        } else if (brightness >= 0) {
+            showFeedbackView("${round(brightness).toInt()}%", manualBrightnessIcon)
+            config.lastUsedBrightnessIsAuto = false
         }
     }
 

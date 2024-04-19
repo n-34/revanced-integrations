@@ -1,4 +1,4 @@
-package app.revanced.integrations.youtube.patches.utils;
+package app.revanced.integrations.youtube.shared;
 
 import androidx.annotation.NonNull;
 
@@ -9,14 +9,15 @@ import java.util.Objects;
 import app.revanced.integrations.shared.utils.Logger;
 
 @SuppressWarnings("unused")
-public class BrowseIdPatch {
-    private static final String DEFAULT_BROWSE_ID = "FEwhat_to_watch";
-    private static final String HISTORY_BROWSE_ID = "FEhistory";
+public class BrowseId {
+    private static final String BROWSE_ID_DEFAULT = "FEwhat_to_watch";
+    private static final String BROWSE_ID_HISTORY = "FEhistory";
+    private static final String BROWSE_ID_LIBRARY = "FElibrary";
 
     /**
      * Current browse id.
      */
-    private static volatile String browseId = DEFAULT_BROWSE_ID;
+    private static volatile String browseId = BROWSE_ID_DEFAULT;
     /**
      * Field where the BrowseId is saved. (type: String)
      */
@@ -96,12 +97,17 @@ public class BrowseIdPatch {
     }
 
     public static void setDefaultBrowseIdToField() {
-        setBrowseIdToField(DEFAULT_BROWSE_ID);
+        setBrowseIdToField(BROWSE_ID_DEFAULT);
     }
 
     public static boolean isHistory() {
-        return browseId.equals(HISTORY_BROWSE_ID);
+        return browseId.equals(BROWSE_ID_HISTORY);
     }
+
+    public static boolean isLibrary() {
+        return browseId.equals(BROWSE_ID_LIBRARY);
+    }
+
 }
 
 

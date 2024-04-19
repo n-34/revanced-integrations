@@ -9,7 +9,7 @@ import app.revanced.integrations.shared.patches.components.StringFilterGroup;
 import app.revanced.integrations.youtube.settings.Settings;
 
 @SuppressWarnings("unused")
-public final class ButtonsFilter extends Filter {
+public final class ActionButtonsFilter extends Filter {
 
     private static final String VIDEO_ACTION_BAR_PATH = "video_action_bar.eml";
 
@@ -17,7 +17,7 @@ public final class ButtonsFilter extends Filter {
     private final StringFilterGroup bufferFilterPathRule;
     private final ByteArrayFilterGroupList bufferButtonsGroupList = new ByteArrayFilterGroupList();
 
-    public ButtonsFilter() {
+    public ActionButtonsFilter() {
         actionBarRule = new StringFilterGroup(
                 null,
                 VIDEO_ACTION_BAR_PATH
@@ -39,11 +39,11 @@ public final class ButtonsFilter extends Filter {
                         "|download_button.eml|"
                 ),
                 new StringFilterGroup(
-                        Settings.HIDE_CREATE_CLIP_BUTTON,
+                        Settings.HIDE_CLIP_BUTTON,
                         "|clip_button.eml|"
                 ),
                 new StringFilterGroup(
-                        Settings.HIDE_SAVE_TO_PLAYLIST_BUTTON,
+                        Settings.HIDE_PLAYLIST_BUTTON,
                         "|save_to_playlist_button"
                 ),
                 new StringFilterGroup(

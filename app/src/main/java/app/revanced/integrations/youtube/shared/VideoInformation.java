@@ -1,39 +1,30 @@
-package app.revanced.integrations.youtube.patches.video;
+package app.revanced.integrations.youtube.shared;
 
 import static app.revanced.integrations.shared.utils.ResourceUtils.getString;
-import static app.revanced.integrations.shared.utils.StringRef.str;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.settings.Settings;
-import app.revanced.integrations.youtube.shared.VideoState;
 
 /**
  * Hooking class for the current playing video.
- * @noinspection unused
+ * @noinspection ALL
  */
 public final class VideoInformation {
     private static final float DEFAULT_YOUTUBE_PLAYBACK_SPEED = 1.0f;
     private static final int DEFAULT_YOUTUBE_VIDEO_QUALITY = -2;
     private static final String DEFAULT_YOUTUBE_VIDEO_QUALITY_STRING = getString("quality_auto");
-    private static final String SEEK_METHOD_NAME = "seekTo";
     /**
      * Prefix present in all Short player parameters signature.
      */
     private static final String SHORTS_PLAYER_PARAMETERS = "8AEB";
-
-    private static WeakReference<Object> playerControllerRef;
-    private static Method seekMethod;
 
     @NonNull
     private static String videoId = "";
@@ -67,20 +58,10 @@ public final class VideoInformation {
 
     /**
      * Injection point.
-     *
-     * @param playerController player controller object.
      */
-    public static void initialize(@NonNull Object playerController) {
-        try {
-            playerControllerRef = new WeakReference<>(Objects.requireNonNull(playerController));
-            videoLength = 0;
-            videoTime = -1;
-
-            seekMethod = playerController.getClass().getMethod(SEEK_METHOD_NAME, Long.TYPE);
-            seekMethod.setAccessible(true);
-        } catch (Exception ex) {
-            Logger.printException(() -> "Failed to initialize", ex);
-        }
+    public static void initialize() {
+        videoLength = 0;
+        videoTime = -1;
     }
 
     /**
@@ -99,51 +80,33 @@ public final class VideoInformation {
             final long videoTime = getVideoTime();
             final long videoLength = getVideoLength();
 
-            // Prevent issues such as play/ pause button or autoplay not working.
-            final long adjustedSeekTime = Math.min(seekTime, videoLength - 250);
+            // Prevent issues such as play/pause button or autoplay not working.
+            final long adjustedSeekTime = Math.min(seekTime, videoLength - 500);
             if (videoTime <= seekTime && videoTime >= adjustedSeekTime) {
-                // Both the current video time and the seekTo are in the last 250ms of the video.
+                // Both the current video time and the seekTo are in the last 500ms of the video.
                 // Ignore this seek call, otherwise if a video ends with multiple closely timed segments
                 // then seeking here can create an infinite loop of skip attempts.
                 Logger.printDebug(() -> "Ignoring seekTo call as video playback is almost finished. "
                         + " videoTime: " + videoTime + " videoLength: " + videoLength + " seekTo: " + seekTime);
                 return false;
             }
-
-            Logger.printDebug(() -> "Seeking to " + adjustedSeekTime);
-            //noinspection DataFlowIssue
-            return (Boolean) seekMethod.invoke(playerControllerRef.get(), adjustedSeekTime);
+            Logger.printDebug(() -> "Seeking to " + seekTime);
+            return overrideVideoTime(adjustedSeekTime);
         } catch (Exception ex) {
             Logger.printException(() -> "Failed to seek", ex);
+            return false;
         }
-        return false;
     }
 
     public static void seekToRelative(long millisecondsRelative) {
         seekTo(videoTime + millisecondsRelative);
     }
 
-    public static void reloadVideo() {
-        if (videoLength < 10000 || videoIsLiveStream)
-            return;
-
-        final long lastVideoTime = videoTime;
-        final float playbackSpeed = getPlaybackSpeed();
-        final long speedAdjustedTimeThreshold = (long) (playbackSpeed * 1000);
-        seekTo(10000);
-        seekTo(lastVideoTime + speedAdjustedTimeThreshold);
-
-        if (!Settings.SKIP_PRELOADED_BUFFER_TOAST.get())
-            return;
-
-        Utils.showToastShort(str("revanced_skipped_preloaded_buffer"));
-    }
-
     public static boolean videoEnded() {
         if (!Settings.ALWAYS_REPEAT.get())
             return false;
 
-        Utils.runOnMainThreadDelayed(() -> seekTo(0), 0);
+        Utils.runOnMainThreadDelayed(() -> overrideVideoTime(0), 0);
 
         return true;
     }
@@ -245,14 +208,6 @@ public final class VideoInformation {
     }
 
     /**
-     * Overrides the current playback speed.
-     * Rest of the implementation added by patch.
-     */
-    public static void overridePlaybackSpeed(float speedOverride) {
-        Logger.printDebug(() -> "Overriding playback speed to: " + speedOverride);
-    }
-
-    /**
      * @return The current playback speed.
      */
     public static float getPlaybackSpeed() {
@@ -266,14 +221,6 @@ public final class VideoInformation {
      */
     public static void setPlaybackSpeed(float newlyLoadedPlaybackSpeed) {
         playbackSpeed = newlyLoadedPlaybackSpeed;
-    }
-
-    /**
-     * Overrides the current quality.
-     * Rest of the implementation added by patch.
-     */
-    public static void overrideVideoQuality(int qualityOverride) {
-        Logger.printDebug(() -> "Overriding video quality to: " + qualityOverride);
     }
 
     /**
@@ -404,16 +351,43 @@ public final class VideoInformation {
     }
 
     /**
-     * @return If the playback is not at the end of the video.
-     * <p>
+     * @return If the playback is at the end of the video.
+     *        <p>
      * If video is playing in the background with no video visible,
-     * this always returns false (even if the video is not actually at the end).
+     * this always returns false (even if the video is actually at the end).
      * <p>
      * This is equivalent to checking for {@link VideoState#ENDED},
-     * but can give a more up to date result for code calling from some hooks.
+     * but can give a more up-to-date result for code calling from some hooks.
+     *
      * @see VideoState
      */
-    public static boolean isNotAtEndOfVideo() {
-        return videoTime < videoLength && videoLength > 0;
+    public static boolean isAtEndOfVideo() {
+        return videoTime >= videoLength && videoLength > 0;
+    }
+
+    /**
+     * Overrides the current playback speed.
+     * Rest of the implementation added by patch.
+     */
+    public static void overridePlaybackSpeed(float speedOverride) {
+        Logger.printDebug(() -> "Overriding playback speed to: " + speedOverride);
+    }
+
+    /**
+     * Overrides the current quality.
+     * Rest of the implementation added by patch.
+     */
+    public static void overrideVideoQuality(int qualityOverride) {
+        Logger.printDebug(() -> "Overriding video quality to: " + qualityOverride);
+    }
+
+    /**
+     * Overrides the current video time by seeking.
+     * Rest of the implementation added by patch.
+     */
+    public static boolean overrideVideoTime(final long seekTime) {
+        // These instructions are ignored by patch.
+        Logger.printDebug(() -> "Seeking to " + seekTime);
+        return false;
     }
 }

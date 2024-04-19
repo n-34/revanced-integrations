@@ -66,7 +66,7 @@ public class VideoUtils extends IntentUtils {
     /**
      * Rest of the implementation added by patch.
      */
-    public static void showPlaybackSpeedFlyoutPanel() {
-        Logger.printDebug(() -> "Playback speed flyout panel opened");
+    public static void showPlaybackSpeedFlyoutMenu() {
+        Logger.printDebug(() -> "Playback speed flyout menu opened");
     }
 }

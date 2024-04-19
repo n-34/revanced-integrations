@@ -21,10 +21,10 @@ public class InitializationPatch {
      * To fix this, show the restart dialog when the app is installed for the first time.
      */
     public static void onCreate(@NonNull Activity mActivity) {
-        ExtendedUtils.setPlayerFlyoutPanelAdditionalSettings();
+        ExtendedUtils.setPlayerFlyoutMenuAdditionalSettings();
         if (BaseSettings.SETTINGS_INITIALIZED.get())
             return;
-        runOnMainThreadDelayed(() -> showRestartDialog(mActivity, str("revanced_restart_first_run")), 500);
+        runOnMainThreadDelayed(() -> showRestartDialog(mActivity, str("revanced_extended_restart_first_run")), 500);
         runOnMainThreadDelayed(() -> BaseSettings.SETTINGS_INITIALIZED.save(true), 1000);
     }
 

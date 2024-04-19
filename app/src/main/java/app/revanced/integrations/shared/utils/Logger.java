@@ -29,8 +29,8 @@ public class Logger {
          * com.company.SomethingView$1
          * </code>
          */
-        private String findOuterClassSimpleName() {
-            var selfClass = this.getClass();
+        default String findOuterClassSimpleName() {
+            Class<?> selfClass = this.getClass();
 
             String fullClassName = selfClass.getName();
             final int dollarSignIndex = fullClassName.indexOf('$');
@@ -55,8 +55,7 @@ public class Logger {
      */
     public static void printDebug(@NonNull LogMessage message) {
         if (ENABLE_DEBUG_LOGGING.get()) {
-            String logTag = REVANCED_LOG_PREFIX + message.getClass().getSimpleName().replaceAll("\\$.+", "");
-            Log.d(logTag, message.buildMessageString());
+            Log.d(REVANCED_LOG_PREFIX + message.findOuterClassSimpleName(), message.buildMessageString());
         }
     }
 
@@ -71,7 +70,7 @@ public class Logger {
      * Logs information messages using the outer class name of the code calling this method.
      */
     public static void printInfo(@NonNull LogMessage message, @Nullable Exception ex) {
-        String logTag = REVANCED_LOG_PREFIX + message.getClass().getSimpleName().replaceAll("\\$.+", "");
+        String logTag = REVANCED_LOG_PREFIX + message.findOuterClassSimpleName();
         String logMessage = message.buildMessageString();
         if (ex == null) {
             Log.i(logTag, logMessage);
@@ -84,14 +83,7 @@ public class Logger {
      * Logs exceptions under the outer class name of the code calling this method.
      */
     public static void printException(@NonNull LogMessage message) {
-        printException(message, null, null);
-    }
-
-    /**
-     * Logs exceptions under the outer class name of the code calling this method.
-     */
-    public static void printException(@NonNull LogMessage message, @Nullable Throwable ex) {
-        printException(message, ex, null);
+        printException(message, null);
     }
 
     /**
@@ -102,12 +94,10 @@ public class Logger {
      *
      * @param message          log message
      * @param ex               exception (optional)
-     * @param userToastMessage user specific toast message to show instead of the log message (optional)
      */
-    public static void printException(@NonNull LogMessage message, @Nullable Throwable ex,
-                                      @Nullable String userToastMessage) {
+    public static void printException(@NonNull LogMessage message, @Nullable Throwable ex) {
         String messageString = message.buildMessageString();
-        String outerClassSimpleName = message.getClass().getSimpleName().replaceAll("\\$.+", "");
+        String outerClassSimpleName = message.findOuterClassSimpleName();
         String logMessage = REVANCED_LOG_PREFIX + outerClassSimpleName;
         if (ex == null) {
             Log.e(logMessage, messageString);

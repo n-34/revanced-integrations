@@ -1,4 +1,4 @@
-package app.revanced.integrations.youtube.patches.misc;
+package app.revanced.integrations.youtube.patches.video;
 
 import app.revanced.integrations.youtube.settings.Settings;
 

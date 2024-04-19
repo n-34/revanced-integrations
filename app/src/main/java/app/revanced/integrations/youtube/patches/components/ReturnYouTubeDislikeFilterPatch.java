@@ -16,8 +16,8 @@ import app.revanced.integrations.shared.patches.components.StringFilterGroup;
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.TrieSearch;
 import app.revanced.integrations.youtube.patches.utils.ReturnYouTubeDislikePatch;
-import app.revanced.integrations.youtube.patches.video.VideoInformation;
 import app.revanced.integrations.youtube.settings.Settings;
+import app.revanced.integrations.youtube.shared.VideoInformation;
 
 /**
  * Searches for video id's in the proto buffer of Shorts dislike.

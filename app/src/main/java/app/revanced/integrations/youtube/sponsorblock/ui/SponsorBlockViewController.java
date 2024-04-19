@@ -1,5 +1,6 @@
 package app.revanced.integrations.youtube.sponsorblock.ui;
 
+import static app.revanced.integrations.shared.utils.ResourceUtils.getDimension;
 import static app.revanced.integrations.shared.utils.ResourceUtils.getLayoutIdentifier;
 import static app.revanced.integrations.shared.utils.Utils.getChildView;
 import static app.revanced.integrations.youtube.utils.ExtendedUtils.isFullscreenHidden;
@@ -18,9 +19,12 @@ import java.util.Objects;
 
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.Utils;
+import app.revanced.integrations.youtube.patches.player.PlayerPatch;
+import app.revanced.integrations.youtube.settings.Settings;
 import app.revanced.integrations.youtube.shared.PlayerType;
 import app.revanced.integrations.youtube.sponsorblock.objects.SponsorSegment;
 
+@SuppressWarnings("unused")
 public class SponsorBlockViewController {
     private static WeakReference<RelativeLayout> inlineSponsorOverlayRef = new WeakReference<>(null);
     private static WeakReference<ViewGroup> youtubeOverlaysLayoutRef = new WeakReference<>(null);
@@ -33,12 +37,19 @@ public class SponsorBlockViewController {
     private static SponsorSegment skipHighlight;
     @Nullable
     private static SponsorSegment skipSegment;
+    private static final int ctaBottomMargin;
+    private static final int defaultBottomMargin;
+    private static final int hiddenBottomMargin;
 
     static {
         PlayerType.getOnChange().addObserver((PlayerType type) -> {
             playerTypeChanged(type);
             return null;
         });
+
+        defaultBottomMargin = getDimension("brand_interaction_default_bottom_margin");
+        ctaBottomMargin = getDimension("brand_interaction_cta_bottom_margin") + PlayerPatch.getQuickActionsTopMargin();
+        hiddenBottomMargin = (int) Math.round((ctaBottomMargin) * 0.5);
     }
 
     public static Context getOverLaysViewGroupContext() {
@@ -186,17 +197,16 @@ public class SponsorBlockViewController {
 
     private static void setNewSegmentLayoutMargins(@Nullable NewSegmentLayout layout, boolean fullScreen) {
         if (layout != null) {
-            setLayoutMargins(layout, fullScreen, layout.defaultBottomMargin, layout.ctaBottomMargin, layout.hiddenBottomMargin);
+            setLayoutMargins(layout, fullScreen);
         }
     }
 
     private static void setSkipButtonMargins(@Nullable SkipSponsorButton button, boolean fullScreen) {
         if (button != null) {
-            setLayoutMargins(button, fullScreen, button.defaultBottomMargin, button.ctaBottomMargin, button.hiddenBottomMargin);
+            setLayoutMargins(button, fullScreen);
         }
     }
-    private static void setLayoutMargins(@NonNull View view, boolean fullScreen,
-                                         int defaultBottomMargin, int ctaBottomMargin, int hiddenBottomMargin) {
+    private static void setLayoutMargins(@NonNull View view, boolean fullScreen) {
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) view.getLayoutParams();
         if (params == null) {
             Logger.printException(() -> "Unable to setNewSegmentLayoutMargins (params are null)");
@@ -204,5 +214,23 @@ public class SponsorBlockViewController {
         }
         params.bottomMargin = fullScreen ? (isFullscreenHidden() ? hiddenBottomMargin : ctaBottomMargin) : defaultBottomMargin;
         view.setLayoutParams(params);
+    }
+
+    /**
+     * Injection point.
+     */
+    public static void endOfVideoReached() {
+        try {
+            Logger.printDebug(() -> "endOfVideoReached");
+            // the buttons automatically set themselves to visible when appropriate,
+            // but if buttons are showing when the end of the video is reached then they need
+            // to be forcefully hidden
+            if (!Settings.ALWAYS_REPEAT.get()) {
+                CreateSegmentButtonController.hide();
+                VotingButtonController.hide();
+            }
+        } catch (Exception ex) {
+            Logger.printException(() -> "endOfVideoReached failure", ex);
+        }
     }
 }

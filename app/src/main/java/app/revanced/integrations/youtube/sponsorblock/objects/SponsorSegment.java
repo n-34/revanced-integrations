@@ -8,7 +8,7 @@ import androidx.annotation.Nullable;
 import java.util.Objects;
 
 import app.revanced.integrations.shared.utils.StringRef;
-import app.revanced.integrations.youtube.patches.video.VideoInformation;
+import app.revanced.integrations.youtube.shared.VideoInformation;
 
 public class SponsorSegment implements Comparable<SponsorSegment> {
     public enum SegmentVote {

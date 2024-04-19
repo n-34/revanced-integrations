@@ -19,6 +19,7 @@ public final class CommentsFilter extends Filter {
     private final StringFilterGroup commentsPreviewDots;
     private final StringFilterGroup createShorts;
     private final StringFilterGroup emojiPicker;
+    private final StringFilterGroup homeFeedVideo;
     private final StringFilterGroup previewCommentText;
     private final StringFilterGroup thanks;
     private final StringTrieSearch exceptions = new StringTrieSearch();
@@ -52,6 +53,11 @@ public final class CommentsFilter extends Filter {
         emojiPicker = new StringFilterGroup(
                 Settings.HIDE_EMOJI_PICKER,
                 "|CellType|ContainerType|ContainerType|ContainerType|ContainerType|ContainerType|"
+        );
+
+        homeFeedVideo = new StringFilterGroup(
+                Settings.HIDE_COMMENTS_SECTION_IN_HOME_FEED,
+                "home_video_with_context.eml"
         );
 
         final StringFilterGroup membersBanner = new StringFilterGroup(
@@ -98,11 +104,25 @@ public final class CommentsFilter extends Filter {
             return false;
 
         if (matchedGroup == createShorts || matchedGroup == emojiPicker || matchedGroup == thanks) {
-            return path.startsWith(COMMENT_COMPOSER_PATH);
+            if (path.startsWith(COMMENT_COMPOSER_PATH)) {
+                return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
+            }
+            return false;
+        } else if (matchedGroup == homeFeedVideo) {
+            if (path.contains(VIDEO_METADATA_CAROUSEL_PATH)) {
+                return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
+            }
+            return false;
         } else if (matchedGroup == commentsPreviewDots) {
-            return path.startsWith(VIDEO_METADATA_CAROUSEL_PATH);
+            if (path.startsWith(VIDEO_METADATA_CAROUSEL_PATH)) {
+                return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
+            }
+            return false;
         } else if (matchedGroup == previewCommentText) {
-            return COMMENT_PREVIEW_TEXT_PATTERN.matcher(path).find();
+            if (COMMENT_PREVIEW_TEXT_PATTERN.matcher(path).find()) {
+                return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
+            }
+            return false;
         }
 
         return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);

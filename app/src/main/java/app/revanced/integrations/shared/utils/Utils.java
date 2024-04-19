@@ -190,15 +190,19 @@ public class Utils {
         return null;
     }
 
-    public static void restartApp(@NonNull Context context) {
-        String packageName = context.getPackageName();
-        Intent intent = context.getPackageManager().getLaunchIntentForPackage(packageName);
+    public static void restartApp(@NonNull Context mContext) {
+        String packageName = mContext.getPackageName();
+        Intent intent = mContext.getPackageManager().getLaunchIntentForPackage(packageName);
         if (intent == null) return;
         Intent mainIntent = Intent.makeRestartActivityTask(intent.getComponent());
         // Required for API 34 and later
         // Ref: https://developer.android.com/about/versions/14/behavior-changes-14#safer-intents
         mainIntent.setPackage(packageName);
-        context.startActivity(mainIntent);
+        if (mContext instanceof Activity mActivity) {
+            mActivity.finishAndRemoveTask();
+        }
+        mContext.startActivity(mainIntent);
+        System.runFinalizersOnExit(true);
         System.exit(0);
     }
 
@@ -393,24 +397,24 @@ public class Utils {
     }
 
     /**
-     * Hide a view by setting its layout params to 1x1
+     * Hide a view by setting its layout params to 0x0
      * @param view The view to hide.
      */
     public static void hideViewByLayoutParams(View view) {
         if (view instanceof LinearLayout) {
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(1, 1);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, 0);
             view.setLayoutParams(layoutParams);
         } else if (view instanceof FrameLayout) {
-            FrameLayout.LayoutParams layoutParams2 = new FrameLayout.LayoutParams(1, 1);
+            FrameLayout.LayoutParams layoutParams2 = new FrameLayout.LayoutParams(0, 0);
             view.setLayoutParams(layoutParams2);
         } else if (view instanceof RelativeLayout) {
-            RelativeLayout.LayoutParams layoutParams3 = new RelativeLayout.LayoutParams(1, 1);
+            RelativeLayout.LayoutParams layoutParams3 = new RelativeLayout.LayoutParams(0, 0);
             view.setLayoutParams(layoutParams3);
         } else if (view instanceof Toolbar) {
-            Toolbar.LayoutParams layoutParams4 = new Toolbar.LayoutParams(1, 1);
+            Toolbar.LayoutParams layoutParams4 = new Toolbar.LayoutParams(0, 0);
             view.setLayoutParams(layoutParams4);
         } else if (view instanceof ViewGroup) {
-            ViewGroup.LayoutParams layoutParams5 = new ViewGroup.LayoutParams(1, 1);
+            ViewGroup.LayoutParams layoutParams5 = new ViewGroup.LayoutParams(0, 0);
             view.setLayoutParams(layoutParams5);
         } else {
             Logger.printDebug(() -> "Hidden view with id " + view.getId());

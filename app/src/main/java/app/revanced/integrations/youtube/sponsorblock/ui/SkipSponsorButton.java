@@ -20,9 +20,6 @@ import app.revanced.integrations.youtube.sponsorblock.SegmentPlaybackController;
 import app.revanced.integrations.youtube.sponsorblock.objects.SponsorSegment;
 
 public class SkipSponsorButton extends FrameLayout {
-    final int defaultBottomMargin;
-    final int ctaBottomMargin;
-    final int hiddenBottomMargin;
     private final TextView skipSponsorTextView;
     private SponsorSegment segment;
 
@@ -45,9 +42,6 @@ public class SkipSponsorButton extends FrameLayout {
         setMinimumHeight(getDimension("ad_skip_ad_button_min_height"));  // dimen:ad_skip_ad_button_min_height
         final LinearLayout skipSponsorBtnContainer = (LinearLayout) Objects.requireNonNull((View) findViewById(getIdIdentifier("revanced_sb_skip_sponsor_button_container")));  // id:revanced_sb_skip_sponsor_button_container
         skipSponsorTextView = (TextView) Objects.requireNonNull((View) findViewById(getIdIdentifier("revanced_sb_skip_sponsor_button_text")));  // id:revanced_sb_skip_sponsor_button_text;
-        defaultBottomMargin = getDimension("brand_interaction_default_bottom_margin");  // dimen:skip_button_default_bottom_margin
-        ctaBottomMargin = getDimension("brand_interaction_cta_bottom_margin");  // dimen:skip_button_cta_bottom_margin
-        hiddenBottomMargin = (int) Math.round((ctaBottomMargin) * 0.5);  // margin when the button container is hidden
 
         skipSponsorBtnContainer.setOnClickListener(v -> {
             // The view controller handles hiding this button, but hide it here as well just in case something goofs.

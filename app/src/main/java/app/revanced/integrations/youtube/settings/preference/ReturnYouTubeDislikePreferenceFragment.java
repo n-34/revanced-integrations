@@ -73,13 +73,6 @@ public class ReturnYouTubeDislikePreferenceFragment extends PreferenceFragment {
             PreferenceScreen preferenceScreen = manager.createPreferenceScreen(context);
             setPreferenceScreen(preferenceScreen);
 
-            // RYD category
-
-            PreferenceCategory rydCategory = new PreferenceCategory(context);
-            rydCategory.setLayoutResource(preferencesCategoryLayout);
-            rydCategory.setTitle(str("revanced_ryd_settings_title"));
-            preferenceScreen.addPreference(rydCategory);
-
             SwitchPreference enabledPreference = new SwitchPreference(context);
             enabledPreference.setChecked(Settings.RYD_ENABLED.get());
             enabledPreference.setTitle(str("revanced_ryd_enable_title"));

@@ -6,12 +6,14 @@ import androidx.annotation.NonNull;
 
 import app.revanced.integrations.youtube.settings.Settings;
 
-@SuppressWarnings("unused")
+/**
+ * @noinspection ALL
+ */
 public class DoubleBackToClosePatch {
     /**
      * Time between two back button presses
      */
-    private static final long PRESSED_TIMEOUT_MILLISECONDS = Settings.DOUBLE_BACK_TIMEOUT.get() * 1000L;
+    private static final long PRESSED_TIMEOUT_MILLISECONDS = Settings.DOUBLE_BACK_TO_CLOSE_TIMEOUT.get();
 
     /**
      * Last time back button was pressed

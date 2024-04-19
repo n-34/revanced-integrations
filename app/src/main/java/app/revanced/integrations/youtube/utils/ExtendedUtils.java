@@ -17,14 +17,14 @@ public class ExtendedUtils extends PackageUtils {
 
         boolean additionalSettingsEnabled = true;
         final BooleanSetting[] additionalSettings = {
-                Settings.HIDE_PLAYER_FLYOUT_PANEL_AMBIENT,
-                Settings.HIDE_PLAYER_FLYOUT_PANEL_HELP,
-                Settings.HIDE_PLAYER_FLYOUT_PANEL_LOOP,
-                Settings.HIDE_PLAYER_FLYOUT_PANEL_PREMIUM_CONTROLS,
-                Settings.HIDE_PLAYER_FLYOUT_PANEL_STABLE_VOLUME,
-                Settings.HIDE_PLAYER_FLYOUT_PANEL_STATS_FOR_NERDS,
-                Settings.HIDE_PLAYER_FLYOUT_PANEL_WATCH_IN_VR,
-                Settings.HIDE_PLAYER_FLYOUT_PANEL_YT_MUSIC,
+                Settings.HIDE_PLAYER_FLYOUT_MENU_AMBIENT,
+                Settings.HIDE_PLAYER_FLYOUT_MENU_HELP,
+                Settings.HIDE_PLAYER_FLYOUT_MENU_LOOP,
+                Settings.HIDE_PLAYER_FLYOUT_MENU_PREMIUM_CONTROLS,
+                Settings.HIDE_PLAYER_FLYOUT_MENU_STABLE_VOLUME,
+                Settings.HIDE_PLAYER_FLYOUT_MENU_STATS_FOR_NERDS,
+                Settings.HIDE_PLAYER_FLYOUT_MENU_WATCH_IN_VR,
+                Settings.HIDE_PLAYER_FLYOUT_MENU_YT_MUSIC,
         };
         for (BooleanSetting s : additionalSettings) {
             additionalSettingsEnabled &= s.get();
@@ -37,8 +37,8 @@ public class ExtendedUtils extends PackageUtils {
                 !Settings.ENABLE_PHONE_LAYOUT.get();
         final BooleanSetting[] hideFullscreenSettings = {
                 Settings.ENABLE_TABLET_LAYOUT,
-                Settings.HIDE_QUICK_ACTIONS,
-                Settings.HIDE_FULLSCREEN_PANELS
+                Settings.DISABLE_ENGAGEMENT_PANEL,
+                Settings.HIDE_QUICK_ACTIONS
         };
         for (BooleanSetting s : hideFullscreenSettings) {
             isFullscreenHidden |= s.get();
@@ -64,14 +64,14 @@ public class ExtendedUtils extends PackageUtils {
     }
 
     private static final Setting<?>[] additionalSettings = {
-            Settings.HIDE_PLAYER_FLYOUT_PANEL_AMBIENT,
-            Settings.HIDE_PLAYER_FLYOUT_PANEL_HELP,
-            Settings.HIDE_PLAYER_FLYOUT_PANEL_LOOP,
-            Settings.HIDE_PLAYER_FLYOUT_PANEL_PREMIUM_CONTROLS,
-            Settings.HIDE_PLAYER_FLYOUT_PANEL_STABLE_VOLUME,
-            Settings.HIDE_PLAYER_FLYOUT_PANEL_STATS_FOR_NERDS,
-            Settings.HIDE_PLAYER_FLYOUT_PANEL_WATCH_IN_VR,
-            Settings.HIDE_PLAYER_FLYOUT_PANEL_YT_MUSIC,
+            Settings.HIDE_PLAYER_FLYOUT_MENU_AMBIENT,
+            Settings.HIDE_PLAYER_FLYOUT_MENU_HELP,
+            Settings.HIDE_PLAYER_FLYOUT_MENU_LOOP,
+            Settings.HIDE_PLAYER_FLYOUT_MENU_PREMIUM_CONTROLS,
+            Settings.HIDE_PLAYER_FLYOUT_MENU_STABLE_VOLUME,
+            Settings.HIDE_PLAYER_FLYOUT_MENU_STATS_FOR_NERDS,
+            Settings.HIDE_PLAYER_FLYOUT_MENU_WATCH_IN_VR,
+            Settings.HIDE_PLAYER_FLYOUT_MENU_YT_MUSIC,
             Settings.SPOOF_APP_VERSION,
             Settings.SPOOF_APP_VERSION_TARGET
     };
@@ -83,7 +83,7 @@ public class ExtendedUtils extends PackageUtils {
         return false;
     }
 
-    public static void setPlayerFlyoutPanelAdditionalSettings() {
-        Settings.HIDE_PLAYER_FLYOUT_PANEL_ADDITIONAL_SETTINGS.save(isAdditionalSettingsEnabled());
+    public static void setPlayerFlyoutMenuAdditionalSettings() {
+        Settings.HIDE_PLAYER_FLYOUT_MENU_ADDITIONAL_SETTINGS.save(isAdditionalSettingsEnabled());
     }
 }
