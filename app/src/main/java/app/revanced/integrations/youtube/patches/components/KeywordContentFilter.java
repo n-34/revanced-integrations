@@ -17,8 +17,8 @@ import app.revanced.integrations.shared.utils.ByteTrieSearch;
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.settings.Settings;
-import app.revanced.integrations.youtube.shared.NavigationBar;
 import app.revanced.integrations.youtube.shared.PlayerType;
+import app.revanced.integrations.youtube.shared.RootView;
 
 /**
  * <pre>
@@ -129,7 +129,7 @@ public final class KeywordContentFilter extends Filter {
             return Settings.HIDE_KEYWORD_CONTENT_HOME.get();
         }
         // Must check second, as search can be from any tab.
-        if (NavigationBar.isSearchBarActive()) {
+        if (RootView.isSearchBarActive()) {
             logNavigationState("Search");
             return Settings.HIDE_KEYWORD_CONTENT_SEARCH.get();
         }

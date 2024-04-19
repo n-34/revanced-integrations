@@ -10,7 +10,7 @@ import app.revanced.integrations.shared.utils.StringTrieSearch;
 import app.revanced.integrations.youtube.patches.feed.FeedPatch;
 import app.revanced.integrations.youtube.settings.Settings;
 import app.revanced.integrations.youtube.shared.BrowseId;
-import app.revanced.integrations.youtube.shared.NavigationBar;
+import app.revanced.integrations.youtube.shared.RootView;
 
 @SuppressWarnings("unused")
 public final class FeedComponentsFilter extends Filter {
@@ -205,7 +205,7 @@ public final class FeedComponentsFilter extends Filter {
     public boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
                        StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
         if (matchedGroup == carouselShelf) {
-            if (BrowseId.isLibrary() && !NavigationBar.isSearchBarActive())
+            if (BrowseId.isLibrary() && !RootView.isSearchBarActive())
                 return false;
         } else if (matchedGroup == channelProfileButtonRule) {
             final boolean isBrowseStoreButtonShown = path.contains(BROWSE_STORE_BUTTON_PATH) && browseStoreButton.check(protobufBufferArray).isFiltered();

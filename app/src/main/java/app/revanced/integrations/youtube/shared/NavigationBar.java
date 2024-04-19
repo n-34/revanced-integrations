@@ -17,25 +17,6 @@ import app.revanced.integrations.youtube.settings.Settings;
 @SuppressWarnings("unused")
 public final class NavigationBar {
 
-    private static volatile WeakReference<View> searchBarResultsRef = new WeakReference<>(null);
-
-    /**
-     * Injection point.
-     */
-    public static void searchBarResultsViewLoaded(View searchbarResults) {
-        searchBarResultsRef = new WeakReference<>(searchbarResults);
-    }
-
-    /**
-     * @return If the search bar is on screen.  This includes if the player
-     *         is on screen and the search results are behind the player (and not visible).
-     *         Detecting the search is covered by the player can be done by checking {@link PlayerType#isMaximizedOrFullscreen()}.
-     */
-    public static boolean isSearchBarActive() {
-        View searchbarResults = searchBarResultsRef.get();
-        return searchbarResults != null && searchbarResults.getParent() != null;
-    }
-
     /**
      * Last YT navigation enum loaded.  Not necessarily the active navigation tab.
      */
