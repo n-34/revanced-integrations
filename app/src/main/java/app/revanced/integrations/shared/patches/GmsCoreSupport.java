@@ -62,7 +62,7 @@ public class GmsCoreSupport {
                         .setIconAttribute(android.R.attr.alertDialogIcon)
                         .setTitle(str("gms_core_dialog_title"))
                         .setMessage(str(dialogMessageRef) + "\n\n" + toastMessage)
-                        .setPositiveButton(android.R.string.ok, (dialog, id) -> open(DONT_KILL_MY_APP_LINK))
+                        .setPositiveButton(str("gms_core_dialog_ok_button_text"), (dialog, id) -> open(DONT_KILL_MY_APP_LINK))
                         // Manually allow using the back button to dismiss the dialog with the back button,
                         // if troubleshooting and somehow the GmsCore verification checks always fail.
                         .setCancelable(true)
