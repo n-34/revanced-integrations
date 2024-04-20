@@ -26,10 +26,10 @@ public class SpoofPlayerParameterPatch {
 
     /**
      * Parameter (also used by
-     * <a href="https://github.com/yt-dlp/yt-dlp/blob/81ca451480051d7ce1a31c017e005358345a9149/yt_dlp/extractor/youtube.py#L3602">yt-dlp</a>)
+     * <a href="https://github.com/LuanRT/YouTube.js/pull/624">YouTube.js</a>)
      * to fix playback issues.
      */
-    private static final String INCOGNITO_PARAMETERS = "CgIQBg==";
+    private static final String INCOGNITO_PARAMETERS = "CgIIAQ%3D%3D";
 
     /**
      * Parameters used when playing clips.
