@@ -8,6 +8,7 @@ import java.util.Objects;
 
 import app.revanced.integrations.shared.utils.Logger;
 
+@Deprecated
 @SuppressWarnings("unused")
 public final class BrowseId {
     private static final String BROWSE_ID_DEFAULT = "FEwhat_to_watch";

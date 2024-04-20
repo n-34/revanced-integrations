@@ -1,5 +1,7 @@
 package app.revanced.integrations.youtube.patches.components;
 
+import static app.revanced.integrations.youtube.shared.NavigationBar.NavigationButton;
+
 import androidx.annotation.Nullable;
 
 import app.revanced.integrations.shared.patches.components.ByteArrayFilterGroup;
@@ -9,7 +11,6 @@ import app.revanced.integrations.shared.patches.components.StringFilterGroupList
 import app.revanced.integrations.shared.utils.StringTrieSearch;
 import app.revanced.integrations.youtube.patches.feed.FeedPatch;
 import app.revanced.integrations.youtube.settings.Settings;
-import app.revanced.integrations.youtube.shared.BrowseId;
 import app.revanced.integrations.youtube.shared.RootView;
 
 @SuppressWarnings("unused")
@@ -209,7 +210,9 @@ public final class FeedComponentsFilter extends Filter {
     public boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
                        StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
         if (matchedGroup == carouselShelf) {
-            if (BrowseId.isLibrary() && !RootView.isSearchBarActive())
+            // In the related video, the carousel shelf is not shown so player type check is ignored.
+            NavigationButton selectedNavButton = NavigationButton.getSelectedNavigationButton();
+            if (selectedNavButton != null && selectedNavButton.isLibraryOrYouTab() && !RootView.isSearchBarActive())
                 return false;
         } else if (matchedGroup == channelProfileButtonRule) {
             final boolean isBrowseStoreButtonShown = path.contains(BROWSE_STORE_BUTTON_PATH) && browseStoreButton.check(protobufBufferArray).isFiltered();
