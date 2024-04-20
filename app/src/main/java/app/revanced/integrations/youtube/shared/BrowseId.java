@@ -9,7 +9,7 @@ import java.util.Objects;
 import app.revanced.integrations.shared.utils.Logger;
 
 @SuppressWarnings("unused")
-public class BrowseId {
+public final class BrowseId {
     private static final String BROWSE_ID_DEFAULT = "FEwhat_to_watch";
     private static final String BROWSE_ID_HISTORY = "FEhistory";
     private static final String BROWSE_ID_LIBRARY = "FElibrary";

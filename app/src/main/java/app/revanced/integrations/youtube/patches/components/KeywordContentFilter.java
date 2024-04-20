@@ -125,24 +125,32 @@ public final class KeywordContentFilter extends Filter {
         // Must check player type first, as search bar can be active behind the player.
         if (PlayerType.getCurrent().isMaximizedOrFullscreenOrSliding()) {
             // For now, consider the under video results the same as the home feed.
-            logNavigationState("Player active");
             return Settings.HIDE_KEYWORD_CONTENT_HOME.get();
         }
         // Must check second, as search can be from any tab.
         if (RootView.isSearchBarActive()) {
-            logNavigationState("Search");
             return Settings.HIDE_KEYWORD_CONTENT_SEARCH.get();
         }
-        if (NavigationButton.HOME.isSelected()) {
-            logNavigationState("Home tab");
-            return Settings.HIDE_KEYWORD_CONTENT_HOME.get();
+
+        // Avoid checking navigation button status if all other settings are off.
+        final boolean hideHome = Settings.HIDE_KEYWORD_CONTENT_HOME.get();
+        final boolean hideSubscriptions = Settings.HIDE_KEYWORD_CONTENT_SUBSCRIPTIONS.get();
+        if (!hideHome && !hideSubscriptions) {
+            return false;
         }
-        if (NavigationButton.SUBSCRIPTIONS.isSelected()) {
-            logNavigationState("Subscription tab");
-            return Settings.HIDE_SUBSCRIPTIONS_BUTTON.get();
+
+        NavigationButton selectedNavButton = NavigationButton.getSelectedNavigationButton();
+        if (selectedNavButton == null) {
+            return hideHome; // Unknown tab, treat the same as home.
+        }
+
+        if (selectedNavButton == NavigationButton.HOME) {
+            return hideHome;
+        }
+        if (selectedNavButton == NavigationButton.SUBSCRIPTIONS) {
+            return hideSubscriptions;
         }
         // User is in the Library or Notifications tab.
-        logNavigationState("Ignored tab");
         return false;
     }
 

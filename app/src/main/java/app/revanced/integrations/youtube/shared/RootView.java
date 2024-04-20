@@ -11,7 +11,7 @@ import app.revanced.integrations.shared.utils.Logger;
 /**
  * @noinspection ALL
  */
-public class RootView {
+public final class RootView {
     private static volatile WeakReference<View> searchBarResultsRef = new WeakReference<>(null);
 
     /**
