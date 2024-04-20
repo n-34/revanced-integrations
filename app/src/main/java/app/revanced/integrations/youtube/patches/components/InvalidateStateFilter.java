@@ -20,7 +20,6 @@ public final class InvalidateStateFilter extends Filter {
     public InvalidateStateFilter() {
         // As an example of the layout included in the player, a video action bar and relative video context was used.
         // Even if the components are hidden by another litho filter patch, this filter can still detect it.
-
         addIdentifierCallbacks(new StringFilterGroup(null, "video_action_bar.eml"));
     }
 

@@ -2,6 +2,7 @@ package app.revanced.integrations.youtube.patches.general;
 
 import static app.revanced.integrations.shared.utils.StringRef.str;
 import static app.revanced.integrations.shared.utils.Utils.hideViewUnderCondition;
+import static app.revanced.integrations.youtube.shared.NavigationBar.NavigationButton;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -25,7 +26,6 @@ import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.patches.utils.ViewGroupMarginLayoutParamsPatch;
 import app.revanced.integrations.youtube.settings.Settings;
-import app.revanced.integrations.youtube.shared.NavigationBar;
 
 /**
  * @noinspection ALL
@@ -229,19 +229,19 @@ public class GeneralPatch {
 
     // region [Hide navigation bar components] patch
 
-    private static final Map<NavigationBar.NavigationButton, Boolean> shouldHideMap = new EnumMap<>(NavigationBar.NavigationButton.class) {
+    private static final Map<NavigationButton, Boolean> shouldHideMap = new EnumMap<>(NavigationButton.class) {
         {
-            put(NavigationBar.NavigationButton.HOME, Settings.HIDE_HOME_BUTTON.get());
-            put(NavigationBar.NavigationButton.SHORTS, Settings.HIDE_SHORTS_BUTTON.get());
-            put(NavigationBar.NavigationButton.SUBSCRIPTIONS, Settings.HIDE_SUBSCRIPTIONS_BUTTON.get());
-            put(NavigationBar.NavigationButton.CREATE, Settings.HIDE_CREATE_BUTTON.get());
-            put(NavigationBar.NavigationButton.NOTIFICATIONS, Settings.HIDE_NOTIFICATIONS_BUTTON.get());
+            put(NavigationButton.HOME, Settings.HIDE_HOME_BUTTON.get());
+            put(NavigationButton.SHORTS, Settings.HIDE_SHORTS_BUTTON.get());
+            put(NavigationButton.SUBSCRIPTIONS, Settings.HIDE_SUBSCRIPTIONS_BUTTON.get());
+            put(NavigationButton.CREATE, Settings.HIDE_CREATE_BUTTON.get());
+            put(NavigationButton.NOTIFICATIONS, Settings.HIDE_NOTIFICATIONS_BUTTON.get());
 
-            put(NavigationBar.NavigationButton.LIBRARY_LOGGED_OUT, Settings.HIDE_LIBRARY_BUTTON.get());
-            put(NavigationBar.NavigationButton.LIBRARY_INCOGNITO, Settings.HIDE_LIBRARY_BUTTON.get());
-            put(NavigationBar.NavigationButton.LIBRARY_OLD_UI, Settings.HIDE_LIBRARY_BUTTON.get());
-            put(NavigationBar.NavigationButton.LIBRARY_PIVOT_UNKNOWN, Settings.HIDE_LIBRARY_BUTTON.get());
-            put(NavigationBar.NavigationButton.LIBRARY_YOU, Settings.HIDE_LIBRARY_BUTTON.get());
+            put(NavigationButton.LIBRARY_LOGGED_OUT, Settings.HIDE_LIBRARY_BUTTON.get());
+            put(NavigationButton.LIBRARY_INCOGNITO, Settings.HIDE_LIBRARY_BUTTON.get());
+            put(NavigationButton.LIBRARY_OLD_UI, Settings.HIDE_LIBRARY_BUTTON.get());
+            put(NavigationButton.LIBRARY_PIVOT_UNKNOWN, Settings.HIDE_LIBRARY_BUTTON.get());
+            put(NavigationButton.LIBRARY_YOU, Settings.HIDE_LIBRARY_BUTTON.get());
         }
     };
 
@@ -253,7 +253,7 @@ public class GeneralPatch {
         return Settings.SWITCH_CREATE_WITH_NOTIFICATIONS_BUTTON.get() || original;
     }
 
-    public static void navigationTabCreated(NavigationBar.NavigationButton button, View tabView) {
+    public static void navigationTabCreated(NavigationButton button, View tabView) {
         if (Boolean.TRUE.equals(shouldHideMap.get(button))) {
             tabView.setVisibility(View.GONE);
         }

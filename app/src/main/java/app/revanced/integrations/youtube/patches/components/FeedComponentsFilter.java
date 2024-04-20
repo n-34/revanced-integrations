@@ -15,6 +15,10 @@ import app.revanced.integrations.youtube.shared.RootView;
 @SuppressWarnings("unused")
 public final class FeedComponentsFilter extends Filter {
     private static final String BROWSE_STORE_BUTTON_PATH = "|ContainerType|button.eml|";
+    private static final String CONVERSATION_CONTEXT_FEED_IDENTIFIER =
+            "horizontalCollectionSwipeProtector=null";
+    private static final String CONVERSATION_CONTEXT_SUBSCRIPTIONS_IDENTIFIER =
+            "heightConstraint=null";
     private static final ByteArrayFilterGroup browseStoreButton =
             new ByteArrayFilterGroup(
                     null,
@@ -169,20 +173,20 @@ public final class FeedComponentsFilter extends Filter {
 
         final StringFilterGroup communityPostsFeed = new StringFilterGroup(
                 null,
-                "heightConstraint=null",
-                "horizontalCollectionSwipeProtector=null"
+                CONVERSATION_CONTEXT_FEED_IDENTIFIER,
+                CONVERSATION_CONTEXT_SUBSCRIPTIONS_IDENTIFIER
         );
 
         final StringFilterGroup communityPostsHomeAndRelatedVideos =
                 new StringFilterGroup(
                         Settings.HIDE_COMMUNITY_POSTS_HOME_RELATED_VIDEOS,
-                        "horizontalCollectionSwipeProtector=null"
+                        CONVERSATION_CONTEXT_FEED_IDENTIFIER
                 );
 
         final StringFilterGroup communityPostsSubscriptions =
                 new StringFilterGroup(
                         Settings.HIDE_COMMUNITY_POSTS_SUBSCRIPTIONS,
-                        "heightConstraint=null"
+                        CONVERSATION_CONTEXT_SUBSCRIPTIONS_IDENTIFIER
                 );
 
         communityPostsGroupListWithOutSettings.addAll(communityPostsFeed);
