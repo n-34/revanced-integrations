@@ -6,7 +6,7 @@ import app.revanced.integrations.youtube.shared.RootView;
 public class MinimizedPlaybackPatch {
 
     public static boolean isPlaybackNotShort() {
-        return !RootView.isShorts();
+        return !RootView.isShortsActive();
     }
 
 }
