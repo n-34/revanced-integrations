@@ -32,9 +32,9 @@ public class CustomPlaybackSpeedPatch {
     public static String[] customSpeedEntries;
     public static String[] customSpeedEntryValues;
     /**
-     * Last time the method was used
+     * The last time the old playback menu was forcefully called.
      */
-    private static long lastTimeUsed = 0;
+    private static long lastTimeOldPlaybackMenuInvoked;
 
     static {
         loadSpeeds();
@@ -82,7 +82,7 @@ public class CustomPlaybackSpeedPatch {
                     throw new IllegalArgumentException();
                 }
                 if (speed > MAXIMUM_PLAYBACK_SPEED) {
-                    resetCustomSpeeds(str("revanced_custom_playback_speeds_warning", MAXIMUM_PLAYBACK_SPEED + ""));
+                    resetCustomSpeeds(str("revanced_custom_playback_speeds_invalid", MAXIMUM_PLAYBACK_SPEED + ""));
                     loadSpeeds();
                     return;
                 }
@@ -107,7 +107,7 @@ public class CustomPlaybackSpeedPatch {
             }
         } catch (Exception ex) {
             Logger.printInfo(() -> "parse error", ex);
-            resetCustomSpeeds(str("revanced_custom_playback_speeds_invalid"));
+            resetCustomSpeeds(str("revanced_custom_playback_speeds_parse_exception"));
             loadSpeeds();
         }
     }
@@ -135,6 +135,9 @@ public class CustomPlaybackSpeedPatch {
         return Settings.ENABLE_CUSTOM_PLAYBACK_SPEED.get() && playbackSpeeds != null;
     }
 
+    /**
+     * Injection point.
+     */
     public static void onFlyoutMenuCreate(final RecyclerView recyclerView) {
         if (!Settings.ENABLE_CUSTOM_PLAYBACK_SPEED.get())
             return;
@@ -192,12 +195,13 @@ public class CustomPlaybackSpeedPatch {
      * @param context Context for [playbackSpeedDialogListener]
      */
     private static void showCustomPlaybackSpeedMenu(@NonNull Context context) {
-        final long currentTime = System.currentTimeMillis();
-
-        // Ignores method reuse in less than 1 second.
-        if (lastTimeUsed != 0 && currentTime - lastTimeUsed < 1000)
+        // This method is sometimes used multiple times.
+        // To prevent this, ignore method reuse within 1 second.
+        final long now = System.currentTimeMillis();
+        if (now - lastTimeOldPlaybackMenuInvoked < 1000) {
             return;
-        lastTimeUsed = currentTime;
+        }
+        lastTimeOldPlaybackMenuInvoked = now;
 
         if (Settings.CUSTOM_PLAYBACK_SPEED_MENU_TYPE.get()) {
             // Open playback speed dialog
