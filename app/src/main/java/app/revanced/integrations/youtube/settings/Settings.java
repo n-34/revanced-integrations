@@ -16,12 +16,17 @@ import java.util.Set;
 
 import app.revanced.integrations.shared.settings.BaseSettings;
 import app.revanced.integrations.shared.settings.BooleanSetting;
+import app.revanced.integrations.shared.settings.EnumSetting;
 import app.revanced.integrations.shared.settings.FloatSetting;
 import app.revanced.integrations.shared.settings.IntegerSetting;
 import app.revanced.integrations.shared.settings.LongSetting;
 import app.revanced.integrations.shared.settings.Setting;
 import app.revanced.integrations.shared.settings.StringSetting;
 import app.revanced.integrations.shared.settings.preference.SharedPrefCategory;
+import app.revanced.integrations.youtube.patches.alternativethumbnails.AlternativeThumbnailsPatch.DeArrowAvailability;
+import app.revanced.integrations.youtube.patches.alternativethumbnails.AlternativeThumbnailsPatch.StillImagesAvailability;
+import app.revanced.integrations.youtube.patches.alternativethumbnails.AlternativeThumbnailsPatch.ThumbnailOption;
+import app.revanced.integrations.youtube.patches.alternativethumbnails.AlternativeThumbnailsPatch.ThumbnailStillTime;
 import app.revanced.integrations.youtube.sponsorblock.SponsorBlockSettings;
 
 @SuppressWarnings("unused")
@@ -39,13 +44,16 @@ public class Settings extends BaseSettings {
 
 
     // PreferenceScreen: Alternative Thumbnails
-    public static final BooleanSetting ALT_THUMBNAIL_DEARROW = new BooleanSetting("revanced_alt_thumbnail_dearrow", FALSE);
-    public static final StringSetting ALT_THUMBNAIL_DEARROW_API_URL = new StringSetting("revanced_alt_thumbnail_dearrow_api_url", "https://dearrow-thumb.ajay.app/api/v1/getThumbnail", true, parent(ALT_THUMBNAIL_DEARROW));
-    public static final BooleanSetting ALT_THUMBNAIL_DEARROW_CONNECTION_TOAST = new BooleanSetting("revanced_alt_thumbnail_dearrow_connection_toast", FALSE, parent(ALT_THUMBNAIL_DEARROW));
-
-    public static final BooleanSetting ALT_THUMBNAIL_STILLS = new BooleanSetting("revanced_alt_thumbnail_stills", FALSE);
-    public static final BooleanSetting ALT_THUMBNAIL_STILLS_FAST = new BooleanSetting("revanced_alt_thumbnail_stills_fast", FALSE, parent(ALT_THUMBNAIL_STILLS));
-    public static final IntegerSetting ALT_THUMBNAIL_STILLS_TIME = new IntegerSetting("revanced_alt_thumbnail_stills_time", 2, parent(ALT_THUMBNAIL_STILLS));
+    public static final EnumSetting<ThumbnailOption> ALT_THUMBNAIL_HOME = new EnumSetting<>("revanced_alt_thumbnail_home", ThumbnailOption.ORIGINAL);
+    public static final EnumSetting<ThumbnailOption> ALT_THUMBNAIL_SUBSCRIPTIONS = new EnumSetting<>("revanced_alt_thumbnail_subscriptions", ThumbnailOption.ORIGINAL);
+    public static final EnumSetting<ThumbnailOption> ALT_THUMBNAIL_LIBRARY = new EnumSetting<>("revanced_alt_thumbnail_library", ThumbnailOption.ORIGINAL);
+    public static final EnumSetting<ThumbnailOption> ALT_THUMBNAIL_PLAYER = new EnumSetting<>("revanced_alt_thumbnail_player", ThumbnailOption.ORIGINAL);
+    public static final EnumSetting<ThumbnailOption> ALT_THUMBNAIL_SEARCH = new EnumSetting<>("revanced_alt_thumbnail_search", ThumbnailOption.ORIGINAL);
+    public static final StringSetting ALT_THUMBNAIL_DEARROW_API_URL = new StringSetting("revanced_alt_thumbnail_dearrow_api_url",
+            "https://dearrow-thumb.ajay.app/api/v1/getThumbnail", true, new DeArrowAvailability());
+    public static final BooleanSetting ALT_THUMBNAIL_DEARROW_CONNECTION_TOAST = new BooleanSetting("revanced_alt_thumbnail_dearrow_connection_toast", FALSE, new DeArrowAvailability());
+    public static final EnumSetting<ThumbnailStillTime> ALT_THUMBNAIL_STILLS_TIME = new EnumSetting<>("revanced_alt_thumbnail_stills_time", ThumbnailStillTime.MIDDLE, new StillImagesAvailability());
+    public static final BooleanSetting ALT_THUMBNAIL_STILLS_FAST = new BooleanSetting("revanced_alt_thumbnail_stills_fast", FALSE, new StillImagesAvailability());
 
 
     // PreferenceScreen: Feed
