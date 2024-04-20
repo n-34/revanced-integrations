@@ -99,7 +99,7 @@ public class Settings extends BaseSettings {
 
     public static final BooleanSetting HIDE_VIDEO_BY_VIEW_COUNTS = new BooleanSetting("revanced_hide_video_by_view_counts", FALSE);
     public static final LongSetting HIDE_VIDEO_VIEW_COUNTS = new LongSetting("revanced_hide_video_view_counts", 1000L, parent(HIDE_VIDEO_BY_VIEW_COUNTS));
-    public static final StringSetting HIDE_VIDEO_VIEW_COUNTS_MULTIPLIER = new StringSetting("revanced_hide_video_view_counts_multiplier", str("revanced_hide_video_view_counts_multiplier_default_value"), parent(HIDE_VIDEO_BY_VIEW_COUNTS));
+    public static final StringSetting HIDE_VIDEO_VIEW_COUNTS_MULTIPLIER = new StringSetting("revanced_hide_video_view_counts_multiplier", str("revanced_hide_video_view_counts_multiplier_default_value"), true, parent(HIDE_VIDEO_BY_VIEW_COUNTS));
 
 
     // PreferenceScreen: General
@@ -311,8 +311,11 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting HIDE_SHORTS_NAVIGATION_BAR = new BooleanSetting("revanced_hide_shorts_navigation_bar", FALSE, true);
 
     // PreferenceScreen: Shorts - Shorts shelf
-    public static final BooleanSetting HIDE_SHORTS_SHELF = new BooleanSetting("revanced_hide_shorts_shelf", TRUE);
-    public static final BooleanSetting HIDE_SHORTS_SHELF_EXCEPTION_HISTORY = new BooleanSetting("revanced_hide_shorts_shelf_exception_history", FALSE);
+    public static final BooleanSetting HIDE_SHORTS_SHELF = new BooleanSetting("revanced_hide_shorts_shelf", TRUE, true);
+    public static final BooleanSetting HIDE_SHORTS_SHELF_HOME_RELATED_VIDEOS = new BooleanSetting("revanced_hide_shorts_shelf_home_related_videos", TRUE);
+    public static final BooleanSetting HIDE_SHORTS_SHELF_SUBSCRIPTIONS = new BooleanSetting("revanced_hide_shorts_shelf_subscriptions", TRUE);
+    public static final BooleanSetting HIDE_SHORTS_SHELF_SEARCH = new BooleanSetting("revanced_hide_shorts_shelf_search", TRUE);
+    public static final BooleanSetting HIDE_SHORTS_SHELF_HISTORY = new BooleanSetting("revanced_hide_shorts_shelf_history", FALSE);
 
 
     // PreferenceScreen: Swipe controls
