@@ -215,7 +215,7 @@ public abstract class Setting<T> {
         if (!oldPrefs.preferences.contains(settingKey)) {
             return; // Nothing to do.
         }
-        
+
         Object newValue = setting.get();
         final Object migratedValue;
         if (setting instanceof BooleanSetting) {
