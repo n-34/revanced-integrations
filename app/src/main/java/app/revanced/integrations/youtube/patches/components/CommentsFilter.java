@@ -16,10 +16,10 @@ public final class CommentsFilter extends Filter {
     private static final Pattern COMMENT_PREVIEW_TEXT_PATTERN = Pattern.compile("comments_entry_point_teaser.+ContainerType");
     private static final String VIDEO_METADATA_CAROUSEL_PATH = "video_metadata_carousel.eml";
 
+    private final StringFilterGroup comments;
     private final StringFilterGroup commentsPreviewDots;
     private final StringFilterGroup createShorts;
     private final StringFilterGroup emojiPicker;
-    private final StringFilterGroup homeFeedVideo;
     private final StringFilterGroup previewCommentText;
     private final StringFilterGroup thanks;
     private final StringTrieSearch exceptions = new StringTrieSearch();
@@ -34,8 +34,8 @@ public final class CommentsFilter extends Filter {
                 "sponsorships_comments_upsell"
         );
 
-        final StringFilterGroup comments = new StringFilterGroup(
-                Settings.HIDE_COMMENTS_SECTION,
+        comments = new StringFilterGroup(
+                null,
                 VIDEO_METADATA_CAROUSEL_PATH,
                 "comments_"
         );
@@ -53,11 +53,6 @@ public final class CommentsFilter extends Filter {
         emojiPicker = new StringFilterGroup(
                 Settings.HIDE_EMOJI_PICKER,
                 "|CellType|ContainerType|ContainerType|ContainerType|ContainerType|ContainerType|"
-        );
-
-        homeFeedVideo = new StringFilterGroup(
-                Settings.HIDE_COMMENTS_SECTION_IN_HOME_FEED,
-                "home_video_with_context.eml"
         );
 
         final StringFilterGroup membersBanner = new StringFilterGroup(
@@ -108,8 +103,13 @@ public final class CommentsFilter extends Filter {
                 return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
             }
             return false;
-        } else if (matchedGroup == homeFeedVideo) {
-            if (path.contains(VIDEO_METADATA_CAROUSEL_PATH)) {
+        } else if (matchedGroup == comments) {
+            if (path.startsWith("home_video_with_context.eml")) {
+                if (Settings.HIDE_COMMENTS_SECTION_IN_HOME_FEED.get()) {
+                    return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
+                }
+                return false;
+            } else if (Settings.HIDE_COMMENTS_SECTION.get()) {
                 return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
             }
             return false;

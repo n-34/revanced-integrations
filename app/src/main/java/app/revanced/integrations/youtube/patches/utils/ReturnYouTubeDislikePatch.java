@@ -324,7 +324,7 @@ public class ReturnYouTubeDislikePatch {
             // but if the user then undoes their action the layout will not remove the extra padding.
             // Use a center alignment to take up any extra space.
             view.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-            
+
             // Single line mode does not clip words if the span is larger than the view bounds.
             // The styled span applied to the view should always have the same bounds,
             // but use this feature just in case the measurements are somehow off by a few pixels.

@@ -41,11 +41,15 @@ public final class FeedComponentsFilter extends Filter {
     private final StringFilterGroup channelProfileButtonRule;
     private final StringFilterGroup communityPosts;
 
-    private final StringFilterGroupList communityPostsGroupListWithOutSettings = new StringFilterGroupList();
-    private final StringFilterGroupList communityPostsGroupListWithSettings = new StringFilterGroupList();
+    private static final StringTrieSearch communityPostsFeedGroupSearch = new StringTrieSearch();
+    private final StringFilterGroupList communityPostsFeedGroup = new StringFilterGroupList();
 
 
     public FeedComponentsFilter() {
+        communityPostsFeedGroupSearch.addPatterns(
+                CONVERSATION_CONTEXT_FEED_IDENTIFIER,
+                CONVERSATION_CONTEXT_SUBSCRIPTIONS_IDENTIFIER
+        );
         mixPlaylistsContextExceptions.addPatterns(
                 "V.ED", // playlist browse id
                 "java.lang.ref.WeakReference"
@@ -172,12 +176,6 @@ public final class FeedComponentsFilter extends Filter {
                 ticketShelf
         );
 
-        final StringFilterGroup communityPostsFeed = new StringFilterGroup(
-                null,
-                CONVERSATION_CONTEXT_FEED_IDENTIFIER,
-                CONVERSATION_CONTEXT_SUBSCRIPTIONS_IDENTIFIER
-        );
-
         final StringFilterGroup communityPostsHomeAndRelatedVideos =
                 new StringFilterGroup(
                         Settings.HIDE_COMMUNITY_POSTS_HOME_RELATED_VIDEOS,
@@ -190,8 +188,7 @@ public final class FeedComponentsFilter extends Filter {
                         CONVERSATION_CONTEXT_SUBSCRIPTIONS_IDENTIFIER
                 );
 
-        communityPostsGroupListWithOutSettings.addAll(communityPostsFeed);
-        communityPostsGroupListWithSettings.addAll(communityPostsHomeAndRelatedVideos, communityPostsSubscriptions);
+        communityPostsFeedGroup.addAll(communityPostsHomeAndRelatedVideos, communityPostsSubscriptions);
     }
 
     /**
@@ -221,10 +218,10 @@ public final class FeedComponentsFilter extends Filter {
                 return false;
             }
         } else if (matchedGroup == communityPosts) {
-            if (!communityPostsGroupListWithOutSettings.check(allValue).isFiltered() && Settings.HIDE_COMMUNITY_POSTS_CHANNEL.get()) {
+            if (!communityPostsFeedGroupSearch.matches(allValue) && Settings.HIDE_COMMUNITY_POSTS_CHANNEL.get()) {
                 return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
             }
-            if (!communityPostsGroupListWithSettings.check(allValue).isFiltered()) {
+            if (!communityPostsFeedGroup.check(allValue).isFiltered()) {
                 return false;
             }
         }

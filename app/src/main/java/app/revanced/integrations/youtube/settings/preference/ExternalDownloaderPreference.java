@@ -73,7 +73,7 @@ public class ExternalDownloaderPreference extends Preference implements Preferen
         packageName = settings.get().toString();
         mClickedDialogEntryIndex = Arrays.asList(mEntryValues).indexOf(packageName);
 
-        final Context context = preference.getContext();
+        final Context context = getContext();
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
         TableLayout table = new TableLayout(context);

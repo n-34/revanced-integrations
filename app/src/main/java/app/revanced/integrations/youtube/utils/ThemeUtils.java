@@ -10,16 +10,23 @@ import android.graphics.drawable.Drawable;
 public class ThemeUtils {
     private static int themeValue;
 
+    /**
+     * Injection point.
+     */
+    public static void setTheme(Enum<?> themeEnum) {
+        themeValue = themeEnum.ordinal();
+    }
+
+    public static boolean isDarkTheme() {
+        return themeValue == 1;
+    }
+
     public static int getThemeId() {
         final String themeName = isDarkTheme()
                 ? "Theme.YouTube.Settings.Dark"
                 : "Theme.YouTube.Settings";
 
         return getStyleIdentifier(themeName);
-    }
-
-    public static boolean isDarkTheme() {
-        return themeValue == 1;
     }
 
     public static Drawable getBackButtonDrawable() {
@@ -49,12 +56,5 @@ public class ThemeUtils {
                 : "yt_white1";  // Color names used in the dark theme
 
         return getColor(colorName);
-    }
-
-    /**
-     * Injection point.
-     */
-    public static void setTheme(Enum<?> themeEnum) {
-        themeValue = themeEnum.ordinal();
     }
 }
