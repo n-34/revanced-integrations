@@ -30,4 +30,12 @@ public final class RootView {
     public static boolean isPlayerActive() {
         return PlayerType.getCurrent().isMaximizedOrFullscreenOrSliding();
     }
+
+    /**
+     * Get current BrowseId.
+     * Rest of the implementation added by patch.
+     */
+    public static String getBrowseId() {
+        return "";
+    }
 }

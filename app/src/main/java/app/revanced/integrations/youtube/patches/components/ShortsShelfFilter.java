@@ -1,26 +1,32 @@
 package app.revanced.integrations.youtube.patches.components;
 
-import static app.revanced.integrations.youtube.shared.NavigationBar.NavigationButton;
-
 import androidx.annotation.Nullable;
 
 import app.revanced.integrations.shared.patches.components.ByteArrayFilterGroup;
 import app.revanced.integrations.shared.patches.components.Filter;
 import app.revanced.integrations.shared.patches.components.StringFilterGroup;
 import app.revanced.integrations.shared.settings.BooleanSetting;
+import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.StringTrieSearch;
 import app.revanced.integrations.youtube.settings.Settings;
 import app.revanced.integrations.youtube.shared.RootView;
 
 @SuppressWarnings("unused")
 public final class ShortsShelfFilter extends Filter {
-    private static final String SHORTS_SHELF_HEADER_CONVERSION_CONTEXT = "horizontalCollectionSwipeProtector=null";
+    private static final String BROWSE_ID_HISTORY = "FEhistory";
+    private static final String BROWSE_ID_SUBSCRIPTIONS = "FEsubscriptions";
+    private static final String CONVERSATION_CONTEXT_FEED_IDENTIFIER =
+            "horizontalCollectionSwipeProtector=null";
     private static final String SHELF_HEADER_PATH = "shelf_header.eml";
     private final StringFilterGroup shortsCompactFeedVideoPath;
     private final ByteArrayFilterGroup shortsCompactFeedVideoBuffer;
     private final StringFilterGroup shelfHeader;
+    private static final StringTrieSearch feedGroup = new StringTrieSearch();
+
+    private static final BooleanSetting hideShortsShelf = Settings.HIDE_SHORTS_SHELF;
 
     public ShortsShelfFilter() {
-        BooleanSetting hideShortsShelf = Settings.HIDE_SHORTS_SHELF;
+        feedGroup.addPattern(CONVERSATION_CONTEXT_FEED_IDENTIFIER);
 
         // Feed Shorts shelf header.
         // Use a different filter group for this pattern, as it requires an additional check after matching.
@@ -69,7 +75,7 @@ public final class ShortsShelfFilter extends Filter {
         } else if (matchedGroup == shelfHeader) {
             // Check ConversationContext to not hide shelf header in channel profile
             // This value does not exist in the shelf header in the channel profile
-            if (!allValue.contains(SHORTS_SHELF_HEADER_CONVERSION_CONTEXT))
+            if (!feedGroup.matches(allValue))
                 return false;
         }
 
@@ -111,20 +117,18 @@ public final class ShortsShelfFilter extends Filter {
             return false;
         }
 
-        NavigationButton selectedNavButton = NavigationButton.getSelectedNavigationButton();
-        if (selectedNavButton == null) {
-            return hideHomeAndRelatedVideos; // Unknown tab, treat the same as home.
+        final String browseId = RootView.getBrowseId();
+        Logger.printDebug(() -> "Current browseId: " + browseId);
+        switch (browseId) {
+            case BROWSE_ID_HISTORY -> {
+                return hideHistory;
+            }
+            case  BROWSE_ID_SUBSCRIPTIONS -> {
+                return hideSubscriptions;
+            }
+            default -> {
+                return hideHomeAndRelatedVideos;
+            }
         }
-        if (selectedNavButton == NavigationButton.HOME) {
-            return hideHomeAndRelatedVideos;
-        }
-        if (selectedNavButton == NavigationButton.SUBSCRIPTIONS) {
-            return hideSubscriptions;
-        }
-        if (selectedNavButton.isLibraryOrYouTab()) {
-            return hideHistory;
-        }
-
-        return false;
     }
 }
