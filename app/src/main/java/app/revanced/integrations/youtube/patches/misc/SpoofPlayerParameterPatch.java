@@ -29,7 +29,7 @@ public class SpoofPlayerParameterPatch {
      * <a href="https://github.com/LuanRT/YouTube.js/pull/624">YouTube.js</a>)
      * to fix playback issues.
      */
-    private static final String INCOGNITO_PARAMETERS = "CgIIAQ%3D%3D";
+    private static final String INCOGNITO_PARAMETERS = "CgIIAQ==";
 
     /**
      * Parameters used when playing clips.

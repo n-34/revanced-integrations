@@ -30,7 +30,6 @@ import app.revanced.integrations.shared.settings.Setting;
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.settings.Settings;
-import app.revanced.integrations.youtube.shared.PlayerType;
 import app.revanced.integrations.youtube.shared.RootView;
 
 /**
@@ -158,7 +157,7 @@ public final class AlternativeThumbnailsPatch {
 
     private static ThumbnailOption optionSettingForCurrentNavigation() {
         // Must check player type first, as search bar can be active behind the player.
-        if (PlayerType.getCurrent().isMaximizedOrFullscreenOrSliding()) {
+        if (RootView.isPlayerActive()) {
             return ALT_THUMBNAIL_PLAYER.get();
         }
 

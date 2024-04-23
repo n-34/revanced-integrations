@@ -17,7 +17,6 @@ import app.revanced.integrations.shared.utils.ByteTrieSearch;
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.settings.Settings;
-import app.revanced.integrations.youtube.shared.PlayerType;
 import app.revanced.integrations.youtube.shared.RootView;
 
 /**
@@ -123,7 +122,7 @@ public final class KeywordContentFilter extends Filter {
 
     private static boolean hideKeywordSettingIsActive() {
         // Must check player type first, as search bar can be active behind the player.
-        if (PlayerType.getCurrent().isMaximizedOrFullscreenOrSliding()) {
+        if (RootView.isPlayerActive()) {
             // For now, consider the under video results the same as the home feed.
             return Settings.HIDE_KEYWORD_CONTENT_HOME.get();
         }
