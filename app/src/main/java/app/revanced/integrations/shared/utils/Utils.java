@@ -4,6 +4,8 @@ import static app.revanced.integrations.shared.utils.ResourceUtils.getIdIdentifi
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Fragment;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
@@ -255,6 +257,44 @@ public class Utils {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2 && toastMessage != null) {
             showToastShort(toastMessage);
         }
+    }
+
+    public static void setEditTextDialogTheme(final AlertDialog.Builder builder) {
+        setEditTextDialogTheme(builder, false);
+    }
+
+    /**
+     * If {@link Fragment} uses [Android library] rather than [AndroidX library],
+     * the Dialog theme corresponding to [Android library] should be used.
+     * <p>
+     * If not, the following issues will occur:
+     * <a href="https://github.com/ReVanced/revanced-patches/issues/3061">ReVanced/revanced-patches#3061</a>
+     * <p>
+     * To prevent these issues, apply the Dialog theme corresponding to [Android library].
+     *
+     * @param builder  Alertdialog builder to apply theme to.
+     *                 When used in a method containing an override, it must be called before 'super'.
+     * @param maxWidth Whether to use alertdialog as max width.
+     *                 It is used when there is a lot of content to show, such as an import/export dialog.
+     */
+    public static void setEditTextDialogTheme(final AlertDialog.Builder builder, boolean maxWidth) {
+        final String styleIdentifier = maxWidth
+                ? "revanced_edit_text_dialog_max_width_style"
+                : "revanced_edit_text_dialog_style";
+        final int editTextDialogStyle = ResourceUtils.getStyleIdentifier(styleIdentifier);
+        if (editTextDialogStyle != 0) {
+            builder.getContext().setTheme(editTextDialogStyle);
+        }
+    }
+
+    public static AlertDialog.Builder getEditTextDialogBuilder(final Context context) {
+        return getEditTextDialogBuilder(context, false);
+    }
+
+    public static AlertDialog.Builder getEditTextDialogBuilder(final Context context, boolean maxWidth) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        setEditTextDialogTheme(builder, maxWidth);
+        return builder;
     }
 
     @Nullable

@@ -10,7 +10,6 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -35,6 +34,7 @@ import androidx.annotation.Nullable;
 import java.util.Objects;
 
 import app.revanced.integrations.shared.settings.Setting;
+import app.revanced.integrations.shared.settings.preference.ResettableEditTextPreference;
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.ResourceUtils;
 import app.revanced.integrations.shared.utils.Utils;
@@ -61,11 +61,11 @@ public class SponsorBlockPreferenceFragment extends PreferenceFragment {
     private SwitchPreference showTimeWithoutSegments;
     private SwitchPreference toastOnConnectionError;
 
-    private EditTextPreference newSegmentStep;
-    private EditTextPreference minSegmentDuration;
-    private EditTextPreference privateUserId;
+    private ResettableEditTextPreference newSegmentStep;
+    private ResettableEditTextPreference minSegmentDuration;
+    private ResettableEditTextPreference privateUserId;
     private EditTextPreference importExport;
-    private Preference apiUrl;
+    private EditTextPreference apiUrl;
 
     private PreferenceCategory statsCategory;
     private PreferenceCategory segmentCategory;
@@ -284,9 +284,10 @@ public class SponsorBlockPreferenceFragment extends PreferenceFragment {
             return true;
         });
 
-        newSegmentStep = new EditTextPreference(context);
+        newSegmentStep = new ResettableEditTextPreference(context);
         newSegmentStep.setTitle(str("revanced_sb_general_adjusting"));
         newSegmentStep.setSummary(str("revanced_sb_general_adjusting_sum"));
+        newSegmentStep.setKey(Settings.SB_CREATE_NEW_SEGMENT_STEP.key);
         newSegmentStep.getEditText().setInputType(InputType.TYPE_CLASS_NUMBER);
         newSegmentStep.setOnPreferenceChangeListener((preference1, newValue) -> {
             final int newAdjustmentValue = Integer.parseInt(newValue.toString());
@@ -338,9 +339,10 @@ public class SponsorBlockPreferenceFragment extends PreferenceFragment {
         });
         category.addPreference(trackSkips);
 
-        minSegmentDuration = new EditTextPreference(context);
+        minSegmentDuration = new ResettableEditTextPreference(context);
         minSegmentDuration.setTitle(str("revanced_sb_general_min_duration"));
         minSegmentDuration.setSummary(str("revanced_sb_general_min_duration_sum"));
+        minSegmentDuration.setKey(Settings.SB_SEGMENT_MIN_DURATION.key);
         minSegmentDuration.getEditText().setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         minSegmentDuration.setOnPreferenceChangeListener((preference1, newValue) -> {
             Settings.SB_SEGMENT_MIN_DURATION.save(Float.valueOf(newValue.toString()));
@@ -348,9 +350,10 @@ public class SponsorBlockPreferenceFragment extends PreferenceFragment {
         });
         category.addPreference(minSegmentDuration);
 
-        privateUserId = new EditTextPreference(context);
+        privateUserId = new ResettableEditTextPreference(context);
         privateUserId.setTitle(str("revanced_sb_general_uuid"));
         privateUserId.setSummary(str("revanced_sb_general_uuid_sum"));
+        privateUserId.setKey(Settings.SB_PRIVATE_USER_ID.key);
         privateUserId.setOnPreferenceChangeListener((preference1, newValue) -> {
             String newUUID = newValue.toString();
             if (!SponsorBlockSettings.isValidSBUserId(newUUID)) {
@@ -364,19 +367,25 @@ public class SponsorBlockPreferenceFragment extends PreferenceFragment {
         });
         category.addPreference(privateUserId);
 
-        apiUrl = new Preference(context);
-        apiUrl.setTitle(str("revanced_sb_general_api_url"));
-        apiUrl.setSummary(Html.fromHtml(str("revanced_sb_general_api_url_sum")));
-        apiUrl.setOnPreferenceClickListener(preference1 -> {
-            EditText editText = new EditText(context);
-            editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
-            editText.setText(Settings.SB_API_URL.get());
+        apiUrl = new EditTextPreference(context) {
+            @Override
+            protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
+                EditText editText = getEditText();
+                String apiUrl = Settings.SB_API_URL.get();
+                editText.setText(apiUrl);
+                editText.setSelection(apiUrl.length());
 
-            DialogInterface.OnClickListener urlChangeListener = (dialog, buttonPressed) -> {
-                if (buttonPressed == DialogInterface.BUTTON_NEUTRAL) {
+                Utils.setEditTextDialogTheme(builder);
+                builder.setTitle(getTitle());
+                builder.setNeutralButton(str("revanced_sb_reset"), (dialog, which) -> {
+                    String defaultStringValue = Settings.SB_API_URL.defaultValue;
+                    editText.setText(defaultStringValue);
+                    editText.setSelection(defaultStringValue.length()); // move cursor to end of text
+
                     Settings.SB_API_URL.resetToDefault();
                     Utils.showToastLong(str("revanced_sb_api_url_reset"));
-                } else if (buttonPressed == DialogInterface.BUTTON_POSITIVE) {
+                });
+                builder.setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     String serverAddress = editText.getText().toString();
                     if (!SponsorBlockSettings.isValidSBServerAddress(serverAddress)) {
                         Utils.showToastLong(str("revanced_sb_api_url_invalid"));
@@ -384,23 +393,24 @@ public class SponsorBlockPreferenceFragment extends PreferenceFragment {
                         Settings.SB_API_URL.save(serverAddress);
                         Utils.showToastLong(str("revanced_sb_api_url_changed"));
                     }
-                }
-            };
-            new AlertDialog.Builder(context)
-                    .setTitle(apiUrl.getTitle())
-                    .setView(editText)
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .setNeutralButton(str("revanced_sb_reset"), urlChangeListener)
-                    .setPositiveButton(android.R.string.ok, urlChangeListener)
-                    .show();
-            return true;
-        });
+                });
+                super.onPrepareDialogBuilder(builder);
+            }
+        };
+        apiUrl.setTitle(str("revanced_sb_general_api_url"));
+        apiUrl.setSummary(Html.fromHtml(str("revanced_sb_general_api_url_sum")));
+        apiUrl.setKey(Settings.SB_API_URL.key);
+        apiUrl.getEditText().setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
         category.addPreference(apiUrl);
 
         importExport = new EditTextPreference(context) {
+            @Override
             protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
+                Utils.setEditTextDialogTheme(builder);
+                super.onPrepareDialogBuilder(builder);
+                builder.setTitle(getTitle());
                 builder.setNeutralButton(str("revanced_sb_settings_copy"), (dialog, which) ->
-                        Utils.setClipboard(getEditText().getText().toString()));
+                        Utils.setClipboard(getEditText().getText().toString(), str("revanced_sb_share_copy_settings_success")));
             }
         };
         importExport.setTitle(str("revanced_sb_settings_ie"));
@@ -504,7 +514,7 @@ public class SponsorBlockPreferenceFragment extends PreferenceFragment {
 
             if (stats.totalSegmentCountIncludingIgnored > 0) {
                 // If user has not created any segments, there's no reason to set a username.
-                EditTextPreference preference = new EditTextPreference(context);
+                ResettableEditTextPreference preference = new ResettableEditTextPreference(context);
                 statsCategory.addPreference(preference);
                 String userName = stats.userName;
                 preference.setTitle(fromHtml(str("revanced_sb_stats_username", userName)));

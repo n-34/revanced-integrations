@@ -14,6 +14,7 @@ import java.util.Objects;
 
 import app.revanced.integrations.shared.settings.Setting;
 import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.Utils;
 
 /** @noinspection deprecation, unused */
 public class ResettableEditTextPreference extends EditTextPreference {
@@ -33,8 +34,14 @@ public class ResettableEditTextPreference extends EditTextPreference {
 
     @Override
     protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
+        Utils.setEditTextDialogTheme(builder);
         super.onPrepareDialogBuilder(builder);
-        Setting<?> setting = Setting.getSettingFromPath(getKey());
+
+        final CharSequence title = getTitle();
+        if (title != null) {
+            builder.setTitle(getTitle());
+        }
+        final Setting<?> setting = Setting.getSettingFromPath(getKey());
         if (setting != null) {
             builder.setNeutralButton(str("revanced_extended_settings_reset"), null);
         }
@@ -44,8 +51,12 @@ public class ResettableEditTextPreference extends EditTextPreference {
     protected void showDialog(Bundle state) {
         super.showDialog(state);
 
+        if (!(getDialog() instanceof AlertDialog alertDialog)) {
+            return;
+        }
+
         // Override the button click listener to prevent dismissing the dialog.
-        Button button = ((AlertDialog) getDialog()).getButton(AlertDialog.BUTTON_NEUTRAL);
+        Button button = alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL);
         if (button == null) {
             return;
         }

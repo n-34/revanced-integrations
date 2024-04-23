@@ -74,7 +74,7 @@ public class ExternalDownloaderPreference extends Preference implements Preferen
         mClickedDialogEntryIndex = Arrays.asList(mEntryValues).indexOf(packageName);
 
         final Context context = getContext();
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = Utils.getEditTextDialogBuilder(context);
 
         TableLayout table = new TableLayout(context);
         table.setOrientation(LinearLayout.HORIZONTAL);
@@ -86,7 +86,7 @@ public class ExternalDownloaderPreference extends Preference implements Preferen
         mEditText.setHint(settings.defaultValue);
         mEditText.setText(packageName);
         mEditText.addTextChangedListener(textWatcher);
-        mEditText.setTextSize(TypedValue.COMPLEX_UNIT_PT, 8);
+        mEditText.setTextSize(TypedValue.COMPLEX_UNIT_PT, 9);
         mEditText.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 1f));
         row.addView(mEditText);
 

@@ -46,6 +46,9 @@ public class SegmentCategoryListPreference extends ListPreference {
     @Override
     protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
         try {
+            Utils.setEditTextDialogTheme(builder);
+            super.onPrepareDialogBuilder(builder);
+
             Context context = builder.getContext();
             TableLayout table = new TableLayout(context);
             table.setOrientation(LinearLayout.HORIZONTAL);
