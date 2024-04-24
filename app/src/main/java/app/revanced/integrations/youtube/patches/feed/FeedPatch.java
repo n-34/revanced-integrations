@@ -74,6 +74,10 @@ public class FeedPatch {
         hideViewUnderCondition(Settings.HIDE_LATEST_VIDEOS_BUTTON.get(), view);
     }
 
+    public static boolean hideSubscriptionsChannelSection() {
+        return Settings.HIDE_SUBSCRIPTIONS_CHANNEL_SECTION.get();
+    }
+
     public static void hideSubscriptionsChannelSection(View view) {
         hideViewUnderCondition(Settings.HIDE_SUBSCRIPTIONS_CHANNEL_SECTION.get(), view);
     }

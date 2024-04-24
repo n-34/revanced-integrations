@@ -113,7 +113,6 @@ public class ReVancedSettingsPreference extends ReVancedPreferenceFragment {
                 Settings.HIDE_QUICK_ACTIONS_SHARE_BUTTON,
                 Settings.QUICK_ACTIONS_TOP_MARGIN,
                 Settings.HIDE_RELATED_VIDEO_OVERLAY,
-                Settings.HIDE_SUBSCRIPTIONS_CHANNEL_SECTION,
                 Settings.SHOW_VIDEO_TITLE_SECTION
         );
     }
