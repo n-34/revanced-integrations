@@ -1,11 +1,10 @@
 package app.revanced.integrations.youtube.patches.shorts;
 
-import static app.revanced.integrations.shared.utils.Utils.hideViewBy0dpUnderCondition;
 import static app.revanced.integrations.shared.utils.Utils.hideViewUnderCondition;
 
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewStub;
+import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
 
@@ -47,8 +46,11 @@ public class ShortsPatch {
         return Settings.HIDE_SHORTS_LIKE_BUTTON.get();
     }
 
-    public static ViewStub hideShortsPaidPromotionBanner(ViewStub viewStub) {
-        return Settings.HIDE_SHORTS_PAID_PROMOTION.get() ? null : viewStub;
+    public static boolean hideShortsPaidPromotionLabel() {
+        return Settings.HIDE_SHORTS_PAID_PROMOTION_LABEL.get();
+    }
+    public static void hideShortsPaidPromotionLabel(TextView textView) {
+        hideViewUnderCondition(Settings.HIDE_SHORTS_PAID_PROMOTION_LABEL.get(), textView);
     }
 
     public static void hideShortsRemixButton(View view) {
@@ -67,12 +69,8 @@ public class ShortsPatch {
         return Settings.HIDE_SHORTS_SOUND_BUTTON.get() ? null : object;
     }
 
-    public static void hideShortsSubscriptionsButton(View view) {
-        hideViewBy0dpUnderCondition(Settings.HIDE_SHORTS_SUBSCRIPTIONS_BUTTON.get(), view);
-    }
-
-    public static int hideShortsSubscriptionsButton(int original) {
-        return Settings.HIDE_SHORTS_SUBSCRIPTIONS_BUTTON.get() ? 0 : original;
+    public static int hideShortsSubscribeButton(int original) {
+        return Settings.HIDE_SHORTS_SUBSCRIBE_BUTTON.get() ? 0 : original;
     }
 
     public static boolean hideShortsToolBar(boolean original) {

@@ -2,132 +2,182 @@ package app.revanced.integrations.youtube.patches.components;
 
 import androidx.annotation.Nullable;
 
+import org.apache.commons.lang3.StringUtils;
+
 import app.revanced.integrations.shared.patches.components.ByteArrayFilterGroup;
 import app.revanced.integrations.shared.patches.components.ByteArrayFilterGroupList;
 import app.revanced.integrations.shared.patches.components.Filter;
 import app.revanced.integrations.shared.patches.components.StringFilterGroup;
-import app.revanced.integrations.shared.utils.StringTrieSearch;
 import app.revanced.integrations.youtube.settings.Settings;
-import app.revanced.integrations.youtube.shared.PlayerType;
 
 @SuppressWarnings("unused")
 public final class ShortsButtonFilter extends Filter {
-    private static final String REEL_CHANNEL_BAR_PATH = "reel_channel_bar.eml";
-    private final StringTrieSearch exceptions = new StringTrieSearch();
-    private final StringFilterGroup infoPanel;
+    private final static String REEL_CHANNEL_BAR_PATH = "reel_channel_bar.eml";
+    private final static String REEL_LIVE_HEADER_PATH = "immersive_live_header.eml";
+    /**
+     * For paid promotion label and subscribe button that appears in the channel bar.
+     */
+    private final static String REEL_METAPANEL_PATH = "reel_metapanel.eml";
 
-    private final StringFilterGroup videoActionButton;
+    private final StringFilterGroup subscribeButton;
+    private final StringFilterGroup joinButton;
+    private final StringFilterGroup paidPromotionButton;
+
+    private final StringFilterGroup suggestedAction;
+    private final ByteArrayFilterGroupList suggestedActionsGroupList =  new ByteArrayFilterGroupList();
+
+    private final StringFilterGroup actionBar;
     private final ByteArrayFilterGroupList videoActionButtonGroupList = new ByteArrayFilterGroupList();
 
-
     public ShortsButtonFilter() {
-        exceptions.addPatterns(
-                "lock_mode_suggested_action"
+        StringFilterGroup pausedOverlayButtons = new StringFilterGroup(
+                Settings.HIDE_SHORTS_PAUSED_OVERLAY_BUTTONS,
+                "shorts_paused_state"
         );
 
-        final StringFilterGroup thanksButton = new StringFilterGroup(
-                Settings.HIDE_SHORTS_THANKS_BUTTON,
-                "suggested_action"
+        StringFilterGroup channelBar = new StringFilterGroup(
+                Settings.HIDE_SHORTS_CHANNEL_BAR,
+                REEL_CHANNEL_BAR_PATH
         );
 
-        addIdentifierCallbacks(thanksButton);
+        StringFilterGroup fullVideoLinkLabel = new StringFilterGroup(
+                Settings.HIDE_SHORTS_FULL_VIDEO_LINK_LABEL,
+                "reel_multi_format_link"
+        );
 
-        final StringFilterGroup joinButton = new StringFilterGroup(
+        StringFilterGroup videoTitle = new StringFilterGroup(
+                Settings.HIDE_SHORTS_VIDEO_TITLE,
+                "shorts_video_title_item"
+        );
+
+        StringFilterGroup reelSoundMetadata = new StringFilterGroup(
+                Settings.HIDE_SHORTS_SOUND_METADATA_LABEL,
+                "reel_sound_metadata"
+        );
+
+        StringFilterGroup infoPanel = new StringFilterGroup(
+                Settings.HIDE_SHORTS_INFO_PANEL,
+                "shorts_info_panel_overview"
+        );
+
+        joinButton = new StringFilterGroup(
                 Settings.HIDE_SHORTS_JOIN_BUTTON,
                 "sponsor_button"
         );
 
-        final StringFilterGroup subscribeButton = new StringFilterGroup(
-                Settings.HIDE_SHORTS_SUBSCRIPTIONS_BUTTON,
-                "shorts_paused_state",
+        subscribeButton = new StringFilterGroup(
+                Settings.HIDE_SHORTS_SUBSCRIBE_BUTTON,
                 "subscribe_button"
         );
 
-        infoPanel = new StringFilterGroup(
-                Settings.HIDE_SHORTS_INFO_PANEL,
-                "reel_multi_format_link",
-                "reel_sound_metadata",
-                "shorts_info_panel_overview"
+        paidPromotionButton = new StringFilterGroup(
+                Settings.HIDE_SHORTS_PAID_PROMOTION_LABEL,
+                "reel_player_disclosure.eml"
         );
 
-        videoActionButton = new StringFilterGroup(
+        actionBar = new StringFilterGroup(
                 null,
-                "shorts_video_action_button"
+                "shorts_action_bar"
+        );
+
+        suggestedAction = new StringFilterGroup(
+                null,
+                "|suggested_action_inner.eml|"
         );
 
         addPathCallbacks(
-                joinButton,
-                subscribeButton,
-                infoPanel,
-                videoActionButton
+                suggestedAction, actionBar, joinButton, subscribeButton,
+                paidPromotionButton, pausedOverlayButtons, channelBar, fullVideoLinkLabel,
+                videoTitle, reelSoundMetadata, infoPanel
         );
 
-        final ByteArrayFilterGroup shortsDislikeButton =
-                new ByteArrayFilterGroup(
-                        Settings.HIDE_SHORTS_DISLIKE_BUTTON,
-                        "reel_dislike_button",
-                        "reel_dislike_toggled_button"
-                );
-
-        final ByteArrayFilterGroup shortsLikeButton =
+        //
+        // Action buttons
+        //
+        //
+        // Action buttons
+        //
+        videoActionButtonGroupList.addAll(
+                // This also appears as the path item 'shorts_like_button.eml'
                 new ByteArrayFilterGroup(
                         Settings.HIDE_SHORTS_LIKE_BUTTON,
                         "reel_like_button",
                         "reel_like_toggled_button"
-                );
-
-        final ByteArrayFilterGroup shortsCommentButton =
+                ),
+                // This also appears as the path item 'shorts_dislike_button.eml'
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_SHORTS_DISLIKE_BUTTON,
+                        "reel_dislike_button",
+                        "reel_dislike_toggled_button"
+                ),
                 new ByteArrayFilterGroup(
                         Settings.HIDE_SHORTS_COMMENTS_BUTTON,
                         "reel_comment_button"
-                );
-
-        final ByteArrayFilterGroup shortsRemixButton =
-                new ByteArrayFilterGroup(
-                        Settings.HIDE_SHORTS_REMIX_BUTTON,
-                        "reel_remix_button"
-                );
-
-        final ByteArrayFilterGroup shortsShareButton =
+                ),
                 new ByteArrayFilterGroup(
                         Settings.HIDE_SHORTS_SHARE_BUTTON,
                         "reel_share_button"
-                );
+                ),
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_SHORTS_REMIX_BUTTON,
+                        "reel_remix_button"
+                )
+        );
 
-        videoActionButtonGroupList.addAll(
-                shortsCommentButton,
-                shortsDislikeButton,
-                shortsLikeButton,
-                shortsRemixButton,
-                shortsShareButton
+        //
+        // Suggested actions.
+        //
+        suggestedActionsGroupList.addAll(
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_SHORTS_SHOP_BUTTON,
+                        "yt_outline_bag_"
+                ),
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_SHORTS_TAGGED_PRODUCTS,
+                        // Product buttons show pictures of the products, and does not have any unique icons to identify.
+                        // Instead use a unique identifier found in the buffer.
+                        "PAproduct_listZ"
+                ),
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_SHORTS_LOCATION_LABEL,
+                        "yt_outline_location_point_"
+                ),
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_SHORTS_SAVE_SOUND_BUTTON,
+                        "yt_outline_list_add_"
+                ),
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_SHORTS_SEARCH_SUGGESTIONS,
+                        "yt_outline_search_"
+                )
         );
     }
 
     @Override
     public boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
                        StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
-        // Thanks button on shorts and the suggested actions button on video players use the same path builder.
-        // Check PlayerType to make each setting work independently.
-        if (exceptions.matches(path) || !PlayerType.getCurrent().isNoneOrHidden())
-            return false;
-
-        if (contentType == FilterContentType.PATH) {
-            if (matchedGroup == infoPanel) {
-                // Always filter if matched.
+        if (matchedGroup == subscribeButton || matchedGroup == joinButton || matchedGroup == paidPromotionButton) {
+            // Selectively filter to avoid false positive filtering of other subscribe/join buttons.
+            if (StringUtils.startsWithAny(path, REEL_CHANNEL_BAR_PATH, REEL_LIVE_HEADER_PATH, REEL_METAPANEL_PATH)) {
                 return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
-            } else if (matchedGroup == videoActionButton) {
-                if (videoActionButtonGroupList.check(protobufBufferArray).isFiltered())
-                    return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
-
-                return false;
-            } else {
-                // Filter other path groups from pathCallbacks, only when reelChannelBar is visible
-                // to avoid false positives.
-                if (path.startsWith(REEL_CHANNEL_BAR_PATH))
-                    return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
-
-                return false;
             }
+            return false;
+        }
+
+        // Video action buttons (like, dislike, comment, share, remix) have the same path.
+        if (matchedGroup == actionBar) {
+            if (videoActionButtonGroupList.check(protobufBufferArray).isFiltered()) {
+                return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
+            }
+            return false;
+        }
+
+        if (matchedGroup == suggestedAction) {
+            // Suggested actions can be at the start or in the middle of a path.
+            if (suggestedActionsGroupList.check(protobufBufferArray).isFiltered()) {
+                return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
+            }
+            return false;
         }
 
         // Super class handles logging.

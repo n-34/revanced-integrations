@@ -186,7 +186,7 @@ public class ReVancedPreferenceFragment extends PreferenceFragment {
                 "revanced_preference_screen_seekbar",
                 "revanced_preference_screen_video_description",
                 "revanced_preference_screen_shorts",
-                "revanced_preference_screen_shorts_shelf",
+                "revanced_preference_screen_shorts_player",
                 "revanced_preference_screen_swipe_controls",
                 "revanced_preference_screen_video",
                 "revanced_preference_screen_misc",

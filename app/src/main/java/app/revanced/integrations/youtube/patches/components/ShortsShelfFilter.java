@@ -40,7 +40,8 @@ public final class ShortsShelfFilter extends Filter {
                 "shorts_shelf",
                 "inline_shorts",
                 "shorts_grid",
-                "shorts_video_cell"
+                "shorts_video_cell",
+                "shorts_pivot_item"
         );
 
         addIdentifierCallbacks(shelfHeader, shorts);
