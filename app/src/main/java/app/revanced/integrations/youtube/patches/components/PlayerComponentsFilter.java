@@ -18,7 +18,6 @@ public final class PlayerComponentsFilter extends Filter {
     public PlayerComponentsFilter() {
         suggestedActionsException.addPatterns(
                 "channel_bar",
-                "lock_mode_suggested_action",
                 "shorts"
         );
 
@@ -65,7 +64,7 @@ public final class PlayerComponentsFilter extends Filter {
 
         suggestedActions = new StringFilterGroup(
                 Settings.HIDE_SUGGESTED_ACTION,
-                "suggested_action"
+                "|suggested_action.eml|"
         );
 
         final StringFilterGroup timedReactions = new StringFilterGroup(
@@ -106,7 +105,7 @@ public final class PlayerComponentsFilter extends Filter {
     public boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
                        StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
         if (matchedGroup == suggestedActions) {
-            // Thanks button on shorts and the suggested actions button on video players use the same path builder.
+            // suggested actions button on shorts and the suggested actions button on video players use the same path builder.
             // Check PlayerType to make each setting work independently.
             if (suggestedActionsException.matches(path) || PlayerType.getCurrent().isNoneOrHidden()) {
                 return false;

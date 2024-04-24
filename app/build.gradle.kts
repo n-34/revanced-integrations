@@ -56,6 +56,7 @@ android {
 
 dependencies {
     compileOnly(libs.annotation)
+    implementation(libs.lang3)
 
     compileOnly(project(":stub"))
 }

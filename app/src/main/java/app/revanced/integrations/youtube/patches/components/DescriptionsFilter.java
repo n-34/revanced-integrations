@@ -9,7 +9,6 @@ import app.revanced.integrations.youtube.settings.Settings;
 
 @SuppressWarnings("unused")
 public final class DescriptionsFilter extends Filter {
-
     private final StringTrieSearch exceptions = new StringTrieSearch();
     private final StringFilterGroup shoppingLinks;
 
@@ -59,7 +58,7 @@ public final class DescriptionsFilter extends Filter {
         );
 
         final StringFilterGroup transcriptSection = new StringFilterGroup(
-                Settings.HIDE_TRANSCIPT_SECTION,
+                Settings.HIDE_TRANSCRIPT_SECTION,
                 "transcript_section"
         );
 

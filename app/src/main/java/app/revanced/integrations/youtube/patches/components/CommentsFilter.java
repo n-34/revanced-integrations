@@ -19,9 +19,9 @@ public final class CommentsFilter extends Filter {
     private final StringFilterGroup comments;
     private final StringFilterGroup commentsPreviewDots;
     private final StringFilterGroup createShorts;
-    private final StringFilterGroup emojiPicker;
     private final StringFilterGroup previewCommentText;
     private final StringFilterGroup thanks;
+    private final StringFilterGroup timeStampAndEmojiPicker;
     private final StringTrieSearch exceptions = new StringTrieSearch();
 
     public CommentsFilter() {
@@ -46,13 +46,8 @@ public final class CommentsFilter extends Filter {
         );
 
         createShorts = new StringFilterGroup(
-                Settings.HIDE_CREATE_SHORTS_BUTTON,
+                Settings.HIDE_COMMENT_CREATE_SHORTS_BUTTON,
                 "composer_short_creation_button"
-        );
-
-        emojiPicker = new StringFilterGroup(
-                Settings.HIDE_EMOJI_PICKER,
-                "|CellType|ContainerType|ContainerType|ContainerType|ContainerType|ContainerType|"
         );
 
         final StringFilterGroup membersBanner = new StringFilterGroup(
@@ -74,9 +69,15 @@ public final class CommentsFilter extends Filter {
         );
 
         thanks = new StringFilterGroup(
-                Settings.HIDE_COMMENTS_THANKS_BUTTON,
+                Settings.HIDE_COMMENT_THANKS_BUTTON,
                 "|super_thanks_button.eml"
         );
+
+        timeStampAndEmojiPicker = new StringFilterGroup(
+                Settings.HIDE_COMMENT_TIMESTAMP_AND_EMOJI_BUTTONS,
+                "|CellType|ContainerType|ContainerType|ContainerType|ContainerType|ContainerType|"
+        );
+
 
         addIdentifierCallbacks(channelGuidelines);
 
@@ -84,11 +85,11 @@ public final class CommentsFilter extends Filter {
                 comments,
                 commentsPreviewDots,
                 createShorts,
-                emojiPicker,
                 membersBanner,
                 previewComment,
                 previewCommentText,
-                thanks
+                thanks,
+                timeStampAndEmojiPicker
         );
     }
 
@@ -98,7 +99,7 @@ public final class CommentsFilter extends Filter {
         if (exceptions.matches(path))
             return false;
 
-        if (matchedGroup == createShorts || matchedGroup == emojiPicker || matchedGroup == thanks) {
+        if (matchedGroup == createShorts || matchedGroup == thanks || matchedGroup == timeStampAndEmojiPicker) {
             if (path.startsWith(COMMENT_COMPOSER_PATH)) {
                 return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
             }

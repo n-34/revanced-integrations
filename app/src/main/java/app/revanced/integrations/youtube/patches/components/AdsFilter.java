@@ -20,7 +20,7 @@ public final class AdsFilter extends Filter {
         );
 
         final StringFilterGroup paidContent = new StringFilterGroup(
-                Settings.HIDE_PAID_PROMOTION,
+                Settings.HIDE_PAID_PROMOTION_LABEL,
                 "paid_content_overlay"
         );
 

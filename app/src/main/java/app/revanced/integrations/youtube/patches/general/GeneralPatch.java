@@ -18,6 +18,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Objects;
@@ -254,7 +256,7 @@ public class GeneralPatch {
     }
 
     public static void navigationTabCreated(NavigationButton button, View tabView) {
-        if (Boolean.TRUE.equals(shouldHideMap.get(button))) {
+        if (BooleanUtils.isTrue(shouldHideMap.get(button))) {
             tabView.setVisibility(View.GONE);
         }
     }

@@ -1,11 +1,13 @@
 [versions]
 agp = "8.0.2" # do not update if possible
 annotation = "1.7.1"
+lang3 = "3.14.0"
 # noinspection GradleDependency
 kotlin = "1.7.21"
 
 [libraries]
 annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
+lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "lang3" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
