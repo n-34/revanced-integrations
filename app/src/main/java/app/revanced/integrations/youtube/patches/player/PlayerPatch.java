@@ -26,10 +26,12 @@ import java.util.regex.Pattern;
 
 import app.revanced.integrations.shared.settings.BooleanSetting;
 import app.revanced.integrations.shared.settings.IntegerSetting;
+import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.ResourceUtils;
 import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.patches.utils.PatchStatus;
 import app.revanced.integrations.youtube.settings.Settings;
+import app.revanced.integrations.youtube.shared.RootView;
 import app.revanced.integrations.youtube.utils.VideoUtils;
 
 @SuppressWarnings("unused")
@@ -63,14 +65,26 @@ public class PlayerPatch {
 
     // region [Description components] patch
 
-    private static final int resultId = getIdIdentifier("results");
+    /**
+     * view id R.id.content
+     */
+    private static final int contentId = getIdIdentifier("content");
 
-    public static void disableVideoDescriptionInteraction(TextView textView, boolean original) {
-        if (textView != null) {
-            textView.setTextIsSelectable(
-                    !Settings.DISABLE_VIDEO_DESCRIPTION_INTERACTION.get() && original
-            );
-        }
+    /**
+     * engagementSubHeaderActive is updated every time the engagement panel is opened.
+     * <p>
+     * If engagementSubHeaderActive is true, the player's comments panel has been opened.
+     * If engagementSubHeaderActive is false, the video description panel has been opened, or the comments panel for Shorts or community posts has been opened.
+     */
+    private static boolean engagementSubHeaderActive = false;
+
+    /**
+     * The last time the clickDescriptionView method was called.
+     */
+    private static long lastTimeDescriptionViewInvoked;
+
+    public static void engagementPanelSubHeaderViewLoaded(@Nullable View engagementPanelView) {
+        engagementSubHeaderActive = engagementPanelView != null;
     }
 
     public static void onVideoDescriptionCreate(RecyclerView recyclerView) {
@@ -79,21 +93,74 @@ public class PlayerPatch {
 
         recyclerView.getViewTreeObserver().addOnDrawListener(() -> {
             try {
-                if (recyclerView.getId() != resultId)
+                // Video description's recyclerView is a child view of [contentId].
+                if (!(recyclerView.getParent().getParent() instanceof View contentView)) {
                     return;
-                if (!(recyclerView.getChildAt(1) instanceof ViewGroup viewGroup))
+                }
+                if (contentView.getId() != contentId) {
                     return;
-                if (!(viewGroup.getChildAt(0) instanceof TextView mTextView))
+                }
+                // Video description panel is only open when the player is active.
+                if (!RootView.isPlayerActive()) {
                     return;
-
-                Utils.runOnMainThreadDelayed(() -> {
-                            mTextView.setSoundEffectsEnabled(false);
-                            mTextView.performClick();
-                        }, 500
-                );
-            } catch (Exception ignored) {
+                }
+                // Ignored when the player comments panel opens.
+                if (engagementSubHeaderActive) {
+                    return;
+                }
+                // Typically, descriptionView is placed as the second child of recyclerView.
+                if (recyclerView.getChildAt(1) instanceof ViewGroup viewGroup) {
+                    clickDescriptionView(viewGroup);
+                }
+                // In some videos, descriptionView is placed as the third child of recyclerView.
+                if (recyclerView.getChildAt(2) instanceof ViewGroup viewGroup) {
+                    clickDescriptionView(viewGroup);
+                }
+                // Even if both methods are performed, there is no major issue with the operation of the patch.
+            } catch (Exception ex) {
+                Logger.printException(() -> "onVideoDescriptionCreate failed.", ex);
             }
         });
+    }
+
+    private static void clickDescriptionView(@NonNull ViewGroup descriptionViewGroup) {
+        final View descriptionView = descriptionViewGroup.getChildAt(0);
+        if (descriptionView == null) {
+            return;
+        }
+        // This method is sometimes used multiple times.
+        // To prevent this, ignore method reuse within 1 second.
+        final long now = System.currentTimeMillis();
+        if (now - lastTimeDescriptionViewInvoked < 1000) {
+            return;
+        }
+        lastTimeDescriptionViewInvoked = now;
+
+        // The type of descriptionView can be either ViewGroup or TextView. (A/B tests)
+        // If the type of descriptionView is TextView, longer delay is required.
+        final long delayMillis = descriptionView instanceof TextView
+                ? 500
+                : 100;
+
+        Utils.runOnMainThreadDelayed(() -> {
+            descriptionView.setSoundEffectsEnabled(false);
+            descriptionView.performClick();
+        }, delayMillis);
+    }
+
+    /**
+     * This method is invoked only when the view type of descriptionView is {@link TextView}. (A/B tests)
+     *
+     * @param textView descriptionView.
+     * @param original Whether to apply {@link TextView#setTextIsSelectable}.
+     *                 Patch replaces the {@link TextView#setTextIsSelectable} method invoke.
+     */
+    public static void disableVideoDescriptionInteraction(TextView textView, boolean original) {
+        if (textView != null) {
+            textView.setTextIsSelectable(
+                    !Settings.DISABLE_VIDEO_DESCRIPTION_INTERACTION.get() && original
+            );
+        }
     }
 
     // endregion
@@ -244,7 +311,7 @@ public class PlayerPatch {
     private static final int inlineExtraButtonId = getIdIdentifier("inline_extra_buttons");
 
     public static void changeEmojiPickerOpacity(ImageView imageView) {
-        if (!Settings.HIDE_EMOJI_PICKER.get())
+        if (!Settings.HIDE_COMMENT_TIMESTAMP_AND_EMOJI_BUTTONS.get())
             return;
 
         imageView.setImageAlpha(0);
@@ -252,11 +319,11 @@ public class PlayerPatch {
 
     @Nullable
     public static Object disableEmojiPickerOnClickListener(@Nullable Object object) {
-        return Settings.HIDE_EMOJI_PICKER.get() ? null : object;
+        return Settings.HIDE_COMMENT_TIMESTAMP_AND_EMOJI_BUTTONS.get() ? null : object;
     }
 
     public static int hideThanksButton(View view, int visibility) {
-        if (!Settings.HIDE_COMMENTS_THANKS_BUTTON.get())
+        if (!Settings.HIDE_COMMENT_THANKS_BUTTON.get())
             return visibility;
 
         if (view.getId() != inlineExtraButtonId)
