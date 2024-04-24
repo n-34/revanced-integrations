@@ -8,9 +8,9 @@ import android.util.AttributeSet;
 
  /**
  * Allows tapping the DeArrow about preference to open the DeArrow website.
- * @noinspection ALL
  */
-public class AlternativeThumbnailsAboutDeArrowPreference extends Preference {
+ @SuppressWarnings({"unused", "deprecation"})
+ public class AlternativeThumbnailsAboutDeArrowPreference extends Preference {
     {
         setOnPreferenceClickListener(pref -> {
             Intent i = new Intent(Intent.ACTION_VIEW);

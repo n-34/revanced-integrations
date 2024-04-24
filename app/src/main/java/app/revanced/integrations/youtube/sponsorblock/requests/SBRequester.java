@@ -129,10 +129,10 @@ public class SBRequester {
                 case HTTP_STATUS_CODE_SUCCESS -> str("revanced_sb_submit_succeeded");
                 case 409 -> str("revanced_sb_submit_failed_duplicate");
                 case 403 ->
-                        str("revanced_sb_submit_failed_forbidden", Requester.parseErrorJsonAndDisconnect(connection));
+                        str("revanced_sb_submit_failed_forbidden", Requester.parseErrorStringAndDisconnect(connection));
                 case 429 -> str("revanced_sb_submit_failed_rate_limit");
                 case 400 ->
-                        str("revanced_sb_submit_failed_invalid", Requester.parseErrorJsonAndDisconnect(connection));
+                        str("revanced_sb_submit_failed_invalid", Requester.parseErrorStringAndDisconnect(connection));
                 default ->
                         str("revanced_sb_submit_failed_unknown_error", responseCode, connection.getResponseMessage());
             };
@@ -188,7 +188,7 @@ public class SBRequester {
                         break;
                     case 403:
                         Utils.showToastLong(
-                                str("revanced_sb_vote_failed_forbidden", Requester.parseErrorJsonAndDisconnect(connection)));
+                                str("revanced_sb_vote_failed_forbidden", Requester.parseErrorStringAndDisconnect(connection)));
                         break;
                     default:
                         Utils.showToastLong(

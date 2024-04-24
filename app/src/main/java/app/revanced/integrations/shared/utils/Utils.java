@@ -355,7 +355,7 @@ public class Utils {
             try {
                 runnable.run();
             } catch (Exception ex) {
-                Logger.printException(() -> runnable.getClass() + ": " + ex.getMessage(), ex);
+                Logger.printException(() -> runnable.getClass().getSimpleName() + ": " + ex.getMessage(), ex);
             }
         };
         new Handler(Looper.getMainLooper()).postDelayed(loggingRunnable, delayMillis);
@@ -486,11 +486,8 @@ public class Utils {
             this.keySuffix = keySuffix;
         }
 
-        /**
-         * Defaults to {@link #UNSORTED} if key is null or has no sort suffix.
-         */
         @NonNull
-        static Sort fromKey(@Nullable String key) {
+        static Sort fromKey(@Nullable String key, @NonNull Sort defaultSort) {
             if (key != null) {
                 for (Sort sort : values()) {
                     if (key.endsWith(sort.keySuffix)) {
@@ -498,7 +495,7 @@ public class Utils {
                     }
                 }
             }
-            return UNSORTED;
+            return defaultSort;
         }
     }
 
@@ -514,25 +511,32 @@ public class Utils {
 
     /**
      * Sort a PreferenceGroup and all it's sub groups by title or key.
-     * <p>
+     *
      * Sort order is determined by the preferences key {@link Sort} suffix.
-     * <p>
+     *
      * If a preference has no key or no {@link Sort} suffix,
      * then the preferences are left unsorted.
      */
+    @SuppressWarnings("deprecation")
     public static void sortPreferenceGroups(@NonNull PreferenceGroup group) {
-        Sort sort = Sort.fromKey(group.getKey());
+        Sort groupSort = Sort.fromKey(group.getKey(), Sort.UNSORTED);
         SortedMap<String, Preference> preferences = new TreeMap<>();
 
         for (int i = 0, prefCount = group.getPreferenceCount(); i < prefCount; i++) {
             Preference preference = group.getPreference(i);
 
-            if (preference instanceof PreferenceGroup preferenceGroup) {
-                sortPreferenceGroups(preferenceGroup);
+            final Sort preferenceSort;
+            if (preference instanceof PreferenceGroup) {
+                sortPreferenceGroups((PreferenceGroup) preference);
+                preferenceSort = groupSort; // Sort value for groups is for it's content, not itself.
+            } else {
+                // Allow individual preferences to set a key sorting.
+                // Used to force a preference to the top or bottom of a group.
+                preferenceSort = Sort.fromKey(preference.getKey(), groupSort);
             }
 
             final String sortValue;
-            switch (sort) {
+            switch (preferenceSort) {
                 case BY_TITLE:
                     sortValue = removePunctuationConvertToLowercase(preference.getTitle());
                     break;

@@ -181,7 +181,7 @@ public class ReturnYouTubeDislikeApi {
             }
 
             if (responseCode == HTTP_STATUS_CODE_SUCCESS) {
-                // do not disconnect, the same server connection will likely be used again soon
+                // Do not disconnect, the same server connection will likely be used again soon.
                 JSONObject json = Requester.parseJSONObject(connection);
                 try {
                     RYDVoteData votingData = new RYDVoteData(json);
@@ -277,19 +277,15 @@ public class ReturnYouTubeDislikeApi {
                 connection.disconnect(); // disconnect, as no more connections will be made for a little while
                 return null;
             }
-            String result = null;
             if (responseCode == HTTP_STATUS_CODE_SUCCESS) {
-                result = Requester.parseJson(connection);
-                if (result.equalsIgnoreCase("true")) {
-                    Logger.printDebug(() -> "Registration confirmation successful");
-                    return userId;
-                }
+                Logger.printDebug(() -> "Registration confirmation successful");
+                return userId;
             }
-            final String resultLog = result == null ? "(no response)" : result;
+            // Something went wrong, might as well disconnect.
+            String response = Requester.parseStringAndDisconnect(connection);
             Logger.printInfo(() -> "Failed to confirm registration for user: " + userId
-                    + " solution: " + solution + " responseCode: " + responseCode + " responseString: " + resultLog);
+                    + " solution: " + solution + " responseCode: " + responseCode + " response: '" + response + "''");
             handleConnectionError(str("revanced_ryd_failure_connection_status_code", responseCode), null);
-            connection.disconnect(); // something went wrong, might as well disconnect
         } catch (SocketTimeoutException ex) {
             handleConnectionError(str("revanced_ryd_failure_connection_timeout"), ex);
         } catch (IOException ex) {
@@ -337,6 +333,7 @@ public class ReturnYouTubeDislikeApi {
                 confirmVote(videoId, userId, solution);
                 return;
             }
+
             Logger.printInfo(() -> "Failed to send vote for video: " + videoId + " vote: " + vote
                     + " response code was: " + responseCode);
             handleConnectionError(str("revanced_ryd_failure_connection_status_code", responseCode), null);
@@ -375,19 +372,15 @@ public class ReturnYouTubeDislikeApi {
                 connection.disconnect(); // disconnect, as no more connections will be made for a little while
                 return;
             }
-            String result = null;
             if (responseCode == HTTP_STATUS_CODE_SUCCESS) {
-                result = Requester.parseJson(connection);
-                if (result.equalsIgnoreCase("true")) {
-                    Logger.printDebug(() -> "Vote confirm successful for video: " + videoId);
-                    return;
-                }
+                Logger.printDebug(() -> "Vote confirm successful for video: " + videoId);
+                return;
             }
-            final String resultLog = result == null ? "(no response)" : result;
+            // Something went wrong, might as well disconnect.
+            String response = Requester.parseStringAndDisconnect(connection);
             Logger.printInfo(() -> "Failed to confirm vote for video: " + videoId
-                    + " solution: " + solution + " responseCode: " + responseCode + " responseString: " + resultLog);
+                    + " solution: " + solution + " responseCode: " + responseCode + " response: '" + response + "'");
             handleConnectionError(str("revanced_ryd_failure_connection_status_code", responseCode), null);
-            connection.disconnect(); // something went wrong, might as well disconnect
         } catch (SocketTimeoutException ex) {
             handleConnectionError(str("revanced_ryd_failure_connection_timeout"), ex);
         } catch (IOException ex) {

@@ -26,10 +26,7 @@ import app.revanced.integrations.shared.settings.Setting;
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.Utils;
 
-/**
- *
- *
- * @noinspection deprecation, unused */
+@SuppressWarnings({"unused", "deprecation"})
 public abstract class AbstractPreferenceFragment extends PreferenceFragment {
     /**
      * Indicates that if a preference changes,
