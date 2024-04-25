@@ -20,6 +20,7 @@ import androidx.annotation.NonNull;
 
 import org.apache.commons.lang3.BooleanUtils;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Objects;
@@ -65,6 +66,62 @@ public class GeneralPatch {
             return;
         }
         Logger.printDebug(() -> "Changing start page to " + startPage);
+    }
+
+    // endregion
+
+    // region [Disable auto audio tracks] patch
+
+    private static final String DEFAULT_AUDIO_TRACKS_IDENTIFIER = "original";
+    private static ArrayList<Object> formatStreamModelArray;
+
+    /**
+     * Find the stream format containing the parameter {@link DEFAULT_AUDIO_TRACKS_IDENTIFIER}, and save to the array.
+     *
+     * @param formatStreamModel stream format model including audio tracks.
+     */
+    public static void setFormatStreamModelArray(final Object formatStreamModel) {
+        if (!Settings.DISABLE_AUTO_AUDIO_TRACKS.get()) {
+            return;
+        }
+
+        // Ignoring, as the stream format model array has already been added.
+        if (formatStreamModelArray != null) {
+            return;
+        }
+
+        // Ignoring, as it is not an original audio track.
+        if (!formatStreamModel.toString().contains(DEFAULT_AUDIO_TRACKS_IDENTIFIER)) {
+            return;
+        }
+
+        // For some reason, when YouTube handles formatStreamModelArray,
+        // it uses an array with duplicate values at the first and second indices.
+        formatStreamModelArray = new ArrayList<>();
+        formatStreamModelArray.add(formatStreamModel);
+        formatStreamModelArray.add(formatStreamModel);
+    }
+
+    /**
+     * Returns an array of stream format models containing the default audio tracks.
+     *
+     * @param localizedFormatStreamModelArray   stream format model array consisting of audio tracks in the system's language.
+     * @return                                  stream format model array consisting of original audio tracks.
+     */
+    public static ArrayList<Object> getFormatStreamModelArray(final ArrayList<Object> localizedFormatStreamModelArray) {
+        if (!Settings.DISABLE_AUTO_AUDIO_TRACKS.get()) {
+            return localizedFormatStreamModelArray;
+        }
+
+        // Ignoring, as the stream format model array is empty.
+        if (formatStreamModelArray == null || formatStreamModelArray.isEmpty()) {
+            return localizedFormatStreamModelArray;
+        }
+
+        // Initialize the array before returning it.
+        ArrayList<Object> defaultFormatStreamModelArray = formatStreamModelArray;
+        formatStreamModelArray = null;
+        return defaultFormatStreamModelArray;
     }
 
     // endregion
