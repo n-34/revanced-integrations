@@ -261,7 +261,7 @@ public class Settings extends BaseSettings {
     // PreferenceScreen: Player - Player buttons
     public static final BooleanSetting HIDE_AUTOPLAY_BUTTON = new BooleanSetting("revanced_hide_autoplay_button", TRUE, true);
     public static final BooleanSetting HIDE_CAPTIONS_BUTTON = new BooleanSetting("revanced_hide_captions_button", FALSE, true);
-    public static final BooleanSetting HIDE_COLLAPSE_BUTTON = new BooleanSetting("revanced_hide_collapse_button", FALSE);
+    public static final BooleanSetting HIDE_COLLAPSE_BUTTON = new BooleanSetting("revanced_hide_collapse_button", FALSE, true);
     public static final BooleanSetting HIDE_FULLSCREEN_BUTTON = new BooleanSetting("revanced_hide_fullscreen_button", FALSE, true);
     public static final BooleanSetting HIDE_PREVIOUS_NEXT_BUTTON = new BooleanSetting("revanced_hide_previous_next_button", FALSE);
     public static final BooleanSetting HIDE_YOUTUBE_MUSIC_BUTTON = new BooleanSetting("revanced_hide_youtube_music_button", FALSE);

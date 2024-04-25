@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -223,19 +224,10 @@ public class PlayerPatch {
     }
 
     public static void setQuickActionMargin(FrameLayout frameLayout) {
-        int topMargin = quickActionsMarginTopSetting.get();
-
-        if (topMargin < 0 || topMargin > 32) {
-            Utils.showToastShort(str("revanced_quick_actions_top_margin_warning"));
-            quickActionsMarginTopSetting.resetToDefault();
-            topMargin = quickActionsMarginTopSetting.defaultValue;
-        }
-        if (topMargin == 0) {
+        int topMarginPx = getQuickActionsTopMargin();
+        if (topMarginPx == 0) {
             return;
         }
-
-        final int topMarginPx =
-                (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, (float) topMargin, Utils.getResources().getDisplayMetrics());
 
         if (!(frameLayout.getLayoutParams() instanceof FrameLayout.MarginLayoutParams marginLayoutParams))
             return;
@@ -336,8 +328,6 @@ public class PlayerPatch {
 
     // region [Hide player buttons] patch
 
-    private static final int collapseButtonId = getIdIdentifier("player_collapse_button");
-
     public static boolean hideAutoPlayButton() {
         return Settings.HIDE_AUTOPLAY_BUTTON.get();
     }
@@ -354,11 +344,33 @@ public class PlayerPatch {
         Utils.hideViewByLayoutParams(view);
     }
 
-    public static void hideCollapseButton(@NonNull View view, int visibility) {
-        if (Settings.HIDE_COLLAPSE_BUTTON.get() && view.getId() == collapseButtonId) {
-            visibility = View.GONE;
+    public static void hideCollapseButton(ImageView imageView) {
+        if (!Settings.HIDE_COLLAPSE_BUTTON.get())
+            return;
+
+        imageView.setImageResource(android.R.color.transparent);
+        imageView.setImageAlpha(0);
+        imageView.setEnabled(false);
+
+        var layoutParams = imageView.getLayoutParams();
+        if (layoutParams instanceof RelativeLayout.LayoutParams) {
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(0, 0);
+            imageView.setLayoutParams(lp);
+        } else {
+            Logger.printDebug(() -> "Unknown collapse button layout params: " + layoutParams);
         }
-        view.setVisibility(visibility);
+    }
+
+    public static void setTitleAnchorStartMargin(View titleAnchorView) {
+        if (!Settings.HIDE_COLLAPSE_BUTTON.get())
+            return;
+
+        var layoutParams = titleAnchorView.getLayoutParams();
+        if (titleAnchorView.getLayoutParams() instanceof RelativeLayout.LayoutParams lp) {
+            lp.setMarginStart(0);
+        } else {
+            Logger.printDebug(() -> "Unknown title anchor layout params: " + layoutParams);
+        }
     }
 
     public static ImageView hideFullscreenButton(ImageView imageView) {
