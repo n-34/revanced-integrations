@@ -6,6 +6,7 @@ import app.revanced.integrations.shared.settings.IntegerSetting;
 import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.settings.Settings;
 import app.revanced.integrations.youtube.shared.VideoInformation;
+import app.revanced.integrations.youtube.utils.ExtendedUtils;
 
 @SuppressWarnings("unused")
 public class VideoQualityPatch {
@@ -17,19 +18,19 @@ public class VideoQualityPatch {
      * Injection point.
      */
     public static void newVideoStarted(final String ignoredVideoId) {
-        final int preferredQuality =
-                Utils.getNetworkType() == Utils.NetworkType.MOBILE
-                        ? mobileQualitySetting.get()
-                        : wifiQualitySetting.get();
+        final int defaultQuality = Utils.getNetworkType() == Utils.NetworkType.MOBILE
+                ? mobileQualitySetting.get()
+                : wifiQualitySetting.get();
 
-        if (preferredQuality == DEFAULT_YOUTUBE_VIDEO_QUALITY)
+        if (defaultQuality == DEFAULT_YOUTUBE_VIDEO_QUALITY)
             return;
 
-        Utils.runOnMainThreadDelayed(() ->
-                VideoInformation.overrideVideoQuality(
-                        VideoInformation.getAvailableVideoQuality(preferredQuality)
-                ),
-                500
+        Utils.runOnMainThreadDelayed(() -> {
+            final int preferredQuality = ExtendedUtils.getClientEnforcesVideoQualityLimits()
+                    ? VideoInformation.getAvailableVideoQuality(defaultQuality)
+                    : defaultQuality;
+            VideoInformation.overrideVideoQuality(preferredQuality);
+            }, 500
         );
     }
 

@@ -4,10 +4,29 @@ import androidx.annotation.NonNull;
 
 import app.revanced.integrations.shared.settings.BooleanSetting;
 import app.revanced.integrations.shared.settings.Setting;
+import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.PackageUtils;
+import app.revanced.integrations.youtube.patches.video.ReloadVideoPatch;
+import app.revanced.integrations.youtube.patches.video.VideoQualityPatch;
 import app.revanced.integrations.youtube.settings.Settings;
 
 public class ExtendedUtils extends PackageUtils {
+    /**
+     * Versions of YouTube after this version have the following video quality enforcement limitations on the client side:
+     * <p>
+     * 1. Even if a video quality change request is sent to the server, it will be applied 4 to 7 seconds after the video starts.
+     * 2. When changing the video quality, if you send an invalid quality change request, it will be ignored. (e.g. If you send a request to change the video quality to 1440p in a video with a maximum video quality of 1080p, it will be ignored.)
+     * <p>
+     * An alternative patch for this limitation is {@link ReloadVideoPatch}.
+     */
+    private static final String CLIENT_ENFORCES_VIDEO_QUALITY_LIMITS_VERSION = "18.39.32";
+
+    /**
+     * This value is used in {@link VideoQualityPatch}.
+     * If this value is false when applying the default video quality,
+     * there is no need to check the available video quality.
+     */
+    private static boolean clientEnforcesVideoQualityLimits = false;
 
     private static boolean isAdditionalSettingsEnabled() {
         // In the old player flyout panels, the video quality icon and additional quality icon are the same
@@ -20,6 +39,7 @@ public class ExtendedUtils extends PackageUtils {
                 Settings.HIDE_PLAYER_FLYOUT_MENU_AMBIENT,
                 Settings.HIDE_PLAYER_FLYOUT_MENU_HELP,
                 Settings.HIDE_PLAYER_FLYOUT_MENU_LOOP,
+                Settings.HIDE_PLAYER_FLYOUT_MENU_PIP,
                 Settings.HIDE_PLAYER_FLYOUT_MENU_PREMIUM_CONTROLS,
                 Settings.HIDE_PLAYER_FLYOUT_MENU_STABLE_VOLUME,
                 Settings.HIDE_PLAYER_FLYOUT_MENU_STATS_FOR_NERDS,
@@ -50,9 +70,32 @@ public class ExtendedUtils extends PackageUtils {
         if (!Settings.SPOOF_APP_VERSION.get())
             return false;
 
-        final int spoofedVersion = Integer.parseInt(Settings.SPOOF_APP_VERSION_TARGET.get().replaceAll("\\.", ""));
-        final int targetVersion = Integer.parseInt(versionName.replaceAll("\\.", ""));
-        return spoofedVersion < targetVersion;
+        return isVersionToLessThan(Settings.SPOOF_APP_VERSION_TARGET.get(), versionName);
+    }
+
+    private static boolean isVersionToLessThan(@NonNull String compareVersion, @NonNull String targetVersion) {
+        try {
+            final int compareVersionNumber = Integer.parseInt(compareVersion.replaceAll("\\.", ""));
+            final int targetVersionNumber = Integer.parseInt(targetVersion.replaceAll("\\.", ""));
+            return compareVersionNumber < targetVersionNumber;
+        } catch (NumberFormatException ex) {
+            Logger.printException(() -> "Failed to compare version: " + compareVersion + ", " + targetVersion, ex);
+        }
+        return false;
+    }
+
+    public static boolean getClientEnforcesVideoQualityLimits() {
+        return clientEnforcesVideoQualityLimits;
+    }
+
+    public static void setClientEnforcesVideoQualityLimits() {
+        if (isVersionToLessThan(getVersionName(), CLIENT_ENFORCES_VIDEO_QUALITY_LIMITS_VERSION)) {
+            return;
+        }
+        if (isSpoofingToLessThan(CLIENT_ENFORCES_VIDEO_QUALITY_LIMITS_VERSION)) {
+            return;
+        }
+        clientEnforcesVideoQualityLimits = true;
     }
 
     public static void setCommentPreviewSettings() {
@@ -67,6 +110,7 @@ public class ExtendedUtils extends PackageUtils {
             Settings.HIDE_PLAYER_FLYOUT_MENU_AMBIENT,
             Settings.HIDE_PLAYER_FLYOUT_MENU_HELP,
             Settings.HIDE_PLAYER_FLYOUT_MENU_LOOP,
+            Settings.HIDE_PLAYER_FLYOUT_MENU_PIP,
             Settings.HIDE_PLAYER_FLYOUT_MENU_PREMIUM_CONTROLS,
             Settings.HIDE_PLAYER_FLYOUT_MENU_STABLE_VOLUME,
             Settings.HIDE_PLAYER_FLYOUT_MENU_STATS_FOR_NERDS,
