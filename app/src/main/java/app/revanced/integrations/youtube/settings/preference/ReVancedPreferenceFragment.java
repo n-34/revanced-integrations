@@ -26,6 +26,7 @@ import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
@@ -41,10 +42,13 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
 import java.util.Objects;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import app.revanced.integrations.shared.settings.BooleanSetting;
 import app.revanced.integrations.shared.settings.Setting;
 import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.patches.video.CustomPlaybackSpeedPatch;
 import app.revanced.integrations.youtube.utils.ExtendedUtils;
 import app.revanced.integrations.youtube.utils.ThemeUtils;
@@ -160,56 +164,47 @@ public class ReVancedPreferenceFragment extends PreferenceFragment {
         });
     }
 
-    public void setPreferenceScreenToolbar() {
-        final String[] preferenceScreenKey = {
-                "revanced_preference_screen_ads",
-                "revanced_preference_screen_alt_thumbnails",
-                "revanced_preference_screen_feed",
-                "revanced_preference_screen_category_bar",
-                "revanced_preference_screen_channel_profile",
-                "revanced_preference_screen_community_posts",
-                "revanced_preference_screen_feed_flyout_menu",
-                "revanced_preference_screen_video_filter",
-                "revanced_preference_screen_general",
-                "revanced_preference_screen_account_munu",
-                "revanced_preference_screen_custom_filter",
-                "revanced_preference_screen_navigation_buttons",
-                "revanced_preference_screen_player",
-                "revanced_preference_screen_action_buttons",
-                "revanced_preference_screen_ambient_mode",
-                "revanced_preference_screen_channel_bar",
-                "revanced_preference_screen_comments",
-                "revanced_preference_screen_player_flyout_menu",
-                "revanced_preference_screen_fullscreen",
-                "revanced_preference_screen_haptic_feedback",
-                "revanced_preference_screen_player_buttons",
-                "revanced_preference_screen_seekbar",
-                "revanced_preference_screen_video_description",
-                "revanced_preference_screen_shorts",
-                "revanced_preference_screen_shorts_player",
-                "revanced_preference_screen_swipe_controls",
-                "revanced_preference_screen_video",
-                "revanced_preference_screen_misc",
-                "revanced_preference_screen_import_export",
-                "revanced_preference_screen_patch_information"
-        };
-        for (String key : preferenceScreenKey) {
-            if (mPreferenceManager.findPreference(key) instanceof PreferenceScreen mPreferenceScreen) {
-                mPreferenceScreen.setOnPreferenceClickListener(preferenceScreen -> {
-                    Dialog preferenceScreenDialog = mPreferenceScreen.getDialog();
-                    ViewGroup rootView = (ViewGroup) preferenceScreenDialog.findViewById(android.R.id.content).getParent();
-                    Toolbar toolbar = new Toolbar(preferenceScreen.getContext());
-                    toolbar.setTitle(preferenceScreen.getTitle());
-                    toolbar.setNavigationIcon(ThemeUtils.getBackButtonDrawable());
-                    toolbar.setNavigationOnClickListener(view -> preferenceScreenDialog.dismiss());
-                    int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics());
-                    toolbar.setTitleMargin(margin, 0, margin, 0);
-                    TextView toolbarTextView = getChildView(toolbar, view -> view instanceof TextView);
-                    toolbarTextView.setTextColor(ThemeUtils.getTextColor());
-                    rootView.addView(toolbar, 0);
-                    return false;
-                });
+    private void putPreferenceScreenMap(SortedMap<String, PreferenceScreen> preferenceScreenMap, PreferenceGroup preferenceGroup) {
+        if (preferenceGroup instanceof PreferenceScreen mPreferenceScreen) {
+            preferenceScreenMap.put(mPreferenceScreen.getKey(), mPreferenceScreen);
+        }
+    }
+
+    private void setPreferenceScreenToolbar() {
+        SortedMap<String, PreferenceScreen> preferenceScreenMap = new TreeMap<>();
+
+        PreferenceScreen rootPreferenceScreen = getPreferenceScreen();
+        for (int i = 0; i < rootPreferenceScreen.getPreferenceCount(); ++i) {
+            if (rootPreferenceScreen.getPreference(i) instanceof PreferenceGroup preferenceGroup) {
+                putPreferenceScreenMap(preferenceScreenMap, preferenceGroup);
+                for (int j = 0; j < preferenceGroup.getPreferenceCount(); ++j) {
+                    if (preferenceGroup.getPreference(j) instanceof PreferenceGroup nestedPreferenceGroup) {
+                        putPreferenceScreenMap(preferenceScreenMap, nestedPreferenceGroup);
+                        for (int k = 0; k < nestedPreferenceGroup.getPreferenceCount(); ++k) {
+                            if (nestedPreferenceGroup.getPreference(k) instanceof PreferenceGroup childPreferenceGroup) {
+                                putPreferenceScreenMap(preferenceScreenMap, childPreferenceGroup);
+                            }
+                        }
+                    }
+                }
             }
+        }
+
+        for (PreferenceScreen mPreferenceScreen : preferenceScreenMap.values()) {
+            mPreferenceScreen.setOnPreferenceClickListener(preferenceScreen -> {
+                Dialog preferenceScreenDialog = mPreferenceScreen.getDialog();
+                ViewGroup rootView = (ViewGroup) preferenceScreenDialog.findViewById(android.R.id.content).getParent();
+                Toolbar toolbar = new Toolbar(preferenceScreen.getContext());
+                toolbar.setTitle(preferenceScreen.getTitle());
+                toolbar.setNavigationIcon(ThemeUtils.getBackButtonDrawable());
+                toolbar.setNavigationOnClickListener(view -> preferenceScreenDialog.dismiss());
+                int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics());
+                toolbar.setTitleMargin(margin, 0, margin, 0);
+                TextView toolbarTextView = getChildView(toolbar, view -> view instanceof TextView);
+                toolbarTextView.setTextColor(ThemeUtils.getTextColor());
+                rootView.addView(toolbar, 0);
+                return false;
+            });
         }
     }
 
