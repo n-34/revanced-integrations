@@ -5,6 +5,7 @@ import static app.revanced.integrations.shared.utils.ResourceUtils.getLayoutIden
 import static app.revanced.integrations.shared.utils.Utils.getChildView;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.util.TypedValue;
@@ -16,6 +17,7 @@ import java.util.Objects;
 
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.ResourceUtils;
+import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.settings.preference.ReVancedPreferenceFragment;
 import app.revanced.integrations.youtube.utils.ThemeUtils;
 
@@ -23,6 +25,11 @@ import app.revanced.integrations.youtube.utils.ThemeUtils;
  * @noinspection ALL
  */
 public class VideoQualitySettingsActivity extends Activity {
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(Utils.getLocalizedContextAndSetResources(base));
+    }
 
     @Override
     protected void onCreate(Bundle bundle) {

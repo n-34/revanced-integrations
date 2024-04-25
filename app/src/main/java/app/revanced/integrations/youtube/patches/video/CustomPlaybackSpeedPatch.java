@@ -1,5 +1,6 @@
 package app.revanced.integrations.youtube.patches.video;
 
+import static app.revanced.integrations.shared.utils.ResourceUtils.getString;
 import static app.revanced.integrations.shared.utils.StringRef.str;
 
 import android.content.Context;
@@ -23,8 +24,8 @@ public class CustomPlaybackSpeedPatch {
      * Maximum playback speed, exclusive value.  Custom speeds must be less than this value.
      */
     public static final float MAXIMUM_PLAYBACK_SPEED = 8;
-    public static final String[] defaultSpeedEntries = {str("quality_auto"), "0.25x", "0.5x", "0.75x", str("revanced_playback_speed_normal"), "1.25x", "1.5x", "1.75x", "2.0x"};
-    public static final String[] defaultSpeedEntryValues = {"-2.0", "0.25", "0.5", "0.75", "1.0", "1.25", "1.5", "1.75", "2.0"};
+    public static final String[] defaultSpeedEntries;
+    public static final String[] defaultSpeedEntryValues;
     /**
      * Custom playback speeds.
      */
@@ -37,6 +38,9 @@ public class CustomPlaybackSpeedPatch {
     private static long lastTimeOldPlaybackMenuInvoked;
 
     static {
+        defaultSpeedEntries = new String[] {getString("quality_auto"), "0.25x", "0.5x", "0.75x", getString("revanced_playback_speed_normal"), "1.25x", "1.5x", "1.75x", "2.0x"};
+        defaultSpeedEntryValues = new String[] {"-2.0", "0.25", "0.5", "0.75", "1.0", "1.25", "1.5", "1.75", "2.0"};
+
         loadSpeeds();
     }
 
@@ -93,7 +97,7 @@ public class CustomPlaybackSpeedPatch {
 
             customSpeedEntries = new String[playbackSpeeds.length + 1];
             customSpeedEntryValues = new String[playbackSpeeds.length + 1];
-            customSpeedEntries[0] = str("quality_auto");
+            customSpeedEntries[0] = getString("quality_auto");
             customSpeedEntryValues[0] = "-2.0";
 
             int i = 1;
@@ -101,7 +105,7 @@ public class CustomPlaybackSpeedPatch {
                 String speedString = String.valueOf(speed);
                 customSpeedEntries[i] = speed != 1.0f
                         ? speedString + "x"
-                        : str("revanced_playback_speed_normal");
+                        : getString("revanced_playback_speed_normal");
                 customSpeedEntryValues[i] = speedString;
                 i++;
             }

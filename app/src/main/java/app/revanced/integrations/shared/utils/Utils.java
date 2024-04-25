@@ -10,6 +10,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -52,6 +53,8 @@ public class Utils {
 
     @SuppressLint("StaticFieldLeak")
     public static Context context;
+
+    private static Resources resources;
 
     protected Utils() {
     } // utility class
@@ -221,7 +224,48 @@ public class Utils {
     }
 
     public static Resources getResources() {
-        return context.getResources();
+        if (resources == null) {
+            return getLocalizedContextAndSetResources(context).getResources();
+        } else {
+            return resources;
+        }
+    }
+
+    /**
+     * Compare MainActivity's Locale and Context's Locale.
+     * If the Locale of MainActivity and the Locale of Context are different, the Locale of MainActivity is applied.
+     * <p>
+     * If Locale changes, resources should also change and be saved locally.
+     * Otherwise, {@link ResourceUtils#getString(String)} will be updated to the incorrect language.
+     *
+     * @param mContext Context to check locale.
+     * @return Context with locale applied.
+     */
+    public static Context getLocalizedContextAndSetResources(Context mContext) {
+        Activity mActivity = activityRef.get();
+        if (mActivity == null) {
+            return mContext;
+        }
+
+        // Locale of MainActivity.
+        Locale applicationLocale = mActivity.getResources().getConfiguration().getLocales().get(0);
+
+        // Locale of Context.
+        Locale contextLocale = mContext.getResources().getConfiguration().getLocales().get(0);
+
+        // If they are identical, no need to override them.
+        if (applicationLocale == contextLocale) {
+            resources = mActivity.getResources();
+            return mContext;
+        }
+
+        // If they are different, overrides the Locale of the Context and resource.
+        Locale.setDefault(applicationLocale);
+        Configuration configuration = new Configuration(mContext.getResources().getConfiguration());
+        configuration.setLocale(applicationLocale);
+        Context localizedContext = mContext.createConfigurationContext(configuration);
+        resources = localizedContext.getResources();
+        return localizedContext;
     }
 
     public static void setActivity(Activity mainActivity) {
@@ -538,8 +582,8 @@ public class Utils {
             Preference preference = group.getPreference(i);
 
             final Sort preferenceSort;
-            if (preference instanceof PreferenceGroup) {
-                sortPreferenceGroups((PreferenceGroup) preference);
+            if (preference instanceof PreferenceGroup preferenceGroup) {
+                sortPreferenceGroups(preferenceGroup);
                 preferenceSort = groupSort; // Sort value for groups is for it's content, not itself.
             } else {
                 // Allow individual preferences to set a key sorting.

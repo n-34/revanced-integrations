@@ -1,7 +1,6 @@
 package app.revanced.integrations.shared.utils;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -9,20 +8,10 @@ import android.view.animation.AnimationUtils;
 import androidx.annotation.NonNull;
 
 /** @noinspection ALL*/
-public class ResourceUtils {
+public class ResourceUtils extends Utils {
 
     private ResourceUtils() {
     } // utility class
-
-    @NonNull
-    private static Context getContext() {
-        return Utils.getContext();
-    }
-
-    @NonNull
-    private static Resources getResources() {
-        return Utils.getResources();
-    }
 
     public static int getIdentifier(@NonNull String str, @NonNull ResourceType resourceType) {
         return getIdentifier(str, resourceType, getContext());
@@ -156,7 +145,4 @@ public class ResourceUtils {
             return type;
         }
     }
-
-
-
 }
