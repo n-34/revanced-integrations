@@ -5,9 +5,12 @@ import static app.revanced.integrations.shared.utils.ResourceUtils.getIdIdentifi
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Application;
 import android.app.Fragment;
+import android.app.Service;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
@@ -228,7 +231,15 @@ public class Utils {
     }
 
     public static void setContext(Context appContext) {
+        while ((appContext instanceof ContextWrapper contextWrapper)
+                && !(appContext instanceof Activity)
+                && !(appContext instanceof Application)
+                && !(appContext instanceof Service)
+        ) {
+            appContext = contextWrapper.getBaseContext();
+        }
         context = appContext;
+
         // In some apps like TikTok, the Setting classes can load in weird orders due to cyclic class dependencies.
         // Calling the regular printDebug method here can cause a Settings context null pointer exception,
         // even though the context is already set before the call.
@@ -511,9 +522,9 @@ public class Utils {
 
     /**
      * Sort a PreferenceGroup and all it's sub groups by title or key.
-     *
+     * <p>
      * Sort order is determined by the preferences key {@link Sort} suffix.
-     *
+     * <p>
      * If a preference has no key or no {@link Sort} suffix,
      * then the preferences are left unsorted.
      */
