@@ -5,9 +5,7 @@ import static app.revanced.integrations.shared.utils.ResourceUtils.getIdIdentifi
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Application;
 import android.app.Fragment;
-import android.app.Service;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -230,12 +228,15 @@ public class Utils {
         activityRef = new WeakReference<>(mainActivity);
     }
 
-    public static void setContext(Context appContext) {
-        while ((appContext instanceof ContextWrapper contextWrapper)
-                && !(appContext instanceof Activity)
-                && !(appContext instanceof Application)
-                && !(appContext instanceof Service)
-        ) {
+    public static void setContext(@Nullable Context appContext) {
+        // Typically, Context is invoked in the constructor method, so it is not null.
+        // Since some are invoked from methods other than the constructor method,
+        // it may be necessary to check whether Context is null.
+        if (appContext == null) {
+            return;
+        }
+
+        if (appContext instanceof ContextWrapper contextWrapper) {
             appContext = contextWrapper.getBaseContext();
         }
         context = appContext;
