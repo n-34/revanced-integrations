@@ -145,18 +145,15 @@ public class PlayerPatch {
                 ? 500
                 : 100;
 
-        Utils.runOnMainThreadDelayed(() -> {
-            descriptionView.setSoundEffectsEnabled(false);
-            descriptionView.performClick();
-        }, delayMillis);
+        Utils.runOnMainThreadDelayed(() -> Utils.clickView(descriptionView), delayMillis);
     }
 
     /**
      * This method is invoked only when the view type of descriptionView is {@link TextView}. (A/B tests)
      *
-     * @param textView descriptionView.
-     * @param original Whether to apply {@link TextView#setTextIsSelectable}.
-     *                 Patch replaces the {@link TextView#setTextIsSelectable} method invoke.
+     * @param textView  descriptionView.
+     * @param original  Whether to apply {@link TextView#setTextIsSelectable}.
+     *                  Patch replaces the {@link TextView#setTextIsSelectable} method invoke.
      */
     public static void disableVideoDescriptionInteraction(TextView textView, boolean original) {
         if (textView != null) {

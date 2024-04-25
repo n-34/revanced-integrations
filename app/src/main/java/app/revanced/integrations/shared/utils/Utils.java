@@ -238,8 +238,8 @@ public class Utils {
      * If Locale changes, resources should also change and be saved locally.
      * Otherwise, {@link ResourceUtils#getString(String)} will be updated to the incorrect language.
      *
-     * @param mContext Context to check locale.
-     * @return Context with locale applied.
+     * @param mContext  Context to check locale.
+     * @return          Context with locale applied.
      */
     public static Context getLocalizedContextAndSetResources(Context mContext) {
         Activity mActivity = activityRef.get();

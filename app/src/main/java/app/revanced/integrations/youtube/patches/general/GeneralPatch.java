@@ -318,9 +318,7 @@ public class GeneralPatch {
 
             // Disable AlertDialog's background dim.
             window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-
-            button.setSoundEffectsEnabled(false);
-            button.performClick();
+            Utils.clickView(button);
         }
     }
 

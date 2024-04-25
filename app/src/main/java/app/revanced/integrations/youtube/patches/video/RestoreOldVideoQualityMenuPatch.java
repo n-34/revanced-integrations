@@ -49,8 +49,7 @@ public class RestoreOldVideoQualityMenuPatch {
                 final View QuickQualityView = (View) recyclerView.getParent().getParent().getParent();
                 if (AdvancedQualityView != null && QuickQualityView != null) {
                     QuickQualityView.setVisibility(View.GONE);
-                    AdvancedQualityView.setSoundEffectsEnabled(false);
-                    AdvancedQualityView.performClick();
+                    Utils.clickView(AdvancedQualityView);
                     VideoQualityMenuFilter.isVideoQualityMenuVisible = false;
                 }
             } catch (Exception ex) {

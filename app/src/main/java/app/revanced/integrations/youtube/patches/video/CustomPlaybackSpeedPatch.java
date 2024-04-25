@@ -166,14 +166,7 @@ public class CustomPlaybackSpeedPatch {
 
                 // Dismiss View [R.id.touch_outside] is the 1st ChildView of the 4th ParentView.
                 // This only shows in phone layout
-                final View touchOutsideView = parentView4th.getChildAt(0);
-                if (touchOutsideView != null) {
-                    touchOutsideView.setSoundEffectsEnabled(false);
-                    touchOutsideView.performClick();
-                    // Dismiss View [R.id.touch_outside] is not only used in the playback speed menu,
-                    // So re-enable sound effect.
-                    touchOutsideView.setSoundEffectsEnabled(true);
-                }
+                Utils.clickView(parentView4th.getChildAt(0));
 
                 // In tablet layout, there is no Dismiss View, instead we just hide all two parent views.
                 parentView3rd.setVisibility(View.GONE);
