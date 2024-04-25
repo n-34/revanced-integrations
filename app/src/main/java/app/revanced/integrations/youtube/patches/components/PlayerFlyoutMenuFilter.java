@@ -83,6 +83,11 @@ public final class PlayerFlyoutMenuFilter extends Filter {
                         "yt_outline_info_circle"
                 ),
                 new ByteArrayFilterGroup(
+                        Settings.HIDE_PLAYER_FLYOUT_MENU_PIP,
+                        "yt_fill_picture_in_picture",
+                        "yt_outline_picture_in_picture"
+                ),
+                new ByteArrayFilterGroup(
                         Settings.HIDE_PLAYER_FLYOUT_MENU_PLAYBACK_SPEED,
                         "yt_outline_play_arrow_half_circle"
                 ),

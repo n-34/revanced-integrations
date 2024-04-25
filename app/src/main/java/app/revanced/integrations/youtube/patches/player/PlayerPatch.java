@@ -25,11 +25,13 @@ import java.lang.ref.WeakReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import app.revanced.integrations.shared.settings.BaseSettings;
 import app.revanced.integrations.shared.settings.BooleanSetting;
 import app.revanced.integrations.shared.settings.IntegerSetting;
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.ResourceUtils;
 import app.revanced.integrations.shared.utils.Utils;
+import app.revanced.integrations.youtube.patches.utils.InitializationPatch;
 import app.revanced.integrations.youtube.patches.utils.PatchStatus;
 import app.revanced.integrations.youtube.settings.Settings;
 import app.revanced.integrations.youtube.shared.RootView;
@@ -459,6 +461,22 @@ public class PlayerPatch {
                 Settings.HIDE_PLAYER_FLYOUT_MENU_QUALITY_FOOTER.get(),
                 view
         );
+    }
+
+    /**
+     * Overriding this values is possible only after the litho component has been loaded.
+     * Otherwise, crash will occur.
+     * See {@link InitializationPatch#onCreate}.
+     *
+     * @param original original value.
+     * @return whether to enable PiP Mode in the player flyout menu.
+     */
+    public static boolean hidePiPModeMenu(boolean original) {
+        if (!BaseSettings.SETTINGS_INITIALIZED.get()) {
+            return original;
+        }
+
+        return !Settings.HIDE_PLAYER_FLYOUT_MENU_PIP.get();
     }
 
     // endregion
