@@ -125,6 +125,7 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting HIDE_SNACK_BAR = new BooleanSetting("revanced_hide_snack_bar", FALSE);
     public static final BooleanSetting HIDE_TOOLBAR_CREATE_NOTIFICATION_BUTTON = new BooleanSetting("revanced_hide_toolbar_create_notification_button", FALSE, true);
     public static final BooleanSetting HIDE_TRENDING_SEARCHES = new BooleanSetting("revanced_hide_trending_searches", TRUE);
+    public static final BooleanSetting HIDE_VOICE_SEARCH_BUTTON = new BooleanSetting("revanced_hide_voice_search_button", FALSE, true);
     public static final BooleanSetting REMOVE_VIEWER_DISCRETION_DIALOG = new BooleanSetting("revanced_remove_viewer_discretion_dialog", FALSE);
 
     public static final BooleanSetting ENABLE_PHONE_LAYOUT = new BooleanSetting("revanced_enable_phone_layout", FALSE, true);
