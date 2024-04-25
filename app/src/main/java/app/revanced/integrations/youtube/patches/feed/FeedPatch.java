@@ -35,6 +35,33 @@ public class FeedPatch {
         return Settings.HIDE_CATEGORY_BAR_IN_SEARCH.get() ? 0 : height;
     }
 
+    /**
+     * Rather than simply hiding the channel tab view, completely removes channel tab from list.
+     * If a channel tab is removed from the list, users will not be able to open it by swiping.
+     *
+     * @param channelTabText    Text to be assigned to channel tab, such as 'Shorts', 'Playlists', 'Community', 'Store'.
+     *                          This text is hardcoded, so it follows the user's language.
+     * @return  Whether to remove the channel tab from the list.
+     */
+    public static boolean hideChannelTab(String channelTabText) {
+        if (!Settings.HIDE_CHANNEL_TAB.get()) {
+            return false;
+        }
+        if (channelTabText == null || channelTabText.isEmpty()) {
+            return false;
+        }
+
+        String[] blockList = Settings.HIDE_CHANNEL_TAB_FILTER_STRINGS.get().split("\\n");
+
+        for (String filter : blockList) {
+            if (!filter.isEmpty() && channelTabText.equals(filter)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static void hideBreakingNewsShelf(View view) {
         hideViewBy0dpUnderCondition(
                 Settings.HIDE_CAROUSEL_SHELF.get(),

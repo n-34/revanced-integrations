@@ -80,6 +80,8 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting HIDE_CATEGORY_BAR_IN_RELATED_VIDEOS = new BooleanSetting("revanced_hide_category_bar_in_related_videos", FALSE, true);
 
     // PreferenceScreen: Feed - Channel profile
+    public static final BooleanSetting HIDE_CHANNEL_TAB = new BooleanSetting("revanced_hide_channel_tab", FALSE);
+    public static final StringSetting HIDE_CHANNEL_TAB_FILTER_STRINGS = new StringSetting("revanced_hide_channel_tab_filter_strings", "", true, parent(HIDE_CHANNEL_TAB));
     public static final BooleanSetting HIDE_BROWSE_STORE_BUTTON = new BooleanSetting("revanced_hide_browse_store_button", TRUE);
     public static final BooleanSetting HIDE_CHANNEL_MEMBER_SHELF = new BooleanSetting("revanced_hide_channel_member_shelf", TRUE);
     public static final BooleanSetting HIDE_CHANNEL_PROFILE_LINKS = new BooleanSetting("revanced_hide_channel_profile_links", TRUE);
