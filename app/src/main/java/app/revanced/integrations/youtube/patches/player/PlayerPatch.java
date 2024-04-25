@@ -337,11 +337,7 @@ public class PlayerPatch {
     }
 
     public static void hideCaptionsButton(View view) {
-        if (!Settings.HIDE_CAPTIONS_BUTTON.get())
-            return;
-
-        view.setVisibility(View.GONE);
-        Utils.hideViewByLayoutParams(view);
+        Utils.hideViewUnderCondition(Settings.HIDE_CAPTIONS_BUTTON, view);
     }
 
     public static void hideCollapseButton(ImageView imageView) {
