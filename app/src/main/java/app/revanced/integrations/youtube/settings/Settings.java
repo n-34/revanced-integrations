@@ -84,7 +84,6 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting HIDE_CHANNEL_MEMBER_SHELF = new BooleanSetting("revanced_hide_channel_member_shelf", TRUE);
     public static final BooleanSetting HIDE_CHANNEL_PROFILE_LINKS = new BooleanSetting("revanced_hide_channel_profile_links", TRUE);
     public static final BooleanSetting HIDE_FOR_YOU_SHELF = new BooleanSetting("revanced_hide_for_you_shelf", TRUE);
-    public static final BooleanSetting HIDE_STORE_TAB = new BooleanSetting("revanced_hide_store_tab", TRUE);
 
     // PreferenceScreen: Feed - Community posts
     public static final BooleanSetting HIDE_COMMUNITY_POSTS_CHANNEL = new BooleanSetting("revanced_hide_community_posts_channel", FALSE);

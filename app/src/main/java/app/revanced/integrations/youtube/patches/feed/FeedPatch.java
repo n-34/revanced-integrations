@@ -35,34 +35,6 @@ public class FeedPatch {
         return Settings.HIDE_CATEGORY_BAR_IN_SEARCH.get() ? 0 : height;
     }
 
-    private static WeakReference<View> channelTabViewRef = new WeakReference<>(null);
-    private static long lastTimeCalled = 0;
-
-    public static void setChannelTabView(View view) {
-        channelTabViewRef = new WeakReference<>(view);
-    }
-
-    public static void hideStoreTab(boolean isBrowseStoreButtonShown) {
-        if (!isBrowseStoreButtonShown || !Settings.HIDE_STORE_TAB.get())
-            return;
-
-        final long currentTime = System.currentTimeMillis();
-
-        // Ignores method reuse in less than 3 second.
-        if (lastTimeCalled != 0 && currentTime - lastTimeCalled < 3000)
-            return;
-        lastTimeCalled = currentTime;
-
-        // This method is called before the channel tab is created.
-        // Add a delay to hide after the channel tab is created.
-        Utils.runOnMainThreadDelayed(() -> {
-                    final View channelTabView = channelTabViewRef.get();
-                    if (channelTabView != null)
-                        channelTabView.setVisibility(View.GONE);
-                }, 0
-        );
-    }
-
     public static void hideBreakingNewsShelf(View view) {
         hideViewBy0dpUnderCondition(
                 Settings.HIDE_CAROUSEL_SHELF.get(),

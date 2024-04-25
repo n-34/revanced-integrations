@@ -9,7 +9,6 @@ import app.revanced.integrations.shared.patches.components.Filter;
 import app.revanced.integrations.shared.patches.components.StringFilterGroup;
 import app.revanced.integrations.shared.patches.components.StringFilterGroupList;
 import app.revanced.integrations.shared.utils.StringTrieSearch;
-import app.revanced.integrations.youtube.patches.feed.FeedPatch;
 import app.revanced.integrations.youtube.settings.Settings;
 import app.revanced.integrations.youtube.shared.RootView;
 
@@ -87,7 +86,7 @@ public final class FeedComponentsFilter extends Filter {
         );
 
         channelProfileButtonRule = new StringFilterGroup(
-                null,
+                Settings.HIDE_BROWSE_STORE_BUTTON,
                 "|channel_profile_"
         );
 
@@ -212,11 +211,10 @@ public final class FeedComponentsFilter extends Filter {
             if (selectedNavButton != null && selectedNavButton.isLibraryOrYouTab() && !RootView.isSearchBarActive())
                 return false;
         } else if (matchedGroup == channelProfileButtonRule) {
-            final boolean isBrowseStoreButtonShown = path.contains(BROWSE_STORE_BUTTON_PATH) && browseStoreButton.check(protobufBufferArray).isFiltered();
-            FeedPatch.hideStoreTab(isBrowseStoreButtonShown);
-            if (!isBrowseStoreButtonShown || !Settings.HIDE_BROWSE_STORE_BUTTON.get()) {
-                return false;
+            if (browseStoreButton.check(protobufBufferArray).isFiltered()) {
+                return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
             }
+            return false;
         } else if (matchedGroup == communityPosts) {
             if (!communityPostsFeedGroupSearch.matches(allValue) && Settings.HIDE_COMMUNITY_POSTS_CHANNEL.get()) {
                 return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
