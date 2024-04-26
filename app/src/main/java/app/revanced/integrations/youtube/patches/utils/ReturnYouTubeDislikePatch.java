@@ -212,10 +212,6 @@ public class ReturnYouTubeDislikePatch {
                 return original;
             }
             if (!Settings.RYD_SHORTS.get()) {
-                // Must clear the current video here, otherwise if the user opens a regular video
-                // then opens a litho short (while keeping the regular video on screen), then closes the short,
-                // the original video may show the incorrect dislike value.
-                clearData();
                 return original;
             }
 
