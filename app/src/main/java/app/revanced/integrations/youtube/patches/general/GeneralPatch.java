@@ -4,8 +4,10 @@ import static app.revanced.integrations.shared.utils.StringRef.str;
 import static app.revanced.integrations.shared.utils.Utils.hideViewUnderCondition;
 import static app.revanced.integrations.youtube.shared.NavigationBar.NavigationButton;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +17,7 @@ import android.view.ViewGroup.MarginLayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -28,6 +31,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.ResourceUtils;
 import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.patches.utils.ViewGroupMarginLayoutParamsPatch;
 import app.revanced.integrations.youtube.settings.Settings;
@@ -368,6 +372,39 @@ public class GeneralPatch {
     // endregion
 
     // region [Toolbar components] patch
+
+    private static final int generalHeaderAttributeId = ResourceUtils.getAttrIdentifier("ytWordmarkHeader");
+    private static final int premiumHeaderAttributeId = ResourceUtils.getAttrIdentifier("ytPremiumWordmarkHeader");
+
+    public static void setDrawerNavigationHeader(View lithoView) {
+        final int headerAttributeId = getHeaderAttributeId();
+
+        lithoView.getViewTreeObserver().addOnDrawListener(() -> {
+            if (!(lithoView instanceof ViewGroup viewGroup))
+                return;
+            if (!(viewGroup.getChildAt(0) instanceof ImageView imageView))
+                return;
+            final Activity mAcrivity = Utils.getActivity();
+            if (mAcrivity == null)
+                return;
+            imageView.setImageDrawable(getHeaderDrawable(mAcrivity, headerAttributeId));
+        });
+    }
+
+    public static int getHeaderAttributeId() {
+        return Settings.CHANGE_YOUTUBE_HEADER.get()
+                ? premiumHeaderAttributeId
+                : generalHeaderAttributeId;
+    }
+
+    public static boolean overridePremiumHeader() {
+        return Settings.CHANGE_YOUTUBE_HEADER.get();
+    }
+
+    private static Drawable getHeaderDrawable(Activity mActivity, int resourceId) {
+        // Rest of the implementation added by patch.
+        return ResourceUtils.getDrawable("");
+    }
 
     public static boolean enableWideSearchBar(boolean original) {
         return Settings.ENABLE_WIDE_SEARCH_BAR.get() || original;
