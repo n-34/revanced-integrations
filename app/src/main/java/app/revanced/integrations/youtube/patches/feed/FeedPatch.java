@@ -10,8 +10,6 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
-import java.lang.ref.WeakReference;
-
 import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.settings.Settings;
 

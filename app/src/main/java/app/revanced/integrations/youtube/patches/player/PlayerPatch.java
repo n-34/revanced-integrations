@@ -328,19 +328,25 @@ public class PlayerPatch {
     // region [Hide player buttons] patch
 
     public static boolean hideAutoPlayButton() {
-        return Settings.HIDE_AUTOPLAY_BUTTON.get();
+        return Settings.HIDE_PLAYER_AUTOPLAY_BUTTON.get();
     }
 
     public static boolean hideCaptionsButton(boolean original) {
-        return !Settings.HIDE_CAPTIONS_BUTTON.get() && original;
+        return !Settings.HIDE_PLAYER_CAPTIONS_BUTTON.get() && original;
+    }
+
+    public static int hideCastButton(int original) {
+        return Settings.HIDE_PLAYER_CAST_BUTTON.get()
+                ? View.GONE
+                : original;
     }
 
     public static void hideCaptionsButton(View view) {
-        Utils.hideViewUnderCondition(Settings.HIDE_CAPTIONS_BUTTON, view);
+        Utils.hideViewUnderCondition(Settings.HIDE_PLAYER_CAPTIONS_BUTTON, view);
     }
 
     public static void hideCollapseButton(ImageView imageView) {
-        if (!Settings.HIDE_COLLAPSE_BUTTON.get())
+        if (!Settings.HIDE_PLAYER_COLLAPSE_BUTTON.get())
             return;
 
         imageView.setImageResource(android.R.color.transparent);
@@ -357,7 +363,7 @@ public class PlayerPatch {
     }
 
     public static void setTitleAnchorStartMargin(View titleAnchorView) {
-        if (!Settings.HIDE_COLLAPSE_BUTTON.get())
+        if (!Settings.HIDE_PLAYER_COLLAPSE_BUTTON.get())
             return;
 
         var layoutParams = titleAnchorView.getLayoutParams();
@@ -369,18 +375,18 @@ public class PlayerPatch {
     }
 
     public static ImageView hideFullscreenButton(ImageView imageView) {
-        final boolean hideView = Settings.HIDE_FULLSCREEN_BUTTON.get();
+        final boolean hideView = Settings.HIDE_PLAYER_FULLSCREEN_BUTTON.get();
 
         Utils.hideViewUnderCondition(hideView, imageView);
         return hideView ? null : imageView;
     }
 
     public static boolean hidePreviousNextButton(boolean previousOrNextButtonVisible) {
-        return !Settings.HIDE_PREVIOUS_NEXT_BUTTON.get() && previousOrNextButtonVisible;
+        return !Settings.HIDE_PLAYER_PREVIOUS_NEXT_BUTTON.get() && previousOrNextButtonVisible;
     }
 
     public static boolean hideMusicButton() {
-        return Settings.HIDE_YOUTUBE_MUSIC_BUTTON.get();
+        return Settings.HIDE_PLAYER_YOUTUBE_MUSIC_BUTTON.get();
     }
 
     // endregion

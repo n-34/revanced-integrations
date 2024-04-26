@@ -7,6 +7,7 @@ import static app.revanced.integrations.youtube.shared.NavigationBar.NavigationB
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -182,21 +184,6 @@ public class GeneralPatch {
 
     // endregion
 
-    // region [Enable wide search bar] patch
-
-    public static boolean enableWideSearchBar(boolean original) {
-        return Settings.ENABLE_WIDE_SEARCH_BAR.get() || original;
-    }
-
-    public static boolean enableWideSearchBarInYouTab(boolean original) {
-        if (!Settings.ENABLE_WIDE_SEARCH_BAR.get())
-            return original;
-        else
-            return !Settings.ENABLE_WIDE_SEARCH_BAR_IN_YOU_TAB.get() && original;
-    }
-
-    // endregion
-
     // region [Hide layout components] patch
 
     /**
@@ -244,10 +231,6 @@ public class GeneralPatch {
         }
     }
 
-    public static int hideCastButton(int original) {
-        return Settings.HIDE_CAST_BUTTON.get() ? View.GONE : original;
-    }
-
     public static boolean hideFloatingMicrophone(boolean original) {
         return Settings.HIDE_FLOATING_MICROPHONE.get() || original;
     }
@@ -256,46 +239,8 @@ public class GeneralPatch {
         return Settings.HIDE_HANDLE.get() ? 8 : originalValue;
     }
 
-    public static boolean hideSearchTermThumbnail() {
-        return Settings.HIDE_SEARCH_TERM_THUMBNAIL.get();
-    }
-
     public static boolean hideSnackBar() {
         return Settings.HIDE_SNACK_BAR.get();
-    }
-
-    private static final String[] TOOLBAR_BUTTON_LIST = {
-            "CREATION_ENTRY",   // Create button (Phone)
-            "FAB_CAMERA",       // Create button (Tablet)
-            "TAB_ACTIVITY"      // Notification button
-    };
-
-    public static void hideToolBarButton(String enumString, View view) {
-        if (!Settings.HIDE_TOOLBAR_CREATE_NOTIFICATION_BUTTON.get())
-            return;
-
-        hideViewUnderCondition(
-                Utils.containsAny(enumString, TOOLBAR_BUTTON_LIST),
-                view
-        );
-    }
-
-    public static boolean hideTrendingSearches(boolean original) {
-        return Settings.HIDE_TRENDING_SEARCHES.get() || original;
-    }
-
-    public static void hideVoiceSearchButton(View view) {
-        hideViewUnderCondition(
-                Settings.HIDE_VOICE_SEARCH_BUTTON.get(),
-                view
-        );
-    }
-
-    public static void hideVoiceSearchButton(View view, int visibility) {
-        view.setVisibility(
-                Settings.HIDE_VOICE_SEARCH_BUTTON.get()
-                        ? View.GONE : visibility
-        );
     }
 
     // endregion
@@ -304,17 +249,17 @@ public class GeneralPatch {
 
     private static final Map<NavigationButton, Boolean> shouldHideMap = new EnumMap<>(NavigationButton.class) {
         {
-            put(NavigationButton.HOME, Settings.HIDE_HOME_BUTTON.get());
-            put(NavigationButton.SHORTS, Settings.HIDE_SHORTS_BUTTON.get());
-            put(NavigationButton.SUBSCRIPTIONS, Settings.HIDE_SUBSCRIPTIONS_BUTTON.get());
-            put(NavigationButton.CREATE, Settings.HIDE_CREATE_BUTTON.get());
-            put(NavigationButton.NOTIFICATIONS, Settings.HIDE_NOTIFICATIONS_BUTTON.get());
+            put(NavigationButton.HOME, Settings.HIDE_NAVIGATION_HOME_BUTTON.get());
+            put(NavigationButton.SHORTS, Settings.HIDE_NAVIGATION_SHORTS_BUTTON.get());
+            put(NavigationButton.SUBSCRIPTIONS, Settings.HIDE_NAVIGATION_SUBSCRIPTIONS_BUTTON.get());
+            put(NavigationButton.CREATE, Settings.HIDE_NAVIGATION_CREATE_BUTTON.get());
+            put(NavigationButton.NOTIFICATIONS, Settings.HIDE_NAVIGATION_NOTIFICATIONS_BUTTON.get());
 
-            put(NavigationButton.LIBRARY_LOGGED_OUT, Settings.HIDE_LIBRARY_BUTTON.get());
-            put(NavigationButton.LIBRARY_INCOGNITO, Settings.HIDE_LIBRARY_BUTTON.get());
-            put(NavigationButton.LIBRARY_OLD_UI, Settings.HIDE_LIBRARY_BUTTON.get());
-            put(NavigationButton.LIBRARY_PIVOT_UNKNOWN, Settings.HIDE_LIBRARY_BUTTON.get());
-            put(NavigationButton.LIBRARY_YOU, Settings.HIDE_LIBRARY_BUTTON.get());
+            put(NavigationButton.LIBRARY_LOGGED_OUT, Settings.HIDE_NAVIGATION_LIBRARY_BUTTON.get());
+            put(NavigationButton.LIBRARY_INCOGNITO, Settings.HIDE_NAVIGATION_LIBRARY_BUTTON.get());
+            put(NavigationButton.LIBRARY_OLD_UI, Settings.HIDE_NAVIGATION_LIBRARY_BUTTON.get());
+            put(NavigationButton.LIBRARY_PIVOT_UNKNOWN, Settings.HIDE_NAVIGATION_LIBRARY_BUTTON.get());
+            put(NavigationButton.LIBRARY_YOU, Settings.HIDE_NAVIGATION_LIBRARY_BUTTON.get());
         }
     };
 
@@ -334,6 +279,28 @@ public class GeneralPatch {
 
     public static void hideNavigationLabel(TextView view) {
         hideViewUnderCondition(Settings.HIDE_NAVIGATION_LABEL.get(), view);
+    }
+
+    // endregion
+
+    // region [Layout switch] patch
+
+    public static boolean enableTabletLayout() {
+        try {
+            return Settings.ENABLE_TABLET_LAYOUT.get();
+        } catch (Exception ex) {
+            Logger.printException(() -> "enableTabletLayout failed", ex);
+        }
+        return false;
+    }
+
+    public static int enablePhoneLayout(int original) {
+        try {
+            return Settings.ENABLE_PHONE_LAYOUT.get() ? 480 : original;
+        } catch (Exception ex) {
+            Logger.printException(() -> "getLayoutOverride failed", ex);
+        }
+        return original;
     }
 
     // endregion
@@ -389,28 +356,6 @@ public class GeneralPatch {
 
     // endregion
 
-    // region [Layout switch] patch
-
-    public static boolean enableTabletLayout() {
-        try {
-            return Settings.ENABLE_TABLET_LAYOUT.get();
-        } catch (Exception ex) {
-            Logger.printException(() -> "enableTabletLayout failed", ex);
-        }
-        return false;
-    }
-
-    public static int enablePhoneLayout(int original) {
-        try {
-            return Settings.ENABLE_PHONE_LAYOUT.get() ? 480 : original;
-        } catch (Exception ex) {
-            Logger.printException(() -> "getLayoutOverride failed", ex);
-        }
-        return original;
-    }
-
-    // endregion
-
     // region [Spoof app version] patch
 
     public static String getVersionOverride(String appVersion) {
@@ -418,6 +363,80 @@ public class GeneralPatch {
             return appVersion;
 
         return Settings.SPOOF_APP_VERSION_TARGET.get();
+    }
+
+    // endregion
+
+    // region [Toolbar components] patch
+
+    public static boolean enableWideSearchBar(boolean original) {
+        return Settings.ENABLE_WIDE_SEARCH_BAR.get() || original;
+    }
+
+    public static boolean enableWideSearchBarInYouTab(boolean original) {
+        if (!Settings.ENABLE_WIDE_SEARCH_BAR.get())
+            return original;
+        else
+            return !Settings.ENABLE_WIDE_SEARCH_BAR_IN_YOU_TAB.get() && original;
+    }
+
+    public static boolean hideCastButton(boolean original) {
+        return !Settings.HIDE_TOOLBAR_CAST_BUTTON.get() && original;
+    }
+
+    public static void hideCastButton(MenuItem menuItem) {
+        if (!Settings.HIDE_TOOLBAR_CAST_BUTTON.get())
+            return;
+
+        menuItem.setVisible(false);
+        menuItem.setEnabled(false);
+    }
+
+    public static void hideCreateButton(String enumString, View view) {
+        if (!Settings.HIDE_TOOLBAR_CREATE_BUTTON.get())
+            return;
+
+        final boolean condition = StringUtils.equalsAny(
+                enumString,
+                "CREATION_ENTRY", // Create button for Phone layout
+                "FAB_CAMERA" // Create button for Tablet layout
+        );
+
+        hideViewUnderCondition(condition, view);
+    }
+
+    public static void hideNotificationButton(String enumString, View view) {
+        if (!Settings.HIDE_TOOLBAR_NOTIFICATION_BUTTON.get())
+            return;
+
+        final boolean condition = StringUtils.equalsAny(
+                enumString,
+                "TAB_ACTIVITY" // Notification button
+        );
+
+        hideViewUnderCondition(condition, view);
+    }
+
+    public static boolean hideSearchTermThumbnail() {
+        return Settings.HIDE_SEARCH_TERM_THUMBNAIL.get();
+    }
+
+    public static boolean hideTrendingSearches(boolean original) {
+        return Settings.HIDE_TRENDING_SEARCHES.get() || original;
+    }
+
+    public static void hideVoiceSearchButton(View view) {
+        hideViewUnderCondition(
+                Settings.HIDE_VOICE_SEARCH_BUTTON.get(),
+                view
+        );
+    }
+
+    public static void hideVoiceSearchButton(View view, int visibility) {
+        view.setVisibility(
+                Settings.HIDE_VOICE_SEARCH_BUTTON.get()
+                        ? View.GONE : visibility
+        );
     }
 
     // endregion
