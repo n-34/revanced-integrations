@@ -140,6 +140,7 @@ public class Settings extends BaseSettings {
     // PreferenceScreen: General - Toolbar
     public static final BooleanSetting CHANGE_YOUTUBE_HEADER = new BooleanSetting("revanced_change_youtube_header", TRUE, true);
     public static final BooleanSetting ENABLE_WIDE_SEARCH_BAR = new BooleanSetting("revanced_enable_wide_search_bar", FALSE, true);
+    public static final BooleanSetting ENABLE_WIDE_SEARCH_BAR_WITH_HEADER = new BooleanSetting("revanced_enable_wide_search_bar_with_header", TRUE, true);
     public static final BooleanSetting ENABLE_WIDE_SEARCH_BAR_IN_YOU_TAB = new BooleanSetting("revanced_enable_wide_search_bar_in_you_tab", FALSE, true);
     public static final BooleanSetting HIDE_TOOLBAR_CAST_BUTTON = new BooleanSetting("revanced_hide_toolbar_cast_button", TRUE, true);
     public static final BooleanSetting HIDE_TOOLBAR_CREATE_BUTTON = new BooleanSetting("revanced_hide_toolbar_create_button", FALSE, true);
