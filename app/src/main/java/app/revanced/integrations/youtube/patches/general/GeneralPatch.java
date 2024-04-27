@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
@@ -231,11 +232,11 @@ public class GeneralPatch {
         hideAccountMenu(viewGroup, menuTitleCharSequence.toString());
     }
 
-    private static void hideAccountMenu(ViewGroup viewGroup, String menuTitleString) {
-        String[] blockList = Settings.HIDE_ACCOUNT_MENU_FILTER_STRINGS.get().split("\\n");
+    private static final String[] accountMenuBlockList = Settings.HIDE_ACCOUNT_MENU_FILTER_STRINGS.get().split("\\n");
 
-        for (String filter : blockList) {
-            if (menuTitleString.equals(filter) && !filter.isEmpty()) {
+    private static void hideAccountMenu(ViewGroup viewGroup, String menuTitleString) {
+        for (String filter : accountMenuBlockList) {
+            if (!filter.isEmpty() && menuTitleString.equals(filter)) {
                 if (viewGroup.getLayoutParams() instanceof MarginLayoutParams)
                     ViewGroupMarginLayoutParamsPatch.hideViewGroupByMarginLayoutParams(viewGroup);
                 else
@@ -244,12 +245,45 @@ public class GeneralPatch {
         }
     }
 
-    public static boolean hideFloatingMicrophone(boolean original) {
-        return Settings.HIDE_FLOATING_MICROPHONE.get() || original;
-    }
-
     public static int hideHandle(int originalValue) {
         return Settings.HIDE_HANDLE.get() ? 8 : originalValue;
+    }
+
+    private static final String[] settingsMenuBlockList = Settings.HIDE_SETTINGS_MENU_FILTER_STRINGS.get().split("\\n");
+    private static final String rvxSettingsLabel = str("revanced_extended_settings_title");
+
+    public static void hideSettingsMenu(RecyclerView recyclerView) {
+        if (!Settings.HIDE_SETTINGS_MENU.get())
+            return;
+
+        recyclerView.getViewTreeObserver().addOnDrawListener(() -> {
+            final int childCount = recyclerView.getChildCount();
+            if (childCount == 0)
+                return;
+            for (int i = 0; i < childCount; i++) {
+                if (!(recyclerView.getChildAt(i) instanceof ViewGroup linearLayout))
+                    return;
+                if (linearLayout.getChildCount() < 2)
+                    return;
+                if (!(linearLayout.getChildAt(1) instanceof ViewGroup relativeLayout))
+                    return;
+                if (!(relativeLayout.getChildAt(0) instanceof TextView textView))
+                    return;
+                final String title = textView.getText().toString();
+                if (title.equals(rvxSettingsLabel))
+                    return;
+
+                for (String filter : settingsMenuBlockList) {
+                    if (!filter.isEmpty() && title.equals(filter)) {
+                        ViewGroupMarginLayoutParamsPatch.hideViewGroupByMarginLayoutParams(linearLayout);
+                    }
+                }
+            }
+        });
+    }
+
+    public static boolean hideFloatingMicrophone(boolean original) {
+        return Settings.HIDE_FLOATING_MICROPHONE.get() || original;
     }
 
     public static boolean hideSnackBar() {
