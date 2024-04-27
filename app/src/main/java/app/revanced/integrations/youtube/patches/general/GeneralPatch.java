@@ -1,11 +1,13 @@
 package app.revanced.integrations.youtube.patches.general;
 
 import static app.revanced.integrations.shared.utils.StringRef.str;
+import static app.revanced.integrations.shared.utils.Utils.getChildView;
 import static app.revanced.integrations.shared.utils.Utils.hideViewUnderCondition;
 import static app.revanced.integrations.youtube.shared.NavigationBar.NavigationButton;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -24,6 +26,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.apps.youtube.app.application.Shell_SettingsActivity;
+import com.google.android.apps.youtube.app.settings.SettingsActivity;
+import com.google.android.apps.youtube.app.settings.videoquality.VideoQualitySettingsActivity;
+
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -37,6 +43,7 @@ import app.revanced.integrations.shared.utils.ResourceUtils;
 import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.patches.utils.ViewGroupMarginLayoutParamsPatch;
 import app.revanced.integrations.youtube.settings.Settings;
+import app.revanced.integrations.youtube.utils.ThemeUtils;
 
 /**
  * @noinspection ALL
@@ -507,25 +514,14 @@ public class GeneralPatch {
         if (!Settings.HIDE_TOOLBAR_CREATE_BUTTON.get())
             return;
 
-        final boolean condition = StringUtils.equalsAny(
-                enumString,
-                "CREATION_ENTRY", // Create button for Phone layout
-                "FAB_CAMERA" // Create button for Tablet layout
-        );
-
-        hideViewUnderCondition(condition, view);
+        hideViewUnderCondition(isCreateButton(enumString), view);
     }
 
     public static void hideNotificationButton(String enumString, View view) {
         if (!Settings.HIDE_TOOLBAR_NOTIFICATION_BUTTON.get())
             return;
 
-        final boolean condition = StringUtils.equalsAny(
-                enumString,
-                "TAB_ACTIVITY" // Notification button
-        );
-
-        hideViewUnderCondition(condition, view);
+        hideViewUnderCondition(isNotificationButton(enumString), view);
     }
 
     public static boolean hideSearchTermThumbnail() {
@@ -547,6 +543,90 @@ public class GeneralPatch {
         view.setVisibility(
                 Settings.HIDE_VOICE_SEARCH_BUTTON.get()
                         ? View.GONE : visibility
+        );
+    }
+
+    private static final int settingsDrawableId = ResourceUtils.getDrawableIdentifier("yt_outline_gear_black_24");
+
+    public static int getCreateButtonDrawableId(int original) {
+        return Settings.REPLACE_TOOLBAR_CREATE_BUTTON.get()
+                ? settingsDrawableId
+                : original;
+    }
+
+    public static void replaceCreateButton(String enumString, View toolbarView) {
+        if (!Settings.REPLACE_TOOLBAR_CREATE_BUTTON.get())
+            return;
+        // Check if the button is a create button.
+        if (!isCreateButton(enumString))
+            return;
+        ImageView imageView = getChildView((ViewGroup) toolbarView, view -> view instanceof ImageView);
+
+        // Overriding is possible only after OnClickListener is assigned to the create button.
+        Utils.runOnMainThreadDelayed(() -> {
+            if (Settings.REPLACE_TOOLBAR_CREATE_BUTTON_TYPE.get()) {
+                imageView.setOnClickListener(button -> openRVXSettings(button));
+                imageView.setOnLongClickListener(button -> {
+                    openYouTubeSettings(button);
+                    return true;
+                });
+            } else {
+                imageView.setOnClickListener(button -> openYouTubeSettings(button));
+                imageView.setOnLongClickListener(button -> {
+                    openRVXSettings(button);
+                    return true;
+                });
+            }
+        }, 0);
+    }
+
+    private static void openYouTubeSettings(View view) {
+        Context context = view.getContext();
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.setPackage(context.getPackageName());
+        intent.setClass(context, Shell_SettingsActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        context.startActivity(intent);
+    }
+
+    private static void openRVXSettings(View view) {
+        Context context = view.getContext();
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.setPackage(context.getPackageName());
+        intent.setData(Uri.parse("revanced_extended_settings_intent"));
+        intent.setClass(context, VideoQualitySettingsActivity.class);
+        context.startActivity(intent);
+    }
+
+    /**
+     * The theme of {@link Shell_SettingsActivity} is dark theme.
+     * Since this theme is hardcoded, we should manually specify the theme for the activity.
+     *
+     * Since {@link Shell_SettingsActivity} only invokes {@link SettingsActivity}, finish activity after specifying a theme.
+     *
+     * @param base {@link Shell_SettingsActivity}
+     */
+    public static void setShellActivityTheme(Activity base) {
+        if (!Settings.REPLACE_TOOLBAR_CREATE_BUTTON.get())
+            return;
+
+        base.setTheme(ThemeUtils.getThemeId());
+        Utils.runOnMainThreadDelayed(() -> base.finish(), 0);
+    }
+
+
+    private static boolean isCreateButton(String enumString) {
+        return StringUtils.equalsAny(
+                enumString,
+                "CREATION_ENTRY", // Create button for Phone layout
+                "FAB_CAMERA" // Create button for Tablet layout
+        );
+    }
+
+    private static boolean isNotificationButton(String enumString) {
+        return StringUtils.equalsAny(
+                enumString,
+                "TAB_ACTIVITY" // Notification button
         );
     }
 
