@@ -67,6 +67,17 @@ public class FeedPatch {
         );
     }
 
+    public static View hideCaptionsButton(View view) {
+        return Settings.HIDE_FEED_CAPTIONS_BUTTON.get() ? null : view;
+    }
+
+    public static void hideCaptionsButtonContainer(View view) {
+        hideViewUnderCondition(
+                Settings.HIDE_FEED_CAPTIONS_BUTTON,
+                view
+        );
+    }
+
     public static void hideLatestVideosButton(View view) {
         hideViewUnderCondition(Settings.HIDE_LATEST_VIDEOS_BUTTON.get(), view);
     }
@@ -76,7 +87,7 @@ public class FeedPatch {
     }
 
     public static void hideSubscriptionsChannelSection(View view) {
-        hideViewUnderCondition(Settings.HIDE_SUBSCRIPTIONS_CHANNEL_SECTION.get(), view);
+        hideViewUnderCondition(Settings.HIDE_SUBSCRIPTIONS_CHANNEL_SECTION, view);
     }
 
     private static FrameLayout.LayoutParams layoutParams;
