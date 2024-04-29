@@ -120,6 +120,7 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting ENABLE_GRADIENT_LOADING_SCREEN = new BooleanSetting("revanced_enable_gradient_loading_screen", FALSE, true);
     public static final BooleanSetting ENABLE_TABLET_MINI_PLAYER = new BooleanSetting("revanced_enable_tablet_mini_player", FALSE, true);
     public static final BooleanSetting ENABLE_MODERN_MINI_PLAYER = new BooleanSetting("revanced_enable_modern_mini_player", FALSE, true, parent(ENABLE_TABLET_MINI_PLAYER));
+    public static final BooleanSetting HIDE_MINI_PLAYER_REWIND_FORWARD_BUTTON = new BooleanSetting("revanced_hide_mini_player_rewind_forward_button", FALSE, true, parent(ENABLE_MODERN_MINI_PLAYER));
     public static final BooleanSetting HIDE_FLOATING_MICROPHONE = new BooleanSetting("revanced_hide_floating_microphone", TRUE, true);
     public static final BooleanSetting HIDE_GRAY_SEPARATOR = new BooleanSetting("revanced_hide_gray_separator", TRUE);
     public static final BooleanSetting HIDE_SNACK_BAR = new BooleanSetting("revanced_hide_snack_bar", FALSE);

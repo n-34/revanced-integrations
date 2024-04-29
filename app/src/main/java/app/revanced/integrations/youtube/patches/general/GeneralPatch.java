@@ -225,6 +225,17 @@ public class GeneralPatch {
         return modernMiniPlayerEnabled ? closeButtonDrawableId : original;
     }
 
+    public static void hideRewindAndForwardButton(View view) {
+        if (!Settings.HIDE_MINI_PLAYER_REWIND_FORWARD_BUTTON.get())
+            return;
+
+        view.setVisibility(View.GONE);
+
+        if (view.getParent() instanceof ViewGroup viewGroup) {
+            viewGroup.removeView(view);
+        }
+    }
+
     // endregion
 
     // region [Hide layout components] patch
