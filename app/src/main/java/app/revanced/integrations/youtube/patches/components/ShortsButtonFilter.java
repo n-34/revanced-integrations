@@ -19,9 +19,12 @@ public final class ShortsButtonFilter extends Filter {
      */
     private final static String REEL_METAPANEL_PATH = "reel_metapanel.eml";
 
+    private final static String SHORTS_PAUSED_STATE_BUTTON_PATH = "|ScrollableContainerType|ContainerType|button.eml|";
+
     private final StringFilterGroup subscribeButton;
     private final StringFilterGroup joinButton;
     private final StringFilterGroup paidPromotionButton;
+    private final StringFilterGroup pausedOverlayButtons;
 
     private final StringFilterGroup suggestedAction;
     private final ByteArrayFilterGroupList suggestedActionsGroupList =  new ByteArrayFilterGroupList();
@@ -29,9 +32,14 @@ public final class ShortsButtonFilter extends Filter {
     private final StringFilterGroup actionBar;
     private final ByteArrayFilterGroupList videoActionButtonGroupList = new ByteArrayFilterGroupList();
 
+    private final ByteArrayFilterGroup shopButton = new ByteArrayFilterGroup(
+            Settings.HIDE_SHORTS_SHOP_BUTTON,
+            "yt_outline_bag_"
+    );
+
     public ShortsButtonFilter() {
-        StringFilterGroup pausedOverlayButtons = new StringFilterGroup(
-                Settings.HIDE_SHORTS_PAUSED_OVERLAY_BUTTONS,
+        pausedOverlayButtons = new StringFilterGroup(
+                null,
                 "shorts_paused_state"
         );
 
@@ -128,10 +136,7 @@ public final class ShortsButtonFilter extends Filter {
         // Suggested actions.
         //
         suggestedActionsGroupList.addAll(
-                new ByteArrayFilterGroup(
-                        Settings.HIDE_SHORTS_SHOP_BUTTON,
-                        "yt_outline_bag_"
-                ),
+                shopButton,
                 new ByteArrayFilterGroup(
                         Settings.HIDE_SHORTS_TAGGED_PRODUCTS,
                         // Product buttons show pictures of the products, and does not have any unique icons to identify.
@@ -176,6 +181,17 @@ public final class ShortsButtonFilter extends Filter {
             // Suggested actions can be at the start or in the middle of a path.
             if (suggestedActionsGroupList.check(protobufBufferArray).isFiltered()) {
                 return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
+            }
+            return false;
+        }
+
+        if (matchedGroup == pausedOverlayButtons) {
+            if (Settings.HIDE_SHORTS_PAUSED_OVERLAY_BUTTONS.get()) {
+                return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
+            } else if (StringUtils.contains(path, SHORTS_PAUSED_STATE_BUTTON_PATH)) {
+                if (shopButton.check(protobufBufferArray).isFiltered()) {
+                    return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
+                }
             }
             return false;
         }
