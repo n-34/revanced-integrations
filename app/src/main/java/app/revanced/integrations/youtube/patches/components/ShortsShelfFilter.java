@@ -40,8 +40,11 @@ public final class ShortsShelfFilter extends Filter {
                 "shorts_shelf",
                 "inline_shorts",
                 "shorts_grid",
-                "shorts_video_cell",
-                "shorts_pivot_item"
+                "shorts_video_cell"
+                // "shorts_pivot_item" appears when you click 'Shorts' in the category bar in the search results, and also in the channel profile.
+                // RVX does not hide the shelf header in the channel profile, so only the 'Shorts' header is left in the channel profile.
+                // This doesn't look good, so just don't hide this component.
+                // "shorts_pivot_item"
         );
 
         addIdentifierCallbacks(shelfHeader, shorts);
