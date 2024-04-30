@@ -1,7 +1,5 @@
 package app.revanced.integrations.youtube.patches.components;
 
-import static app.revanced.integrations.youtube.shared.NavigationBar.NavigationButton;
-
 import androidx.annotation.Nullable;
 
 import app.revanced.integrations.shared.patches.components.ByteArrayFilterGroup;
@@ -10,6 +8,7 @@ import app.revanced.integrations.shared.patches.components.StringFilterGroup;
 import app.revanced.integrations.shared.patches.components.StringFilterGroupList;
 import app.revanced.integrations.shared.utils.StringTrieSearch;
 import app.revanced.integrations.youtube.settings.Settings;
+import app.revanced.integrations.youtube.shared.NavigationBar;
 import app.revanced.integrations.youtube.shared.RootView;
 
 @SuppressWarnings("unused")
@@ -36,7 +35,7 @@ public final class FeedComponentsFilter extends Filter {
             );
     private static final StringTrieSearch mixPlaylistsContextExceptions = new StringTrieSearch();
 
-    private final StringFilterGroup carouselShelf;
+    public final StringFilterGroup carouselShelf;
     private final StringFilterGroup channelProfileButtonRule;
     private final StringFilterGroup communityPosts;
 
@@ -207,8 +206,7 @@ public final class FeedComponentsFilter extends Filter {
                        StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
         if (matchedGroup == carouselShelf) {
             // In the related video, the carousel shelf is not shown so player type check is ignored.
-            NavigationButton selectedNavButton = NavigationButton.getSelectedNavigationButton();
-            if (selectedNavButton != null && selectedNavButton.isLibraryOrYouTab() && !RootView.isSearchBarActive())
+            if (NavigationBar.getNavButtonIndex() > 2 && !RootView.isSearchBarActive())
                 return false;
         } else if (matchedGroup == channelProfileButtonRule) {
             if (browseStoreButton.check(protobufBufferArray).isFiltered()) {

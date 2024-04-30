@@ -168,14 +168,25 @@ public final class NavigationBar {
         }
     }
 
+    private static volatile int navButtonIndex = 0;
+
+    public static void setNavButtonIndex(int newlyLoadedNavButtonIndex) {
+        navButtonIndex = newlyLoadedNavButtonIndex;
+    }
+
+    public static int getNavButtonIndex() {
+        return navButtonIndex;
+    }
+
     /**
      * Injection point.
      */
-    public static void navigationTabSelected(View navButtonImageView, boolean isSelected) {
+    public static void navigationTabSelected(View navButtonImageView, int newlyLoadedNavButtonIndex, boolean isSelected) {
         try {
             if (!isSelected) {
                 return;
             }
+            navButtonIndex = newlyLoadedNavButtonIndex;
 
             NavigationButton button = viewToButtonMap.get(navButtonImageView);
 
