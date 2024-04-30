@@ -54,7 +54,7 @@ public final class DescriptionsFilter extends Filter {
 
         shoppingLinks = new StringFilterGroup(
                 Settings.HIDE_SHOPPING_LINKS,
-                "expandable_list"
+                "expandable_list."
         );
 
         final StringFilterGroup transcriptSection = new StringFilterGroup(

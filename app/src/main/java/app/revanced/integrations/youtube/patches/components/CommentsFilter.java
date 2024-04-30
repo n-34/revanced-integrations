@@ -57,7 +57,7 @@ public final class CommentsFilter extends Filter {
 
         final StringFilterGroup previewComment = new StringFilterGroup(
                 Settings.HIDE_PREVIEW_COMMENT_OLD_METHOD,
-                "|carousel_item",
+                "|carousel_item.",
                 "|carousel_listener",
                 COMMENT_ENTRY_POINT_TEASER_PATH,
                 "comments_entry_point_simplebox"

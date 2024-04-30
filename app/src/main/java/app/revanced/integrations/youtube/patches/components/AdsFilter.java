@@ -16,7 +16,8 @@ public final class AdsFilter extends Filter {
 
         final StringFilterGroup merchandise = new StringFilterGroup(
                 Settings.HIDE_MERCHANDISE_SHELF,
-                "product_carousel"
+                "product_carousel",
+                "shopping_carousel"
         );
 
         final StringFilterGroup paidContent = new StringFilterGroup(
