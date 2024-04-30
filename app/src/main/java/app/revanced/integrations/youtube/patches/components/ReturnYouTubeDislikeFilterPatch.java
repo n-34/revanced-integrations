@@ -32,6 +32,9 @@ import app.revanced.integrations.youtube.shared.VideoInformation;
  * But the correct video id does appear in the protobuffer just before a Shorts litho span is created.
  *
  * Once a way to asynchronously update litho text is found, this strategy will no longer be needed.
+ *
+ * TODO: RVX can now fetch the correct video ID from Shorts, this filters is no longer needed.
+ *       Keep this filters until refactoring is done for the RYD patch.
  */
 public final class ReturnYouTubeDislikeFilterPatch extends Filter {
 
@@ -74,6 +77,28 @@ public final class ReturnYouTubeDislikeFilterPatch extends Filter {
                 // Video was not already disliked.
                 new ByteArrayFilterGroup(null, "ic_right_dislike_off_shadowed")
         );
+    }
+
+    private volatile static String shortsVideoId = "";
+
+    public static String getShortsVideoId() {
+        return shortsVideoId;
+    }
+
+    /**
+     * Injection point.
+     */
+    public static void newShortsVideoStarted(@NonNull String newlyLoadedChannelId, @NonNull String newlyLoadedChannelName,
+                                             @NonNull String newlyLoadedVideoId, @NonNull String newlyLoadedVideoTitle,
+                                             final long newlyLoadedVideoLength, boolean newlyLoadedLiveStreamValue) {
+        if (!Settings.RYD_SHORTS.get()) {
+            return;
+        }
+        if (shortsVideoId.equals(newlyLoadedVideoId)) {
+            return;
+        }
+        Logger.printDebug(() -> "newShortsVideoStarted: " + newlyLoadedVideoId);
+        shortsVideoId = newlyLoadedVideoId;
     }
 
     /**
@@ -138,6 +163,8 @@ public final class ReturnYouTubeDislikeFilterPatch extends Filter {
         synchronized (lastVideoIds) {
             for (String videoId : lastVideoIds.keySet()) {
                 if (byteArrayContainsString(protobufBufferArray, videoId)) {
+                    return videoId;
+                } else if (videoId.equals(shortsVideoId)) {
                     return videoId;
                 }
             }

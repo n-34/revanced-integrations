@@ -53,11 +53,6 @@ public class ReturnYouTubeDislikePatch {
             isSpoofingToLessThan("18.34.00");
 
     /**
-     * Injection point.
-     * Whether to use incognito mode.
-     */
-    public static volatile boolean isIncognito;
-    /**
      * RYD data for the current video on screen.
      */
     @Nullable
@@ -215,22 +210,15 @@ public class ReturnYouTubeDislikePatch {
                 return original;
             }
 
-            final boolean fetchDislikeIncognito =
-                    conversionContextString.contains("|shorts_dislike_button.eml|")
-                            && isIncognito;
             final boolean fetchDislikeLiveStream =
                     conversionContextString.contains("immersive_live_video_action_bar.eml")
                             && conversionContextString.contains("|dislike_button.eml|");
 
-            if (fetchDislikeIncognito) {
-                Logger.printDebug(() -> "setShortsDislikes in Incognito mode");
-            } else if (fetchDislikeLiveStream) {
-                Logger.printDebug(() -> "setShortsDislikes in LiveStream");
-            } else {
+            if (!fetchDislikeLiveStream) {
                 return original;
             }
 
-            ReturnYouTubeDislike videoData = ReturnYouTubeDislike.getFetchForVideoId(VideoInformation.getVideoId());
+            ReturnYouTubeDislike videoData = ReturnYouTubeDislike.getFetchForVideoId(ReturnYouTubeDislikeFilterPatch.getShortsVideoId());
             videoData.setVideoIdIsShort(true);
             lastLithoShortsVideoData = videoData;
             lithoShortsShouldUseCurrentData = false;
