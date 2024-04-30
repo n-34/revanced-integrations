@@ -49,10 +49,12 @@ public final class ShortsShelfFilter extends Filter {
 
         addIdentifierCallbacks(shelfHeader, shorts);
 
-        // Shorts that appear in the feed/search when the device is using tablet layout.
         shortsCompactFeedVideoPath = new StringFilterGroup(
                 hideShortsShelf,
-                "compact_video.eml"
+                // Shorts that appear in the feed/search when the device is using tablet layout.
+                "compact_video.eml",
+                // Search results that appear in a horizontal shelf.
+                "video_card.eml"
         );
 
         // Filter out items that use the 'frame0' thumbnail.
@@ -73,7 +75,7 @@ public final class ShortsShelfFilter extends Filter {
             return false;
 
         if (matchedGroup == shortsCompactFeedVideoPath) {
-            if (contentIndex == 0 && shortsCompactFeedVideoBuffer.check(protobufBufferArray).isFiltered())
+            if (shortsCompactFeedVideoBuffer.check(protobufBufferArray).isFiltered())
                 return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
             return false;
         } else if (matchedGroup == shelfHeader) {
