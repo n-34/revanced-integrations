@@ -33,7 +33,10 @@ public final class GeneralAdsPatch {
         return filterChildren(list);
     }
 
-    public static boolean hideNewPostAds() {
-        return Settings.HIDE_NEW_POST_ADS.get();
+    public static void hideNewPostAds(ArrayList<Object> arrayList, Object object) {
+        if (Settings.HIDE_NEW_POST_ADS.get())
+            return;
+
+        arrayList.add(object);
     }
 }
