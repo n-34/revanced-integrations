@@ -22,10 +22,8 @@ import app.revanced.integrations.youtube.utils.ExtendedUtils;
  * @noinspection ALL
  */
 public class ReVancedSettingsPreference extends ReVancedPreferenceFragment {
-    private static final String EXTERNAL_DOWNLOADER_PREFERENCE_KEY = "revanced_external_downloader";
-
-
-    public static void enableDisablePreferences() {
+    
+    private static void enableDisablePreferences() {
         for (Setting<?> setting : Setting.allLoadedSettings()) {
             final Preference preference = mPreferenceManager.findPreference(setting.key);
             if (preference != null) {
@@ -47,6 +45,8 @@ public class ReVancedSettingsPreference extends ReVancedPreferenceFragment {
     }
 
     public static void initializeReVancedSettings(@NonNull Activity activity) {
+        enableDisablePreferences();
+
         AmbientModePreferenceLinks();
         FullScreenPanelPreferenceLinks();
         LayoutOverrideLinks();

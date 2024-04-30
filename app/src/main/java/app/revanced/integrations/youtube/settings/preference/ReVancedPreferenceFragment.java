@@ -10,7 +10,6 @@ import static app.revanced.integrations.shared.utils.Utils.showToastShort;
 import static app.revanced.integrations.youtube.settings.Settings.DEFAULT_PLAYBACK_SPEED;
 import static app.revanced.integrations.youtube.settings.Settings.HIDE_PREVIEW_COMMENT;
 import static app.revanced.integrations.youtube.settings.Settings.HIDE_PREVIEW_COMMENT_TYPE;
-import static app.revanced.integrations.youtube.settings.preference.ReVancedSettingsPreference.enableDisablePreferences;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -48,7 +47,6 @@ import java.util.TreeMap;
 import app.revanced.integrations.shared.settings.BooleanSetting;
 import app.revanced.integrations.shared.settings.Setting;
 import app.revanced.integrations.shared.utils.Logger;
-import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.patches.video.CustomPlaybackSpeedPatch;
 import app.revanced.integrations.youtube.utils.ExtendedUtils;
 import app.revanced.integrations.youtube.utils.ThemeUtils;
@@ -109,14 +107,15 @@ public class ReVancedPreferenceFragment extends PreferenceFragment {
                 return;
             }
 
-            enableDisablePreferences();
+            final Activity mActivity = getActivity();
+            ReVancedSettingsPreference.initializeReVancedSettings(mActivity);
 
             if (settingImportInProgress) {
                 return;
             }
 
             if (setting.rebootApp)
-                showRestartDialog(getActivity());
+                showRestartDialog(mActivity);
         } catch (Exception ex) {
             Logger.printException(() -> "OnSharedPreferenceChangeListener failure", ex);
         }
@@ -222,10 +221,9 @@ public class ReVancedPreferenceFragment extends PreferenceFragment {
             setPreferenceFragmentToolbar("revanced_preference_screen_sb");
             setPreferenceScreenToolbar();
 
-            enableDisablePreferences();
+            ReVancedSettingsPreference.initializeReVancedSettings(getActivity());
 
             setBackupRestorePreference();
-            ReVancedSettingsPreference.initializeReVancedSettings(getActivity());
 
             for (Setting<?> setting : Setting.allLoadedSettings()) {
                 final Preference preference = mPreferenceManager.findPreference(setting.key);
