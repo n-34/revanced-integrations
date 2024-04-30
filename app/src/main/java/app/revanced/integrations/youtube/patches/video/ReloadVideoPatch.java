@@ -11,44 +11,38 @@ import app.revanced.integrations.youtube.shared.VideoInformation;
 
 @SuppressWarnings("unused")
 public class ReloadVideoPatch {
-    private static final int RELOAD_VIDEO_TIME_MILLISECONDS = 15000;
+    private static final long RELOAD_VIDEO_TIME_MILLISECONDS = 15000L;
 
     @NonNull
     public static String videoId = "";
 
     /**
      * Injection point.
-     *
-     * @param newlyLoadedVideoId id of the current video
      */
-    public static void setVideoId(@NonNull String newlyLoadedVideoId) {
-        if (!Settings.SKIP_PRELOADED_BUFFER.get()) {
+    public static void newVideoStarted(@NonNull String newlyLoadedChannelId, @NonNull String newlyLoadedChannelName,
+                                       @NonNull String newlyLoadedVideoId, @NonNull String newlyLoadedVideoTitle,
+                                       final long newlyLoadedVideoLength, boolean newlyLoadedLiveStreamValue) {
+        if (!Settings.SKIP_PRELOADED_BUFFER.get())
             return;
-        }
-
-        if (PlayerType.getCurrent() == PlayerType.INLINE_MINIMAL) {
+        if (PlayerType.getCurrent() == PlayerType.INLINE_MINIMAL)
             return;
-        }
-
         if (videoId.equals(newlyLoadedVideoId))
             return;
-
         videoId = newlyLoadedVideoId;
 
-        Utils.runOnMainThreadDelayed(ReloadVideoPatch::reloadVideo, 700);
-    }
-
-    public static void reloadVideo() {
-        final long videoLength = VideoInformation.getVideoLength();
-        final boolean videoIsLiveStream = VideoInformation.getLiveStreamState();
-
-        if (videoLength < RELOAD_VIDEO_TIME_MILLISECONDS || videoIsLiveStream)
+        if (newlyLoadedVideoLength < RELOAD_VIDEO_TIME_MILLISECONDS || newlyLoadedLiveStreamValue)
             return;
 
+        final long seekTime = Math.max(RELOAD_VIDEO_TIME_MILLISECONDS, (long) (newlyLoadedVideoLength * 0.5));
+
+        Utils.runOnMainThreadDelayed(() -> reloadVideo(seekTime), 250);
+    }
+
+    private static void reloadVideo(final long videoLength) {
         final long lastVideoTime = VideoInformation.getVideoTime();
         final float playbackSpeed = VideoInformation.getPlaybackSpeed();
-        final long speedAdjustedTimeThreshold = (long) (playbackSpeed * 1000);
-        VideoInformation.overrideVideoTime(RELOAD_VIDEO_TIME_MILLISECONDS);
+        final long speedAdjustedTimeThreshold = (long) (playbackSpeed * 300);
+        VideoInformation.overrideVideoTime(videoLength);
         VideoInformation.overrideVideoTime(lastVideoTime + speedAdjustedTimeThreshold);
 
         if (!Settings.SKIP_PRELOADED_BUFFER_TOAST.get())

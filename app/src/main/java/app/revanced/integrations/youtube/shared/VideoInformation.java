@@ -5,9 +5,12 @@ import static app.revanced.integrations.shared.utils.ResourceUtils.getString;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import org.apache.commons.lang3.time.FastDateFormat;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimeZone;
 
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.Utils;
@@ -26,17 +29,24 @@ public final class VideoInformation {
      */
     private static final String SHORTS_PLAYER_PARAMETERS = "8AEB";
 
+    private static final FastDateFormat fdf = FastDateFormat.getInstance("HH:mm:ss", TimeZone.getTimeZone("UTC"));
+    @NonNull
+    private static String channelId = "";
+    @NonNull
+    private static String channelName = "";
     @NonNull
     private static String videoId = "";
-
+    @NonNull
+    private static String videoTitle = "";
     private static long videoLength = 0;
-    private static long videoTime = -1;
+    private static boolean videoIsLiveStream;
+    private static volatile long videoTime = -1;
 
     @NonNull
     private static volatile String playerResponseVideoId = "";
     private static volatile boolean playerResponseVideoIdIsShort;
     private static volatile boolean videoIdIsShort;
-    private static volatile boolean videoIsLiveStream;
+    private static volatile boolean videoIsPlaylist;
 
     /**
      * The current playback speed
@@ -103,12 +113,50 @@ public final class VideoInformation {
     }
 
     public static boolean videoEnded() {
-        if (!Settings.ALWAYS_REPEAT.get())
-            return false;
+        return Settings.ALWAYS_REPEAT.get() && overrideVideoTime(0);
+    }
 
-        Utils.runOnMainThreadDelayed(() -> overrideVideoTime(0), 0);
+    /**
+     * Injection point.
+     *
+     * @param newlyLoadedChannelId          id of the current channel.
+     * @param newlyLoadedChannelName        name of the current channel.
+     * @param newlyLoadedVideoId            id of the current video.
+     * @param newlyLoadedVideoTitle         title of the current video.
+     * @param newlyLoadedVideoLength        length of the video in milliseconds.
+     * @param newlyLoadedLiveStreamValue    whether the current video is a livestream.
+     */
+    public static void setVideoInformation(@NonNull String newlyLoadedChannelId, @NonNull String newlyLoadedChannelName,
+                                           @NonNull String newlyLoadedVideoId, @NonNull String newlyLoadedVideoTitle,
+                                           final long newlyLoadedVideoLength, boolean newlyLoadedLiveStreamValue) {
+        if (videoId.equals(newlyLoadedVideoId))
+            return;
 
-        return true;
+        channelId = newlyLoadedChannelId;
+        channelName = newlyLoadedChannelName;
+        videoId = newlyLoadedVideoId;
+        videoTitle = newlyLoadedVideoTitle;
+        videoLength = newlyLoadedVideoLength;
+        videoIsLiveStream = newlyLoadedLiveStreamValue;
+
+        Logger.printDebug(() ->
+                "channelId='" +
+                        newlyLoadedChannelId +
+                        "'\nchannelName='" +
+                        newlyLoadedChannelName +
+                        "'\nvideoId='" +
+                        newlyLoadedVideoId +
+                        "'\nvideoTitle='" +
+                        newlyLoadedVideoTitle +
+                        "'\nvideoLength='" +
+                        newlyLoadedVideoLength +
+                        "' ("+
+                        fdf.format(newlyLoadedVideoLength) +
+                        ")\n"+
+                        "videoIsLiveStream='" +
+                        newlyLoadedLiveStreamValue +
+                        "'"
+        );
     }
 
     /**
@@ -121,24 +169,12 @@ public final class VideoInformation {
         return videoId;
     }
 
-    /**
-     * Injection point.
-     *
-     * @param newlyLoadedVideoId id of the current video
-     */
-    public static void setVideoId(@NonNull String newlyLoadedVideoId) {
-        if (videoId.equals(newlyLoadedVideoId))
-            return;
-
-        videoId = newlyLoadedVideoId;
-    }
-
     public static boolean getLiveStreamState() {
         return videoIsLiveStream;
     }
 
-    public static void setLiveStreamState(final String newlyLoadedVideoCpn, boolean newlyLoadedValue) {
-        videoIsLiveStream = newlyLoadedValue;
+    public static boolean getPlaylistState() {
+        return videoIsPlaylist;
     }
 
     /**
@@ -185,7 +221,7 @@ public final class VideoInformation {
      * Injection point.
      */
     @Nullable
-    public static String newPlayerResponseParameter(@NonNull String videoId, @Nullable String playerParameter, boolean isShortAndOpeningOrPlaying) {
+    public static String newPlayerResponseParameter(@NonNull String videoId, @Nullable String playerParameter, @Nullable String playlistId, boolean isShortAndOpeningOrPlaying) {
         final boolean isShort = playerParametersAreShort(playerParameter);
         playerResponseVideoIdIsShort = isShort;
         if (!isShort || isShortAndOpeningOrPlaying) {
@@ -193,6 +229,7 @@ public final class VideoInformation {
                 videoIdIsShort = isShort;
             }
         }
+        videoIsPlaylist = playlistId != null && !playlistId.isEmpty();
         return playerParameter; // Return the original value since we are observing and not modifying.
     }
 
@@ -260,7 +297,7 @@ public final class VideoInformation {
                 videoQuality = DEFAULT_YOUTUBE_VIDEO_QUALITY;
                 videoQualityString = DEFAULT_YOUTUBE_VIDEO_QUALITY_STRING;
             }
-        } catch (Exception ignored) {
+        } catch (NumberFormatException ignored) {
         }
     }
 
@@ -316,22 +353,13 @@ public final class VideoInformation {
     }
 
     /**
-     * Injection point.
-     *
-     * @param length The length of the video in milliseconds.
-     */
-    public static void setVideoLength(final long length) {
-        videoLength = length;
-    }
-
-    /**
      * Playback time of the current video playing.  Includes Shorts.
      * <p>
      * Value will lag behind the actual playback time by a variable amount based on the playback speed.
      * <p>
-     * If playback speed is 2.0x, this value may be up to 2000ms behind the actual playback time.
-     * If playback speed is 1.0x, this value may be up to 1000ms behind the actual playback time.
-     * If playback speed is 0.5x, this value may be up to 500ms behind the actual playback time.
+     * If playback speed is 2.0x, this value may be up to 200ms behind the actual playback time.
+     * If playback speed is 1.0x, this value may be up to 100ms behind the actual playback time.
+     * If playback speed is 0.5x, this value may be up to 50ms behind the actual playback time.
      * Etc.
      *
      * @return The time of the video in milliseconds. -1 if not set yet.
@@ -342,7 +370,7 @@ public final class VideoInformation {
 
     /**
      * Injection point.
-     * Called on the main thread every 1000ms.
+     * Called on the main thread every 100ms.
      *
      * @param time The current playback time of the video in milliseconds.
      */

@@ -59,8 +59,10 @@ public class SegmentPlaybackController {
      * contain the current video time.  Segment are removed when playback exits the segment.
      */
     private static final List<SponsorSegment> hiddenSkipSegmentsForCurrentVideoTime = new ArrayList<>();
-    @Nullable
-    private static String currentVideoId;
+    @NonNull
+    private static String videoId = "";
+    private static long videoLength = 0;
+
     @Nullable
     private static SponsorSegment[] segments;
     /**
@@ -165,8 +167,9 @@ public class SegmentPlaybackController {
     /**
      * Clears all downloaded data.
      */
-    private static void clearData() {
-        currentVideoId = null;
+    public static void clearData() {
+        videoId = "";
+        videoLength = 0;
         segments = null;
         highlightSegment = null;
         highlightSegmentInitialShowEndTime = 0;
@@ -200,7 +203,9 @@ public class SegmentPlaybackController {
     /**
      * Injection point.
      */
-    public static void setCurrentVideoId(@Nullable String videoId) {
+    public static void newVideoStarted(@NonNull String newlyLoadedChannelId, @NonNull String newlyLoadedChannelName,
+                                       @NonNull String newlyLoadedVideoId, @NonNull String newlyLoadedVideoTitle,
+                                       final long newlyLoadedVideoLength, boolean newlyLoadedLiveStreamValue) {
         try {
             if (!Settings.SB_ENABLED.get()) {
                 return;
@@ -209,10 +214,7 @@ public class SegmentPlaybackController {
                 Logger.printDebug(() -> "Network not connected, ignoring video");
                 return;
             }
-            if (videoId == null || videoId.isEmpty()) {
-                return;
-            }
-            if (Objects.equals(currentVideoId, videoId)) {
+            if (Objects.equals(videoId, newlyLoadedVideoId)) {
                 return;
             }
             clearData();
@@ -221,12 +223,13 @@ public class SegmentPlaybackController {
                 return;
             }
 
-            currentVideoId = videoId;
-            Logger.printDebug(() -> "setCurrentVideoId: " + videoId);
+            videoId = newlyLoadedVideoId;
+            videoLength = newlyLoadedVideoLength;
+            Logger.printDebug(() -> "newVideoStarted: " + newlyLoadedVideoId);
 
             Utils.runOnBackgroundThread(() -> {
                 try {
-                    executeDownloadSegments(videoId);
+                    executeDownloadSegments(newlyLoadedVideoId);
                 } catch (Exception e) {
                     Logger.printException(() -> "Failed to download segments", e);
                 }
@@ -237,17 +240,38 @@ public class SegmentPlaybackController {
     }
 
     /**
+     * Id of the last video opened.  Includes Shorts.
+     *
+     * @return The id of the video, or an empty string if no videos have been opened yet.
+     */
+    @NonNull
+    public static String getVideoId() {
+        return videoId;
+    }
+
+    /**
+     * Length of the current video playing.  Includes Shorts.
+     *
+     * @return The length of the video in milliseconds.
+     * If the video is not yet loaded, or if the video is playing in the background with no video visible,
+     * then this returns zero.
+     */
+    public static long getVideoLength() {
+        return videoLength;
+    }
+
+    /**
      * Must be called off main thread
      */
-    static void executeDownloadSegments(@NonNull String videoId) {
-        Objects.requireNonNull(videoId);
+    static void executeDownloadSegments(@NonNull String newlyLoadedVideoId) {
+        Objects.requireNonNull(newlyLoadedVideoId);
         try {
-            SponsorSegment[] segments = SBRequester.getSegments(videoId);
+            SponsorSegment[] segments = SBRequester.getSegments(newlyLoadedVideoId);
 
             Utils.runOnMainThread(() -> {
-                if (!videoId.equals(currentVideoId)) {
+                if (!newlyLoadedVideoId.equals(videoId)) {
                     // user changed videos before get segments network call could complete
-                    Logger.printDebug(() -> "Ignoring segments for prior video: " + videoId);
+                    Logger.printDebug(() -> "Ignoring segments for prior video: " + newlyLoadedVideoId);
                     return;
                 }
                 setSegments(segments);
@@ -277,7 +301,7 @@ public class SegmentPlaybackController {
 
     /**
      * Injection point.
-     * Updates SponsorBlock every 1000ms.
+     * Updates SponsorBlock every 100ms.
      * When changing videos, this is first called with value 0 and then the video is changed.
      */
     public static void setVideoTime(long millis) {
@@ -295,12 +319,12 @@ public class SegmentPlaybackController {
             // Amount of time to look ahead for the next segment,
             // and the threshold to determine if a scheduled show/hide is at the correct video time when it's run.
             //
-            // This value must be greater than largest time between calls to this method (1000ms),
+            // This value must be greater than largest time between calls to this method (100ms),
             // and must be adjusted for the video speed.
             //
             // To debug the stale skip logic, set this to a very large value (5000 or more)
             // then try manually seeking just before playback reaches a segment skip.
-            final long speedAdjustedTimeThreshold = (long) (playbackSpeed * 1200);
+            final long speedAdjustedTimeThreshold = (long) (playbackSpeed * 100);
             final long startTimerLookAheadThreshold = millis + speedAdjustedTimeThreshold;
 
             SponsorSegment foundSegmentCurrentlyPlaying = null;
@@ -683,15 +707,14 @@ public class SegmentPlaybackController {
 
     @SuppressLint("DefaultLocale")
     private static void calculateTimeWithoutSegments() {
-        final long currentVideoLength = VideoInformation.getVideoLength();
-        if (!Settings.SB_VIDEO_LENGTH_WITHOUT_SEGMENTS.get() || currentVideoLength <= 0
+        if (!Settings.SB_VIDEO_LENGTH_WITHOUT_SEGMENTS.get() || videoLength <= 0
                 || segments == null || segments.length == 0) {
             timeWithoutSegments = null;
             return;
         }
 
         boolean foundNonhighlightSegments = false;
-        long timeWithoutSegmentsValue = currentVideoLength;
+        long timeWithoutSegmentsValue = videoLength;
 
         for (int i = 0, length = segments.length; i < length; i++) {
             SponsorSegment segment = segments[i];
@@ -741,7 +764,6 @@ public class SegmentPlaybackController {
     public static void drawSponsorTimeBars(final Canvas canvas, final float posY) {
         try {
             if (segments == null) return;
-            final long videoLength = VideoInformation.getVideoLength();
             if (videoLength <= 0) return;
 
             final int thicknessDiv2 = sponsorBarThickness / 2; // rounds down

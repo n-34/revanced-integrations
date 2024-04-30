@@ -2,6 +2,8 @@ package app.revanced.integrations.youtube.patches.video;
 
 import static app.revanced.integrations.shared.utils.StringRef.str;
 
+import androidx.annotation.NonNull;
+
 import app.revanced.integrations.shared.settings.IntegerSetting;
 import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.settings.Settings;
@@ -17,7 +19,9 @@ public class VideoQualityPatch {
     /**
      * Injection point.
      */
-    public static void newVideoStarted(final String ignoredVideoId) {
+    public static void newVideoStarted(@NonNull String newlyLoadedChannelId, @NonNull String newlyLoadedChannelName,
+                                           @NonNull String newlyLoadedVideoId, @NonNull String newlyLoadedVideoTitle,
+                                           final long newlyLoadedVideoLength, boolean newlyLoadedLiveStreamValue) {
         final int defaultQuality = Utils.getNetworkType() == Utils.NetworkType.MOBILE
                 ? mobileQualitySetting.get()
                 : wifiQualitySetting.get();
@@ -25,12 +29,22 @@ public class VideoQualityPatch {
         if (defaultQuality == DEFAULT_YOUTUBE_VIDEO_QUALITY)
             return;
 
+        final boolean clientEnforcesVideoQualityLimits = ExtendedUtils.getClientEnforcesVideoQualityLimits();
+        long delayMillis;
+        if (!clientEnforcesVideoQualityLimits) {
+            delayMillis = 0;
+        } else if (Settings.SKIP_PRELOADED_BUFFER.get()) {
+            delayMillis = 250;
+        } else {
+            delayMillis = 500;
+        }
+
         Utils.runOnMainThreadDelayed(() -> {
-            final int preferredQuality = ExtendedUtils.getClientEnforcesVideoQualityLimits()
+            final int preferredQuality = clientEnforcesVideoQualityLimits
                     ? VideoInformation.getAvailableVideoQuality(defaultQuality)
                     : defaultQuality;
             VideoInformation.overrideVideoQuality(preferredQuality);
-            }, 500
+            }, delayMillis
         );
     }
 

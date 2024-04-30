@@ -88,7 +88,7 @@ public class SpoofPlayerParameterPatch {
      * @param videoId    Original video id value.
      * @param parameters Original player parameter value.
      */
-    public static String spoofParameter(@NonNull String videoId, @Nullable String parameters, boolean isShortAndOpeningOrPlaying) {
+    public static String spoofParameter(@NonNull String videoId, @Nullable String parameters, @Nullable String playlistId, boolean isShortAndOpeningOrPlaying) {
         try {
             Logger.printDebug(() -> "Original player parameter value: " + parameters);
 

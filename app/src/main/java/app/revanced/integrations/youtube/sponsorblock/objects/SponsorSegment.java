@@ -8,7 +8,7 @@ import androidx.annotation.Nullable;
 import java.util.Objects;
 
 import app.revanced.integrations.shared.utils.StringRef;
-import app.revanced.integrations.youtube.shared.VideoInformation;
+import app.revanced.integrations.youtube.sponsorblock.SegmentPlaybackController;
 
 public class SponsorSegment implements Comparable<SponsorSegment> {
     public enum SegmentVote {
@@ -101,7 +101,7 @@ public class SponsorSegment implements Comparable<SponsorSegment> {
      */
     @NonNull
     public String getSkipButtonText() {
-        return category.getSkipButtonText(start, VideoInformation.getVideoLength()).toString();
+        return category.getSkipButtonText(start, SegmentPlaybackController.getVideoLength()).toString();
     }
 
     /**
@@ -109,7 +109,7 @@ public class SponsorSegment implements Comparable<SponsorSegment> {
      */
     @NonNull
     public String getSkippedToastText() {
-        return category.getSkippedToastText(start, VideoInformation.getVideoLength()).toString();
+        return category.getSkippedToastText(start, SegmentPlaybackController.getVideoLength()).toString();
     }
 
     @Override

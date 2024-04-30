@@ -13,11 +13,11 @@ import app.revanced.integrations.youtube.settings.Settings;
 @SuppressWarnings("unused")
 public class RestoreOldVideoQualityMenuPatch {
 
-    public static boolean showOldVideoQualityMenu() {
+    public static boolean restoreOldVideoQualityMenu() {
         return Settings.RESTORE_OLD_VIDEO_QUALITY_MENU.get();
     }
 
-    public static void showOldVideoQualityMenu(ListView listView) {
+    public static void restoreOldVideoQualityMenu(ListView listView) {
         if (!Settings.RESTORE_OLD_VIDEO_QUALITY_MENU.get())
             return;
 

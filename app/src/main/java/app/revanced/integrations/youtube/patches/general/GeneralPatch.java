@@ -155,7 +155,9 @@ public class GeneralPatch {
         return subtitlePrefetched;
     }
 
-    public static void newVideoStarted(@NonNull String newlyLoadedVideoId) {
+    public static void newVideoStarted(@NonNull String newlyLoadedChannelId, @NonNull String newlyLoadedChannelName,
+                                       @NonNull String newlyLoadedVideoId, @NonNull String newlyLoadedVideoTitle,
+                                       final long newlyLoadedVideoLength, boolean newlyLoadedLiveStreamValue) {
         if (Objects.equals(newlyLoadedVideoId, videoId)) {
             return;
         }

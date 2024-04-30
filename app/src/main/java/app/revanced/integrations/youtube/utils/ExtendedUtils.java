@@ -92,9 +92,6 @@ public class ExtendedUtils extends PackageUtils {
         if (isVersionToLessThan(getVersionName(), CLIENT_ENFORCES_VIDEO_QUALITY_LIMITS_VERSION)) {
             return;
         }
-        if (isSpoofingToLessThan(CLIENT_ENFORCES_VIDEO_QUALITY_LIMITS_VERSION)) {
-            return;
-        }
         clientEnforcesVideoQualityLimits = true;
     }
 

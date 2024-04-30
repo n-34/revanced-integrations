@@ -219,8 +219,8 @@ public class SponsorBlockUtils {
             Utils.verifyOnMainThread();
             final long start = newSponsorSegmentStartMillis;
             final long end = newSponsorSegmentEndMillis;
-            final String videoId = VideoInformation.getVideoId();
-            final long videoLength = VideoInformation.getVideoLength();
+            final String videoId = SegmentPlaybackController.getVideoId();
+            final long videoLength = SegmentPlaybackController.getVideoLength();
             final SegmentCategory segmentCategory = newUserCreatedSegmentCategory;
             if (start < 0 || end < 0 || start >= end || videoLength <= 0 || videoId.isEmpty() || segmentCategory == null) {
                 Logger.printException(() -> "invalid parameters");
@@ -297,7 +297,7 @@ public class SponsorBlockUtils {
             }
 
             // use same time formatting as shown in the video player
-            final long videoLength = VideoInformation.getVideoLength();
+            final long videoLength = SegmentPlaybackController.getVideoLength();
             final String formatPattern;
             if (videoLength < (10 * 60 * 1000)) {
                 formatPattern = "m:ss.SSS"; // less than 10 minutes

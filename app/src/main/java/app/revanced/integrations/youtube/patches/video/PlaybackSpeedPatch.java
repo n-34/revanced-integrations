@@ -2,9 +2,8 @@ package app.revanced.integrations.youtube.patches.video;
 
 import static app.revanced.integrations.shared.utils.StringRef.str;
 import static app.revanced.integrations.shared.utils.Utils.showToastShort;
-import static app.revanced.integrations.youtube.shared.VideoInformation.getLiveStreamState;
 
-import java.util.Objects;
+import androidx.annotation.NonNull;
 
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.youtube.patches.utils.PatchStatus;
@@ -13,45 +12,38 @@ import app.revanced.integrations.youtube.shared.VideoInformation;
 
 @SuppressWarnings("unused")
 public class PlaybackSpeedPatch {
-    private static String currentVideoCpn;
+    private static boolean isLiveStream = false;
 
     /**
      * Injection point.
      */
-    public static void newVideoStarted(final String newlyLoadedVideoCpn, boolean isLiveStream) {
-        try {
-            if (Objects.equals(currentVideoCpn, newlyLoadedVideoCpn))
-                return;
-            currentVideoCpn = newlyLoadedVideoCpn;
+    public static void newVideoStarted(@NonNull String newlyLoadedChannelId, @NonNull String newlyLoadedChannelName,
+                                       @NonNull String newlyLoadedVideoId, @NonNull String newlyLoadedVideoTitle,
+                                       final long newlyLoadedVideoLength, boolean newlyLoadedLiveStreamValue) {
+        isLiveStream = newlyLoadedLiveStreamValue;
 
-            if (Settings.DISABLE_DEFAULT_PLAYBACK_SPEED_LIVE.get() && isLiveStream)
-                return;
+        if (Settings.DISABLE_DEFAULT_PLAYBACK_SPEED_LIVE.get() && newlyLoadedLiveStreamValue)
+            return;
 
-            VideoInformation.overridePlaybackSpeed(Settings.DEFAULT_PLAYBACK_SPEED.get());
-        } catch (Exception ex) {
-            Logger.printException(() -> "Failed to setDefaultPlaybackSpeed", ex);
-        }
+        Logger.printInfo(() -> "newVideoStarted: " + newlyLoadedVideoId);
+
+        VideoInformation.overridePlaybackSpeed(Settings.DEFAULT_PLAYBACK_SPEED.get());
     }
 
     /**
      * Injection point.
      */
     public static float getPlaybackSpeedInShorts(final float playbackSpeed) {
+        if (!VideoInformation.lastPlayerResponseIsShort())
+            return playbackSpeed;
         if (!Settings.ENABLE_DEFAULT_PLAYBACK_SPEED_SHORTS.get())
             return playbackSpeed;
-
-        if (Settings.DISABLE_DEFAULT_PLAYBACK_SPEED_LIVE.get() && getLiveStreamState())
+        if (Settings.DISABLE_DEFAULT_PLAYBACK_SPEED_LIVE.get() && isLiveStream)
             return playbackSpeed;
 
-        return Settings.DEFAULT_PLAYBACK_SPEED.get();
-    }
+        Logger.printInfo(() -> "getPlaybackSpeedInShorts: " + playbackSpeed);
 
-    /**
-     * Injection point.
-     * Overrides the video speed.  Called after video loads, and immediately after user selects a different playback speed
-     */
-    public static float getPlaybackSpeedOverride() {
-        return VideoInformation.getPlaybackSpeed();
+        return Settings.DEFAULT_PLAYBACK_SPEED.get();
     }
 
     /**
