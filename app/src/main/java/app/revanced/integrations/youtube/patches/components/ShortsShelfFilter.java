@@ -22,10 +22,18 @@ public final class ShortsShelfFilter extends Filter {
     private final ByteArrayFilterGroup shortsCompactFeedVideoBuffer;
     private final StringFilterGroup shelfHeader;
     private static final StringTrieSearch feedGroup = new StringTrieSearch();
-
     private static final BooleanSetting hideShortsShelf = Settings.HIDE_SHORTS_SHELF;
+    private static final boolean hideHomeAndRelatedVideos = Settings.HIDE_SHORTS_SHELF_HOME_RELATED_VIDEOS.get();
+    private static final boolean  hideSubscriptions = Settings.HIDE_SHORTS_SHELF_SUBSCRIPTIONS.get();
+    private static final boolean hideSearch = Settings.HIDE_SHORTS_SHELF_SEARCH.get();
+    private static final boolean hideHistory = Settings.HIDE_SHORTS_SHELF_HISTORY.get();
+    private final StringTrieSearch exceptions = new StringTrieSearch();
 
     public ShortsShelfFilter() {
+        if (!hideHistory) {
+            exceptions.addPattern("library_recent_shelf.eml");
+        }
+
         feedGroup.addPattern(CONVERSATION_CONTEXT_FEED_IDENTIFIER);
 
         // Feed Shorts shelf header.
@@ -71,6 +79,8 @@ public final class ShortsShelfFilter extends Filter {
     @Override
     public boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
                        StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
+        if (exceptions.matches(path))
+            return false;
         if (!shouldHideShortsFeedItems())
             return false;
 
@@ -90,11 +100,6 @@ public final class ShortsShelfFilter extends Filter {
     }
 
     private static boolean shouldHideShortsFeedItems() {
-        final boolean hideHomeAndRelatedVideos = Settings.HIDE_SHORTS_SHELF_HOME_RELATED_VIDEOS.get();
-        final boolean hideSubscriptions = Settings.HIDE_SHORTS_SHELF_SUBSCRIPTIONS.get();
-        final boolean hideSearch = Settings.HIDE_SHORTS_SHELF_SEARCH.get();
-        final boolean hideHistory = Settings.HIDE_SHORTS_SHELF_HISTORY.get();
-
         if (hideHomeAndRelatedVideos && hideSubscriptions && hideSearch && hideHistory) {
             // Shorts suggestions can load in the background if a video is opened and
             // then immediately minimized before any suggestions are loaded.
