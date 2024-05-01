@@ -434,6 +434,13 @@ public class PlayerPatch {
         hideViewUnderCondition(Settings.HIDE_SUGGESTED_ACTION.get(), view);
     }
 
+    public static void skipAutoPlayCountdown(View view) {
+        if (!Settings.SKIP_AUTOPLAY_COUNTDOWN.get())
+            return;
+
+        Utils.clickView(view);
+    }
+
     // endregion
 
     // region [Hide player flyout menu] patch
