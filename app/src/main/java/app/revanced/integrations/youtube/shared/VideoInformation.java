@@ -14,7 +14,7 @@ import java.util.TimeZone;
 
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.Utils;
-import app.revanced.integrations.youtube.settings.Settings;
+import app.revanced.integrations.youtube.patches.utils.AlwaysRepeatPatch;
 
 /**
  * Hooking class for the current playing video.
@@ -87,20 +87,9 @@ public final class VideoInformation {
     public static boolean seekTo(final long seekTime) {
         Utils.verifyOnMainThread();
         try {
-            final long videoTime = getVideoTime();
-            final long videoLength = getVideoLength();
+            final long adjustedSeekTime = getAdjustedSeekTime(seekTime);
 
-            // Prevent issues such as play/pause button or autoplay not working.
-            final long adjustedSeekTime = Math.min(seekTime, videoLength - 500);
-            if (videoTime <= seekTime && videoTime >= adjustedSeekTime) {
-                // Both the current video time and the seekTo are in the last 500ms of the video.
-                // Ignore this seek call, otherwise if a video ends with multiple closely timed segments
-                // then seeking here can create an infinite loop of skip attempts.
-                Logger.printDebug(() -> "Ignoring seekTo call as video playback is almost finished. "
-                        + " videoTime: " + videoTime + " videoLength: " + videoLength + " seekTo: " + seekTime);
-                return false;
-            }
-            Logger.printDebug(() -> "Seeking to " + seekTime);
+            Logger.printDebug(() -> "Seeking to " + adjustedSeekTime);
             return overrideVideoTime(adjustedSeekTime);
         } catch (Exception ex) {
             Logger.printException(() -> "Failed to seek", ex);
@@ -108,12 +97,27 @@ public final class VideoInformation {
         }
     }
 
-    public static void seekToRelative(long millisecondsRelative) {
-        seekTo(videoTime + millisecondsRelative);
+    // Prevent issues such as play/pause button or autoplay not working.
+    private static long getAdjustedSeekTime(final long seekTime) {
+        // If the user skips to a section that is 500 ms before the video length,
+        // it will get stuck in a loop.
+        if (videoLength - seekTime > 500) {
+            return seekTime;
+        }
+
+        // Both the current video time and the seekTo are in the last 500ms of the video.
+        if (AlwaysRepeatPatch.alwaysRepeatEnabled()) {
+            // If always-repeat is turned on, just skips to time 0.
+            return 0;
+        } else {
+            // Otherwise, just skips to a time longer than the video length.
+            // Paradoxically, if user skips to a section much longer than the video length, does not get stuck in a loop.
+            return Integer.MAX_VALUE;
+        }
     }
 
-    public static boolean videoEnded() {
-        return Settings.ALWAYS_REPEAT.get() && overrideVideoTime(0);
+    public static void seekToRelative(long millisecondsRelative) {
+        seekTo(videoTime + millisecondsRelative);
     }
 
     /**

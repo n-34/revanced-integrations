@@ -19,11 +19,16 @@ public class AlwaysRepeat extends BottomControlButton {
                 "always_repeat_button",
                 Settings.OVERLAY_BUTTON_ALWAYS_REPEAT,
                 Settings.ALWAYS_REPEAT,
+                Settings.ALWAYS_REPEAT_PAUSE,
                 view -> {
                     if (instance != null)
-                        instance.changeSelected(!view.isSelected(), false);
+                        instance.changeSelected(!view.isSelected());
                 },
-                null
+                view -> {
+                    if (instance != null)
+                        instance.changeColorFilter();
+                    return true;
+                }
         );
     }
 

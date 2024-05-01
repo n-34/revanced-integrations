@@ -2,8 +2,13 @@ package app.revanced.integrations.youtube.patches.overlaybutton;
 
 import static app.revanced.integrations.shared.utils.ResourceUtils.getAnimation;
 import static app.revanced.integrations.shared.utils.ResourceUtils.getInteger;
+import static app.revanced.integrations.shared.utils.StringRef.str;
 import static app.revanced.integrations.shared.utils.Utils.getChildView;
 
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -17,15 +22,20 @@ import java.util.Objects;
 
 import app.revanced.integrations.shared.settings.BooleanSetting;
 import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.Utils;
 
 public abstract class BottomControlButton {
     private static final Animation fadeIn;
     private static final Animation fadeOut;
     private static final Animation fadeOutImmediate;
 
+    private final ColorFilter cf =
+            new PorterDuffColorFilter(Color.parseColor("#fffffc79"), PorterDuff.Mode.SRC_ATOP);
+
     private final WeakReference<ImageView> buttonRef;
     private final BooleanSetting setting;
-    private final BooleanSetting interactionSetting;
+    private final BooleanSetting primaryInteractionSetting;
+    private final BooleanSetting secondaryInteractionSetting;
     protected boolean isVisible;
 
     static {
@@ -57,29 +67,34 @@ public abstract class BottomControlButton {
         return fadeOutImmediate;
     }
 
-    public BottomControlButton(@NonNull ViewGroup bottomControlsViewGroup, @NonNull String imageViewButtonId,
-                               @NonNull BooleanSetting booleanSetting, @NonNull View.OnClickListener onClickListener,
-                               @Nullable View.OnLongClickListener longClickListener) {
-        this(bottomControlsViewGroup, imageViewButtonId, booleanSetting, null, onClickListener, longClickListener);
+    public BottomControlButton(@NonNull ViewGroup bottomControlsViewGroup, @NonNull String imageViewButtonId, @NonNull BooleanSetting booleanSetting,
+                               @NonNull View.OnClickListener onClickListener, @Nullable View.OnLongClickListener longClickListener) {
+        this(bottomControlsViewGroup, imageViewButtonId, booleanSetting, null, null, onClickListener, longClickListener);
     }
 
-    public BottomControlButton(@NonNull ViewGroup bottomControlsViewGroup, @NonNull String imageViewButtonId,
-                               @NonNull BooleanSetting booleanSetting, @Nullable BooleanSetting interactionSetting,
-                               @NonNull View.OnClickListener onClickListener,
-                               @Nullable View.OnLongClickListener longClickListener) {
+    public BottomControlButton(@NonNull ViewGroup bottomControlsViewGroup, @NonNull String imageViewButtonId, @NonNull BooleanSetting booleanSetting, @Nullable BooleanSetting primaryInteractionSetting,
+                               @NonNull View.OnClickListener onClickListener, @Nullable View.OnLongClickListener longClickListener) {
+        this(bottomControlsViewGroup, imageViewButtonId, booleanSetting, primaryInteractionSetting, null, onClickListener, longClickListener);
+    }
+
+    public BottomControlButton(@NonNull ViewGroup bottomControlsViewGroup, @NonNull String imageViewButtonId, @NonNull BooleanSetting booleanSetting,
+                               @Nullable BooleanSetting primaryInteractionSetting, @Nullable BooleanSetting secondaryInteractionSetting,
+                               @NonNull View.OnClickListener onClickListener, @Nullable View.OnLongClickListener longClickListener) {
         Logger.printDebug(() -> "Initializing button: " + imageViewButtonId);
 
         setting = booleanSetting;
 
         // Create the button.
         ImageView imageView = Objects.requireNonNull(getChildView(bottomControlsViewGroup, imageViewButtonId));
-        if (interactionSetting != null) {
-            this.interactionSetting = interactionSetting;
-            imageView.setSelected(interactionSetting.get());
-        } else {
-            this.interactionSetting = null;
-        }
         imageView.setOnClickListener(onClickListener);
+        this.primaryInteractionSetting = primaryInteractionSetting;
+        this.secondaryInteractionSetting = secondaryInteractionSetting;
+        if (primaryInteractionSetting != null) {
+            imageView.setSelected(primaryInteractionSetting.get());
+        }
+        if (secondaryInteractionSetting != null) {
+            setColorFilter(imageView, secondaryInteractionSetting.get());
+        }
         if (longClickListener != null) {
             imageView.setOnLongClickListener(longClickListener);
         }
@@ -87,13 +102,39 @@ public abstract class BottomControlButton {
         buttonRef = new WeakReference<>(imageView);
     }
 
-    public void changeSelected(boolean selected, boolean onlyView) {
+    public void changeSelected(boolean selected) {
         ImageView imageView = buttonRef.get();
-        if (imageView == null || interactionSetting == null)
+        if (imageView == null || primaryInteractionSetting == null)
             return;
 
+        if (imageView.getColorFilter() == cf) {
+            Utils.showToastShort(str("revanced_overlay_button_not_allowed_warning"));
+            return;
+        }
+
         imageView.setSelected(selected);
-        if (!onlyView) interactionSetting.save(selected);
+        primaryInteractionSetting.save(selected);
+    }
+
+    public void changeColorFilter() {
+        ImageView imageView = buttonRef.get();
+        if (imageView == null) return;
+        if (primaryInteractionSetting == null || secondaryInteractionSetting == null)
+            return;
+
+        imageView.setSelected(true);
+        primaryInteractionSetting.save(true);
+
+        final boolean newValue = !secondaryInteractionSetting.get();
+        secondaryInteractionSetting.save(newValue);
+        setColorFilter(imageView, newValue);
+    }
+
+    public void setColorFilter(ImageView imageView, boolean selected) {
+        if (selected)
+            imageView.setColorFilter(cf);
+        else
+            imageView.clearColorFilter();
     }
 
     public void setVisibility(boolean visible, boolean animation) {
