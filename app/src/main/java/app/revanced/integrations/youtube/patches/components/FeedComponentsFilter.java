@@ -146,6 +146,11 @@ public final class FeedComponentsFilter extends Filter {
                 "set_reminder_button"
         );
 
+        final StringFilterGroup playables = new StringFilterGroup(
+                Settings.HIDE_PLAYABLES,
+                "horizontal_gaming_shelf.eml"
+        );
+
         final StringFilterGroup subscriptionsChannelBar = new StringFilterGroup(
                 Settings.HIDE_SUBSCRIPTIONS_CHANNEL_SECTION,
                 "subscriptions_channel_bar"
@@ -171,6 +176,7 @@ public final class FeedComponentsFilter extends Filter {
                 latestPosts,
                 movieShelf,
                 notifyMe,
+                playables,
                 subscriptionsChannelBar,
                 ticketShelf
         );
