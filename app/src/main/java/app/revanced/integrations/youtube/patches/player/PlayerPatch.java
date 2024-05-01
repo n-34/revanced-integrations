@@ -34,7 +34,6 @@ import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.patches.utils.InitializationPatch;
 import app.revanced.integrations.youtube.patches.utils.PatchStatus;
 import app.revanced.integrations.youtube.settings.Settings;
-import app.revanced.integrations.youtube.shared.RootView;
 import app.revanced.integrations.youtube.utils.VideoUtils;
 
 @SuppressWarnings("unused")
@@ -71,24 +70,20 @@ public class PlayerPatch {
     /**
      * view id R.id.content
      */
-    private static final int contentId = getIdIdentifier("content");
+    private static final int contentId = ResourceUtils.getIdIdentifier("content");
+    private static final String descriptionString = ResourceUtils.getString("create_playlist_description");
 
-    /**
-     * engagementSubHeaderActive is updated every time the engagement panel is opened.
-     * <p>
-     * If engagementSubHeaderActive is true, the player's comments panel has been opened.
-     * If engagementSubHeaderActive is false, the video description panel has been opened, or the comments panel for Shorts or community posts has been opened.
-     */
-    private static boolean engagementSubHeaderActive = false;
+    private static boolean isDescriptionPanel = false;
+
+    public static void setContentDescription(String contentDescription) {
+        isDescriptionPanel = contentDescription.trim().equals(descriptionString);
+    }
 
     /**
      * The last time the clickDescriptionView method was called.
      */
     private static long lastTimeDescriptionViewInvoked;
 
-    public static void engagementPanelSubHeaderViewLoaded(@Nullable View engagementPanelView) {
-        engagementSubHeaderActive = engagementPanelView != null;
-    }
 
     public static void onVideoDescriptionCreate(RecyclerView recyclerView) {
         if (!Settings.EXPAND_VIDEO_DESCRIPTION.get())
@@ -103,12 +98,16 @@ public class PlayerPatch {
                 if (contentView.getId() != contentId) {
                     return;
                 }
-                // Video description panel is only open when the player is active.
-                if (!RootView.isPlayerActive()) {
+                // This method is invoked whenever the Engagement panel is opened. (Description, Chapters, Comments, etc)
+                // Check the title of the Engagement panel to prevent unnecessary clicking.
+                if (!isDescriptionPanel) {
                     return;
                 }
-                // Ignored when the player comments panel opens.
-                if (engagementSubHeaderActive) {
+                // The first view group contains information such as the video's title, like count, and number of views.
+                if (!(recyclerView.getChildAt(0) instanceof ViewGroup primaryViewGroup)) {
+                    return;
+                }
+                if (primaryViewGroup.getChildCount() < 2) {
                     return;
                 }
                 // Typically, descriptionView is placed as the second child of recyclerView.
