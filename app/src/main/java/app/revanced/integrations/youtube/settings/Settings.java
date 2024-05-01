@@ -308,13 +308,11 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting RESTORE_OLD_SEEKBAR_THUMBNAILS = new BooleanSetting("revanced_restore_old_seekbar_thumbnails", TRUE);
 
     // PreferenceScreen: Player - Video description
-    public static final BooleanSetting HIDE_CHAPTERS = new BooleanSetting("revanced_hide_chapters", FALSE);
+    public static final BooleanSetting HIDE_CHAPTERS_SECTION = new BooleanSetting("revanced_hide_chapters_section", FALSE);
     public static final BooleanSetting HIDE_INFO_CARDS_SECTION = new BooleanSetting("revanced_hide_info_cards_section", FALSE);
-    public static final BooleanSetting HIDE_GAME_SECTION = new BooleanSetting("revanced_hide_game_section", FALSE);
-    public static final BooleanSetting HIDE_MUSIC_SECTION = new BooleanSetting("revanced_hide_music_section", FALSE);
-    public static final BooleanSetting HIDE_PLACE_SECTION = new BooleanSetting("revanced_hide_place_section", FALSE);
     public static final BooleanSetting HIDE_PODCAST_SECTION = new BooleanSetting("revanced_hide_podcast_section", FALSE);
     public static final BooleanSetting HIDE_SHOPPING_LINKS = new BooleanSetting("revanced_hide_shopping_links", TRUE);
+    public static final BooleanSetting HIDE_SUGGESTIONS_SECTION = new BooleanSetting("revanced_hide_suggestions_section", FALSE);
     public static final BooleanSetting HIDE_TRANSCRIPT_SECTION = new BooleanSetting("revanced_hide_transcript_section", FALSE);
     public static final BooleanSetting DISABLE_VIDEO_DESCRIPTION_INTERACTION = new BooleanSetting("revanced_disable_video_description_interaction", FALSE, true);
     public static final BooleanSetting EXPAND_VIDEO_DESCRIPTION = new BooleanSetting("revanced_expand_video_description", FALSE, true);

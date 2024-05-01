@@ -10,6 +10,7 @@ import app.revanced.integrations.youtube.settings.Settings;
 @SuppressWarnings("unused")
 public final class DescriptionsFilter extends Filter {
     private final StringTrieSearch exceptions = new StringTrieSearch();
+    private final StringFilterGroup chapterSection;
     private final StringFilterGroup shoppingLinks;
 
     public DescriptionsFilter() {
@@ -21,35 +22,40 @@ public final class DescriptionsFilter extends Filter {
                 "metadata"
         );
 
-        final StringFilterGroup chapterSection = new StringFilterGroup(
-                Settings.HIDE_CHAPTERS,
-                "macro_markers_carousel."
-        );
-
         final StringFilterGroup infoCardsSection = new StringFilterGroup(
                 Settings.HIDE_INFO_CARDS_SECTION,
-                "infocards_section"
-        );
-
-        final StringFilterGroup gameSection = new StringFilterGroup(
-                Settings.HIDE_GAME_SECTION,
-                "gaming_section"
-        );
-
-        final StringFilterGroup musicSection = new StringFilterGroup(
-                Settings.HIDE_MUSIC_SECTION,
-                "music_section",
-                "video_attributes_section"
-        );
-
-        final StringFilterGroup placeSection = new StringFilterGroup(
-                Settings.HIDE_PLACE_SECTION,
-                "place_section"
+                "infocards_section.eml"
         );
 
         final StringFilterGroup podcastSection = new StringFilterGroup(
                 Settings.HIDE_PODCAST_SECTION,
-                "playlist_section"
+                "playlist_section.eml"
+        );
+
+        // game section, music section and places section now use the same identifier in the latest version.
+        final StringFilterGroup suggestionSection = new StringFilterGroup(
+                Settings.HIDE_SUGGESTIONS_SECTION,
+                "gaming_section.eml",
+                "music_section.eml",
+                "place_section.eml",
+                "video_attributes_section.eml"
+        );
+
+        final StringFilterGroup transcriptSection = new StringFilterGroup(
+                Settings.HIDE_TRANSCRIPT_SECTION,
+                "transcript_section.eml"
+        );
+
+        addIdentifierCallbacks(
+                infoCardsSection,
+                podcastSection,
+                suggestionSection,
+                transcriptSection
+        );
+
+        chapterSection = new StringFilterGroup(
+                Settings.HIDE_CHAPTERS_SECTION,
+                "macro_markers_carousel."
         );
 
         shoppingLinks = new StringFilterGroup(
@@ -57,33 +63,26 @@ public final class DescriptionsFilter extends Filter {
                 "expandable_list."
         );
 
-        final StringFilterGroup transcriptSection = new StringFilterGroup(
-                Settings.HIDE_TRANSCRIPT_SECTION,
-                "transcript_section"
-        );
-
 
         addPathCallbacks(
                 chapterSection,
-                infoCardsSection,
-                gameSection,
-                musicSection,
-                placeSection,
-                podcastSection,
-                shoppingLinks,
-                transcriptSection
+                shoppingLinks
         );
     }
 
     @Override
     public boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
                        StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
-        if (exceptions.matches(path))
+        if (exceptions.matches(path)) {
             return false;
+        }
 
         // Check for the index because of likelihood of false positives.
-        if (matchedGroup == shoppingLinks && contentIndex != 0)
-            return false;
+        if (matchedGroup == chapterSection || matchedGroup == shoppingLinks) {
+            if (contentIndex != 0) {
+                return false;
+            }
+        }
 
         return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
     }
