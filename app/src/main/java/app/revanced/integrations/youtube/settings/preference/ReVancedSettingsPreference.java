@@ -51,6 +51,7 @@ public class ReVancedSettingsPreference extends ReVancedPreferenceFragment {
         FullScreenPanelPreferenceLinks();
         LayoutOverrideLinks();
         NavigationPreferenceLinks();
+        SpeedOverlayPreferenceLinks();
         QuickActionsPreferenceLinks();
         TabletLayoutLinks();
         setExternalDownloaderPreference(activity);
@@ -184,6 +185,16 @@ public class ReVancedSettingsPreference extends ReVancedPreferenceFragment {
                 Settings.HIDE_NAVIGATION_NOTIFICATIONS_BUTTON,
                 Settings.REPLACE_TOOLBAR_CREATE_BUTTON,
                 Settings.REPLACE_TOOLBAR_CREATE_BUTTON_TYPE
+        );
+    }
+
+    /**
+     * Enable/Disable Preference related to Speed overlay settings
+     */
+    private static void SpeedOverlayPreferenceLinks() {
+        enableDisablePreferences(
+                Settings.DISABLE_SPEED_OVERLAY.get(),
+                Settings.SPEED_OVERLAY_VALUE
         );
     }
 

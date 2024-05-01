@@ -25,7 +25,7 @@ public class PlaybackSpeedPatch {
         if (Settings.DISABLE_DEFAULT_PLAYBACK_SPEED_LIVE.get() && newlyLoadedLiveStreamValue)
             return;
 
-        Logger.printInfo(() -> "newVideoStarted: " + newlyLoadedVideoId);
+        Logger.printDebug(() -> "newVideoStarted: " + newlyLoadedVideoId);
 
         VideoInformation.overridePlaybackSpeed(Settings.DEFAULT_PLAYBACK_SPEED.get());
     }
@@ -41,7 +41,7 @@ public class PlaybackSpeedPatch {
         if (Settings.DISABLE_DEFAULT_PLAYBACK_SPEED_LIVE.get() && isLiveStream)
             return playbackSpeed;
 
-        Logger.printInfo(() -> "getPlaybackSpeedInShorts: " + playbackSpeed);
+        Logger.printDebug(() -> "getPlaybackSpeedInShorts: " + playbackSpeed);
 
         return Settings.DEFAULT_PLAYBACK_SPEED.get();
     }

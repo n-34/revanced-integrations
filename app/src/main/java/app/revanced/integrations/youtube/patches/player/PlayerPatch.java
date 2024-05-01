@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 import app.revanced.integrations.shared.settings.BaseSettings;
 import app.revanced.integrations.shared.settings.BooleanSetting;
+import app.revanced.integrations.shared.settings.FloatSetting;
 import app.revanced.integrations.shared.settings.IntegerSetting;
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.ResourceUtils;
@@ -398,6 +399,20 @@ public class PlayerPatch {
 
     public static boolean disableSpeedOverlay(boolean original) {
         return !Settings.DISABLE_SPEED_OVERLAY.get() && original;
+    }
+
+    public static float speedOverlayValue(float original) {
+        final FloatSetting speedOverlayValue = Settings.SPEED_OVERLAY_VALUE;
+        float playbackSpeed = speedOverlayValue.get();
+
+        if (playbackSpeed > 0.0f && playbackSpeed <= 8.0f) {
+            return playbackSpeed;
+        }
+
+        Utils.showToastShort(str("revanced_speed_overlay_value_warning"));
+        speedOverlayValue.resetToDefault();
+
+        return original;
     }
 
     public static boolean hideChannelWatermark(boolean original) {
