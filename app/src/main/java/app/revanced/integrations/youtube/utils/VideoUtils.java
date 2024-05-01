@@ -8,6 +8,7 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -136,11 +137,27 @@ public class VideoUtils extends IntentUtils {
                 .show();
     }
 
+    public static void showFlyoutMenu() {
+        if (Settings.APPEND_TIME_STAMP_INFORMATION_TYPE.get()) {
+            showVideoQualityFlyoutMenu();
+        } else {
+            showPlaybackSpeedFlyoutMenu();
+        }
+    }
+
     /**
      * Rest of the implementation added by patch.
      */
     public static void showPlaybackSpeedFlyoutMenu() {
         Logger.printDebug(() -> "Playback speed flyout menu opened");
+    }
+
+    /**
+     * Rest of the implementation added by patch.
+     */
+    public static void showVideoQualityFlyoutMenu() {
+        // These instructions are ignored by patch.
+        Log.d("Extended: VideoUtils", "Video quality flyout menu opened");
     }
 
     public static String getFormattedQualityString(@Nullable String prefix) {

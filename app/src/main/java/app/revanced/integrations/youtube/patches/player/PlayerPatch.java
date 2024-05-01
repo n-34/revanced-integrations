@@ -538,6 +538,10 @@ public class PlayerPatch {
                     return true;
                 }
         );
+
+        if (Settings.REPLACE_TIME_STAMP_ACTION.get()) {
+            containerView.setOnClickListener(timeStampContainerView -> VideoUtils.showFlyoutMenu());
+        }
     }
 
     public static int getSeekbarClickedColorValue(final int colorValue) {
