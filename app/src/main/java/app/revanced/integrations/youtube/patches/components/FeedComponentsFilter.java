@@ -6,6 +6,7 @@ import app.revanced.integrations.shared.patches.components.ByteArrayFilterGroup;
 import app.revanced.integrations.shared.patches.components.Filter;
 import app.revanced.integrations.shared.patches.components.StringFilterGroup;
 import app.revanced.integrations.shared.patches.components.StringFilterGroupList;
+import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.StringTrieSearch;
 import app.revanced.integrations.youtube.settings.Settings;
 import app.revanced.integrations.youtube.shared.NavigationBar;
@@ -201,12 +202,16 @@ public final class FeedComponentsFilter extends Filter {
                 && !mixPlaylistsContextExceptions.matches(conversionContext.toString());
     }
 
+    private static final String BROWSE_ID_LIBRARY = "FElibrary";
+
     @Override
     public boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
                        StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
         if (matchedGroup == carouselShelf) {
             // In the related video, the carousel shelf is not shown so player type check is ignored.
-            if (NavigationBar.getNavButtonIndex() > 2 && !RootView.isSearchBarActive())
+            final String browseId = RootView.getBrowseId();
+            Logger.printDebug(() -> "Current browseId: " + browseId);
+            if (browseId.equals(BROWSE_ID_LIBRARY) && !RootView.isSearchBarActive())
                 return false;
         } else if (matchedGroup == channelProfileButtonRule) {
             if (browseStoreButton.check(protobufBufferArray).isFiltered()) {
