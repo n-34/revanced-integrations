@@ -1,6 +1,5 @@
 package app.revanced.integrations.youtube.patches.player;
 
-import static app.revanced.integrations.shared.utils.ResourceUtils.getIdIdentifier;
 import static app.revanced.integrations.shared.utils.StringRef.str;
 import static app.revanced.integrations.shared.utils.Utils.hideViewBy0dpUnderCondition;
 import static app.revanced.integrations.shared.utils.Utils.hideViewUnderCondition;
@@ -298,8 +297,6 @@ public class PlayerPatch {
 
     // region [Hide comments component] patch
 
-    private static final int inlineExtraButtonId = getIdIdentifier("inline_extra_buttons");
-
     public static void changeEmojiPickerOpacity(ImageView imageView) {
         if (!Settings.HIDE_COMMENT_TIMESTAMP_AND_EMOJI_BUTTONS.get())
             return;
@@ -310,16 +307,6 @@ public class PlayerPatch {
     @Nullable
     public static Object disableEmojiPickerOnClickListener(@Nullable Object object) {
         return Settings.HIDE_COMMENT_TIMESTAMP_AND_EMOJI_BUTTONS.get() ? null : object;
-    }
-
-    public static int hideThanksButton(View view, int visibility) {
-        if (!Settings.HIDE_COMMENT_THANKS_BUTTON.get())
-            return visibility;
-
-        if (view.getId() != inlineExtraButtonId)
-            return visibility;
-
-        return View.GONE;
     }
 
     // endregion
