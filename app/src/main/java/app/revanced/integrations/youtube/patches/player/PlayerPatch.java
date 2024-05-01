@@ -571,8 +571,15 @@ public class PlayerPatch {
         return Settings.ENABLE_SEEKBAR_TAPPING.get();
     }
 
+    private static final int timeBarChapterViewId =
+            ResourceUtils.getIdIdentifier("time_bar_chapter_title");
+
     public static boolean hideSeekbar() {
         return Settings.HIDE_SEEKBAR.get();
+    }
+
+    public static boolean hideSeekbarChapters(View view) {
+        return Settings.HIDE_SEEKBAR_CHAPTERS.get() && view.getId() == timeBarChapterViewId;
     }
 
     public static boolean hideTimeStamp() {
