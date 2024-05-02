@@ -1,5 +1,6 @@
 package app.revanced.integrations.music.patches.actionbar;
 
+import static app.revanced.integrations.shared.utils.Utils.hideViewBy0dpUnderCondition;
 import static app.revanced.integrations.shared.utils.Utils.hideViewUnderCondition;
 
 import android.view.View;
@@ -28,14 +29,15 @@ public class ActionBarPatch {
     }
 
     public static void hideLikeDislikeButton(View view) {
+        final boolean enabled = Settings.HIDE_ACTION_BUTTON_LIKE_DISLIKE.get();
         hideViewUnderCondition(
-                Settings.HIDE_ACTION_BUTTON_LIKE_DISLIKE.get(),
+                enabled,
                 view
         );
-    }
-
-    public static boolean hideLikeDislikeButton(boolean original) {
-        return Settings.HIDE_ACTION_BUTTON_LIKE_DISLIKE.get() || original;
+        hideViewBy0dpUnderCondition(
+                enabled,
+                view
+        );
     }
 
     public static void hookDownloadButton(View view) {
