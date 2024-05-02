@@ -1,20 +1,13 @@
 package app.revanced.integrations.youtube.settings.preference;
 
-import static app.revanced.integrations.shared.utils.ResourceUtils.getLayoutIdentifier;
-import static app.revanced.integrations.shared.utils.StringRef.str;
 import static app.revanced.integrations.youtube.utils.ExtendedUtils.isSpoofingToLessThan;
 
 import android.app.Activity;
 import android.preference.Preference;
-import android.preference.PreferenceCategory;
-import android.preference.PreferenceScreen;
-import android.preference.SwitchPreference;
 
 import androidx.annotation.NonNull;
 
 import app.revanced.integrations.shared.settings.Setting;
-import app.revanced.integrations.shared.utils.Logger;
-import app.revanced.integrations.youtube.patches.utils.PatchStatus;
 import app.revanced.integrations.youtube.settings.Settings;
 import app.revanced.integrations.youtube.utils.ExtendedUtils;
 
@@ -48,13 +41,13 @@ public class ReVancedSettingsPreference extends ReVancedPreferenceFragment {
         enableDisablePreferences();
 
         AmbientModePreferenceLinks();
+        ExternalDownloaderPreferenceLinks();
         FullScreenPanelPreferenceLinks();
         LayoutOverrideLinks();
         NavigationPreferenceLinks();
         SpeedOverlayPreferenceLinks();
         QuickActionsPreferenceLinks();
         TabletLayoutLinks();
-        setExternalDownloaderPreference(activity);
     }
 
     /**
@@ -65,6 +58,16 @@ public class ReVancedSettingsPreference extends ReVancedPreferenceFragment {
                 Settings.DISABLE_AMBIENT_MODE.get(),
                 Settings.BYPASS_AMBIENT_MODE_RESTRICTIONS,
                 Settings.DISABLE_AMBIENT_MODE_IN_FULLSCREEN
+        );
+    }
+
+    /**
+     * Enable/Disable Preference for External downloader settings
+     */
+    private static void ExternalDownloaderPreferenceLinks() {
+        enableDisablePreferences(
+                isSpoofingToLessThan("18.24.00"),
+                Settings.EXTERNAL_DOWNLOADER_ACTION_BUTTON
         );
     }
 
@@ -196,40 +199,5 @@ public class ReVancedSettingsPreference extends ReVancedPreferenceFragment {
                 Settings.DISABLE_SPEED_OVERLAY.get(),
                 Settings.SPEED_OVERLAY_VALUE
         );
-    }
-
-    /**
-     * Add Preference to External downloader settings submenu
-     */
-    private static void setExternalDownloaderPreference(@NonNull Activity activity) {
-        try {
-            // check if Preference Screen is not null
-            if (!(mPreferenceManager.findPreference("revanced_preference_screen_player_buttons") instanceof PreferenceScreen playerButtonPreferenceScreen))
-                return;
-
-            // The player buttons preference screen contains overlay buttons as well as other settings. (e.g. Hide autoplay button)
-            // Make sure the overlay buttons patch is included.
-            if (!PatchStatus.OverlayButtons())
-                return;
-
-            if (isSpoofingToLessThan("18.24.00"))
-                return;
-
-            PreferenceCategory experimentalPreferenceCategory = new PreferenceCategory(activity);
-            experimentalPreferenceCategory.setTitle(str("revanced_preference_category_experimental_flag"));
-            experimentalPreferenceCategory.setLayoutResource(getLayoutIdentifier("revanced_settings_preferences_category"));
-
-            SwitchPreference overrideDownloadActionPreference = new SwitchPreference(activity);
-            overrideDownloadActionPreference.setTitle(str("revanced_external_downloader_action_title"));
-            overrideDownloadActionPreference.setSummaryOn(str("revanced_external_downloader_action_summary_on"));
-            overrideDownloadActionPreference.setSummaryOff(str("revanced_external_downloader_action_summary_off"));
-            overrideDownloadActionPreference.setKey(Settings.EXTERNAL_DOWNLOADER_ACTION_BUTTON.key);
-            overrideDownloadActionPreference.setDefaultValue(Settings.EXTERNAL_DOWNLOADER_ACTION_BUTTON.defaultValue);
-
-            playerButtonPreferenceScreen.addPreference(experimentalPreferenceCategory);
-            playerButtonPreferenceScreen.addPreference(overrideDownloadActionPreference);
-        } catch (Throwable th) {
-            Logger.printException(() -> "Error setting setExternalDownloaderPreference" + th);
-        }
     }
 }
