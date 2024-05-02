@@ -68,6 +68,10 @@ public class PlayerPatch {
 
     // region [Description components] patch
 
+    public static boolean disableRollingNumberAnimations() {
+        return Settings.DISABLE_ROLLING_NUMBER_ANIMATIONS.get();
+    }
+
     /**
      * view id R.id.content
      */
