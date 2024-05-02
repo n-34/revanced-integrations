@@ -6,11 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-
 import java.lang.ref.WeakReference;
 
-import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.youtube.settings.Settings;
 
 @SuppressWarnings("unused")
@@ -97,56 +94,6 @@ public class ShortsPatch {
         if (pivotBarView != null) {
             hideViewUnderCondition(Settings.HIDE_SHORTS_NAVIGATION_BAR.get(), pivotBarView);
         }
-    }
-
-    /**
-     * The last character of some handles is an official channel certification mark.
-     * This was in the form of nonBreakSpaceCharacter before SpannableString was made.
-     */
-    private static final String NON_BREAK_SPACE_CHARACTER = "\u00A0";
-    private static String channelName = "";
-
-    /**
-     * This method is only invoked on Shorts and is updated whenever the user swipes up or down on the Shorts.
-     */
-    public static void newShortsVideoStarted(@NonNull String newlyLoadedChannelId, @NonNull String newlyLoadedChannelName,
-                                             @NonNull String newlyLoadedVideoId, @NonNull String newlyLoadedVideoTitle,
-                                             final long newlyLoadedVideoLength, boolean newlyLoadedLiveStreamValue) {
-        if (newlyLoadedChannelName.equals(channelName))
-            return;
-
-        Logger.printDebug(() -> "New channel name loaded: " + newlyLoadedChannelName);
-
-        channelName = newlyLoadedChannelName;
-    }
-
-    public static CharSequence onCharSequenceLoaded(@NonNull Object conversionContext,
-                                                    @NonNull CharSequence charSequence) {
-        try {
-            if (!Settings.RETURN_SHORTS_CHANNEL_NAME.get())
-                return charSequence;
-
-            final String conversionContextString = conversionContext.toString();
-            final String originalString = charSequence.toString();
-
-            if (!conversionContextString.contains("|reel_channel_bar_inner.eml|"))
-                return charSequence;
-            if (!originalString.startsWith("@"))
-                return charSequence;
-            if (channelName.isEmpty())
-                return charSequence;
-
-            String replacedChannelName = channelName;
-            if (originalString.contains(NON_BREAK_SPACE_CHARACTER)) {
-                replacedChannelName += NON_BREAK_SPACE_CHARACTER;
-            }
-            final String finalChannelName = replacedChannelName;
-            Logger.printDebug(() -> "Replace Handle " + originalString + " to " + finalChannelName);
-            return finalChannelName;
-        } catch (Exception ex) {
-            Logger.printException(() -> "onCharSequenceLoaded failed", ex);
-        }
-        return charSequence;
     }
 
 }
