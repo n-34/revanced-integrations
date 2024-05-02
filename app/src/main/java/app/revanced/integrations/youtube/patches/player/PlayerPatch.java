@@ -34,6 +34,7 @@ import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.patches.utils.InitializationPatch;
 import app.revanced.integrations.youtube.patches.utils.PatchStatus;
 import app.revanced.integrations.youtube.settings.Settings;
+import app.revanced.integrations.youtube.shared.RootView;
 import app.revanced.integrations.youtube.utils.VideoUtils;
 
 @SuppressWarnings("unused")
@@ -71,12 +72,16 @@ public class PlayerPatch {
      * view id R.id.content
      */
     private static final int contentId = ResourceUtils.getIdIdentifier("content");
-    private static final String descriptionString = ResourceUtils.getString("create_playlist_description");
+    /**
+     * engagementSubHeaderActive is updated every time the engagement panel is opened.
+     * <p>
+     * If engagementSubHeaderActive is true, the player's comments panel has been opened.
+     * If engagementSubHeaderActive is false, the video description panel has been opened, or the comments panel for Shorts or community posts has been opened.
+     */
+    private static boolean engagementSubHeaderActive = false;
 
-    private static boolean isDescriptionPanel = false;
-
-    public static void setContentDescription(String contentDescription) {
-        isDescriptionPanel = contentDescription.trim().equals(descriptionString);
+    public static void engagementPanelSubHeaderViewLoaded(@Nullable View engagementPanelView) {
+        engagementSubHeaderActive = engagementPanelView != null;
     }
 
     /**
@@ -91,6 +96,10 @@ public class PlayerPatch {
 
         recyclerView.getViewTreeObserver().addOnDrawListener(() -> {
             try {
+                // Video description panel is only open when the player is active.
+                if (!RootView.isPlayerActive()) {
+                    return;
+                }
                 // Video description's recyclerView is a child view of [contentId].
                 if (!(recyclerView.getParent().getParent() instanceof View contentView)) {
                     return;
@@ -98,9 +107,8 @@ public class PlayerPatch {
                 if (contentView.getId() != contentId) {
                     return;
                 }
-                // This method is invoked whenever the Engagement panel is opened. (Description, Chapters, Comments, etc)
-                // Check the title of the Engagement panel to prevent unnecessary clicking.
-                if (!isDescriptionPanel) {
+                // Ignored when the player comments panel opens.
+                if (engagementSubHeaderActive) {
                     return;
                 }
                 // The first view group contains information such as the video's title, like count, and number of views.
