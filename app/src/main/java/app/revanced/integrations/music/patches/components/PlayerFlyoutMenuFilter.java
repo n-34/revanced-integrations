@@ -5,13 +5,13 @@ import app.revanced.integrations.shared.patches.components.Filter;
 import app.revanced.integrations.shared.patches.components.StringFilterGroup;
 
 @SuppressWarnings("unused")
-public final class ButtonShelfFilter extends Filter {
+public final class PlayerFlyoutMenuFilter extends Filter {
 
-    public ButtonShelfFilter() {
+    public PlayerFlyoutMenuFilter() {
         addIdentifierCallbacks(
                 new StringFilterGroup(
-                        Settings.HIDE_BUTTON_SHELF,
-                        "entry_point_button_shelf"
+                        Settings.HIDE_FLYOUT_MENU_3_COLUMN_COMPONENT,
+                        "music_highlight_menu_item_carousel.eml"
                 )
         );
     }

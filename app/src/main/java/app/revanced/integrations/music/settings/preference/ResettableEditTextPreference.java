@@ -18,13 +18,8 @@ import app.revanced.integrations.shared.utils.Logger;
 public class ResettableEditTextPreference {
 
     public static void showDialog(Activity mActivity, @NonNull Setting<String> setting) {
-        showDialog(mActivity, setting, setting.get());
-    }
-
-    public static void showDialog(Activity mActivity, @NonNull Setting<String> setting, String hint) {
         try {
             final EditText textView = new EditText(mActivity);
-            textView.setHint(hint);
             textView.setText(setting.get());
 
             TextInputLayout textInputLayout = new TextInputLayout(mActivity);

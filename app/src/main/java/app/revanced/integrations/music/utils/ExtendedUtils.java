@@ -8,9 +8,17 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 
+import app.revanced.integrations.music.settings.Settings;
 import app.revanced.integrations.shared.utils.PackageUtils;
 
 public class ExtendedUtils extends PackageUtils {
+
+    public static boolean isSpoofingToLessThan(@NonNull String versionName) {
+        if (!Settings.SPOOF_APP_VERSION.get())
+            return false;
+
+        return isVersionToLessThan(Settings.SPOOF_APP_VERSION_TARGET.get(), versionName);
+    }
 
     private static int dpToPx(float dp) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());

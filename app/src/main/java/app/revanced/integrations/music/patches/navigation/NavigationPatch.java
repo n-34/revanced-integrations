@@ -33,11 +33,11 @@ public class NavigationPatch {
     }
 
     private enum NavigationButton {
-        HOME("TAB_HOME", Settings.HIDE_HOME_BUTTON.get()),
-        SAMPLES("TAB_SAMPLES", Settings.HIDE_SAMPLES_BUTTON.get()),
-        EXPLORE("TAB_EXPLORE", Settings.HIDE_EXPLORE_BUTTON.get()),
-        LIBRARY("LIBRARY_MUSIC", Settings.HIDE_LIBRARY_BUTTON.get()),
-        UPGRADE("TAB_MUSIC_PREMIUM", Settings.HIDE_UPGRADE_BUTTON.get());
+        HOME("TAB_HOME", Settings.HIDE_NAVIGATION_HOME_BUTTON.get()),
+        SAMPLES("TAB_SAMPLES", Settings.HIDE_NAVIGATION_SAMPLES_BUTTON.get()),
+        EXPLORE("TAB_EXPLORE", Settings.HIDE_NAVIGATION_EXPLORE_BUTTON.get()),
+        LIBRARY("LIBRARY_MUSIC", Settings.HIDE_NAVIGATION_LIBRARY_BUTTON.get()),
+        UPGRADE("TAB_MUSIC_PREMIUM", Settings.HIDE_NAVIGATION_UPGRADE_BUTTON.get());
 
         private final boolean enabled;
         private final String name;

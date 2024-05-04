@@ -20,7 +20,7 @@ public class ResettableListPreference {
         try {
             final String settingsKey = setting.key;
 
-            final String entryKey = settingsKey + "_entry";
+            final String entryKey = settingsKey + "_entries";
             final String entryValueKey = settingsKey + "_entry_value";
             final String[] mEntries = getStringArray(entryKey);
             final String[] mEntryValues = getStringArray(entryValueKey);

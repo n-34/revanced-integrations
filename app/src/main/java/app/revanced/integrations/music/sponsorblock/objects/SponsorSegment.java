@@ -5,7 +5,7 @@ import androidx.annotation.Nullable;
 
 import java.util.Objects;
 
-import app.revanced.integrations.music.patches.video.VideoInformation;
+import app.revanced.integrations.music.shared.VideoInformation;
 
 public class SponsorSegment implements Comparable<SponsorSegment> {
     @NonNull

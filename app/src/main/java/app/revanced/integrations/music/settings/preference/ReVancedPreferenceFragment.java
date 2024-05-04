@@ -44,7 +44,6 @@ import java.util.Date;
 import java.util.Objects;
 
 import app.revanced.integrations.music.patches.utils.ReturnYouTubeDislikePatch;
-import app.revanced.integrations.music.patches.video.CustomPlaybackSpeedPatch;
 import app.revanced.integrations.music.returnyoutubedislike.ReturnYouTubeDislike;
 import app.revanced.integrations.music.settings.ActivityHook;
 import app.revanced.integrations.music.settings.Settings;
@@ -59,7 +58,7 @@ import app.revanced.integrations.shared.utils.Utils;
  */
 public class ReVancedPreferenceFragment extends PreferenceFragment {
 
-    private static final String IMPORT_EXPORT_SETTINGS_ENTRY_KEY = "revanced_extended_settings_import_export_entry";
+    private static final String IMPORT_EXPORT_SETTINGS_ENTRY_KEY = "revanced_extended_settings_import_export_entries";
     private static final int READ_REQUEST_CODE = 42;
     private static final int WRITE_REQUEST_CODE = 43;
 
@@ -77,10 +76,10 @@ public class ReVancedPreferenceFragment extends PreferenceFragment {
             return;
 
         for (Setting<?> setting : Setting.allLoadedSettings()) {
-            if (setting.equals(Settings.ENABLE_OLD_PLAYER_LAYOUT)) {
-                Settings.ENABLE_OLD_PLAYER_BACKGROUND.save(newValue);
-            } else if (setting.equals(Settings.ENABLE_OLD_PLAYER_BACKGROUND) && !newValue) {
-                Settings.ENABLE_OLD_PLAYER_LAYOUT.save(newValue);
+            if (setting.equals(Settings.RESTORE_OLD_PLAYER_LAYOUT)) {
+                Settings.RESTORE_OLD_PLAYER_BACKGROUND.save(newValue);
+            } else if (setting.equals(Settings.RESTORE_OLD_PLAYER_BACKGROUND) && !newValue) {
+                Settings.RESTORE_OLD_PLAYER_LAYOUT.save(newValue);
             } else if (setting.equals(Settings.RYD_ENABLED)) {
                 ReturnYouTubeDislikePatch.onRYDStatusChange(newValue);
             } else if (setting.equals(Settings.RYD_DISLIKE_PERCENTAGE) || setting.equals(Settings.RYD_COMPACT_LAYOUT)) {
@@ -129,12 +128,12 @@ public class ReVancedPreferenceFragment extends PreferenceFragment {
 
             if (settings.equals(CHANGE_START_PAGE)) {
                 ResettableListPreference.showDialog(mActivity, setting, 2);
-            } else if (settings.equals(CUSTOM_FILTER_STRINGS) || settings.equals(HIDE_ACCOUNT_MENU_FILTER_STRINGS)) {
-                ResettableEditTextPreference.showDialog(mActivity, setting, str("revanced_custom_filter_strings_summary"));
-            } else if (settings.equals(CUSTOM_PLAYBACK_SPEEDS)) {
-                ResettableEditTextPreference.showDialog(mActivity, setting, CustomPlaybackSpeedPatch.getWarningMessage());
-            } else if (settings.equals(EXTERNAL_DOWNLOADER_PACKAGE_NAME)) {
+            } else if (settings.equals(CUSTOM_FILTER_STRINGS)
+                    || settings.equals(HIDE_ACCOUNT_MENU_FILTER_STRINGS)
+                    || settings.equals(CUSTOM_PLAYBACK_SPEEDS)) {
                 ResettableEditTextPreference.showDialog(mActivity, setting);
+            } else if (settings.equals(EXTERNAL_DOWNLOADER_PACKAGE_NAME)) {
+                ExternalDownloaderPreference.showDialog(mActivity);
             } else if (settings.equals(SB_API_URL)) {
                 SponsorBlockApiUrlPreference.showDialog(mActivity);
             } else if (settings.equals(SETTINGS_IMPORT_EXPORT)) {

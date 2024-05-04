@@ -1,5 +1,6 @@
 package app.revanced.integrations.music.utils;
 
+import static app.revanced.integrations.music.settings.preference.ExternalDownloaderPreference.checkPackageIsEnabled;
 import static app.revanced.integrations.shared.utils.StringRef.str;
 
 import android.annotation.SuppressLint;
@@ -8,40 +9,46 @@ import android.media.AudioManager;
 
 import androidx.annotation.NonNull;
 
-import app.revanced.integrations.music.patches.video.VideoInformation;
+import app.revanced.integrations.music.shared.VideoInformation;
 import app.revanced.integrations.music.settings.Settings;
+import app.revanced.integrations.shared.settings.StringSetting;
 import app.revanced.integrations.shared.utils.IntentUtils;
 import app.revanced.integrations.shared.utils.Logger;
 
 @SuppressWarnings("unused")
 public class VideoUtils extends IntentUtils {
+    private static final StringSetting externalDownloaderPackageName =
+            Settings.EXTERNAL_DOWNLOADER_PACKAGE_NAME;
 
     public static void launchExternalDownloader() {
         launchExternalDownloader(VideoInformation.getVideoId());
     }
 
     public static void launchExternalDownloader(@NonNull String videoId) {
-        String downloaderPackageName = Settings.EXTERNAL_DOWNLOADER_PACKAGE_NAME.get().trim();
+        try {
+            String downloaderPackageName = externalDownloaderPackageName.get().trim();
 
-        if (downloaderPackageName.isEmpty()) {
-            Settings.EXTERNAL_DOWNLOADER_PACKAGE_NAME.resetToDefault();
-            downloaderPackageName = Settings.EXTERNAL_DOWNLOADER_PACKAGE_NAME.defaultValue;
+            if (downloaderPackageName.isEmpty()) {
+                externalDownloaderPackageName.resetToDefault();
+                downloaderPackageName = externalDownloaderPackageName.defaultValue;
+            }
+
+            if (!checkPackageIsEnabled()) {
+                return;
+            }
+
+            final String content = String.format("https://music.youtube.com/watch?v=%s", videoId);
+            launchExternalDownloader(content, downloaderPackageName);
+        } catch (Exception ex) {
+            Logger.printException(() -> "launchExternalDownloader failure", ex);
         }
-
-        if (!ExtendedUtils.isPackageEnabled(downloaderPackageName)) {
-            showToastShort(str("revanced_external_downloader_not_installed_warning", downloaderPackageName));
-            return;
-        }
-
-        final String content = String.format("https://music.youtube.com/watch?v=%s", videoId);
-        launchExternalDownloader(content, downloaderPackageName);
     }
 
     @SuppressLint("IntentReset")
     public static void openInYouTube() {
         final String videoId = VideoInformation.getVideoId();
         if (videoId.isEmpty()) {
-            showToastShort(str("revanced_watch_on_youtube_warning"));
+            showToastShort(str("revanced_replace_flyout_menu_dismiss_queue_watch_on_youtube_warning"));
             return;
         }
 
@@ -50,7 +57,7 @@ public class VideoUtils extends IntentUtils {
         }
 
         String url = String.format("vnd.youtube://%s", videoId);
-        if (Settings.REPLACE_FLYOUT_PANEL_DISMISS_QUEUE_CONTINUE_WATCH.get()) {
+        if (Settings.REPLACE_FLYOUT_MENU_DISMISS_QUEUE_CONTINUE_WATCH.get()) {
             long seconds = VideoInformation.getVideoTime() / 1000;
             url += String.format("?t=%s", seconds);
         }

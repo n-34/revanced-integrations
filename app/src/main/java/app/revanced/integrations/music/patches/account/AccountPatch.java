@@ -22,7 +22,7 @@ public class AccountPatch {
         final String[] blockList = Settings.HIDE_ACCOUNT_MENU_FILTER_STRINGS.get().split("\\n");
 
         for (String filter : blockList) {
-            if (charSequence.toString().equals(filter) && !filter.isEmpty())
+            if (!filter.isEmpty() && charSequence.toString().equals(filter))
                 view.setVisibility(View.GONE);
         }
     }
@@ -32,11 +32,10 @@ public class AccountPatch {
     }
 
     public static void hideHandle(TextView textView, int visibility) {
-        if (Settings.HIDE_HANDLE.get()) {
-            textView.setVisibility(View.GONE);
-        } else {
-            textView.setVisibility(visibility);
-        }
+        final int finalVisibility = Settings.HIDE_HANDLE.get()
+                ? View.GONE
+                : visibility;
+        textView.setVisibility(finalVisibility);
     }
 
     public static int hideTermsContainer() {

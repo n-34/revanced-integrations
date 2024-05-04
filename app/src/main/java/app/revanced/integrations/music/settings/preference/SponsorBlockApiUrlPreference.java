@@ -25,7 +25,6 @@ public class SponsorBlockApiUrlPreference {
             final StringSetting apiUrl = Settings.SB_API_URL;
 
             final EditText textView = new EditText(mActivity);
-            textView.setHint(apiUrl.get());
             textView.setText(apiUrl.get());
 
             TextInputLayout textInputLayout = new TextInputLayout(mActivity);

@@ -23,7 +23,7 @@ public class InitializationPatch {
         if (BaseSettings.SETTINGS_INITIALIZED.get())
             return;
 
-        showRestartDialog(mActivity, "revanced_restart_first_run", 1000);
+        showRestartDialog(mActivity, "revanced_extended_restart_first_run", 1000);
         Utils.runOnMainThreadDelayed(() -> BaseSettings.SETTINGS_INITIALIZED.save(true), 1000);
     }
 

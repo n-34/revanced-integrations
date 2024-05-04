@@ -1,11 +1,12 @@
 package app.revanced.integrations.music.settings;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 
 import androidx.annotation.NonNull;
+
+import java.lang.ref.WeakReference;
 
 import app.revanced.integrations.music.settings.preference.ReVancedPreferenceFragment;
 import app.revanced.integrations.shared.utils.Logger;
@@ -14,11 +15,10 @@ import app.revanced.integrations.shared.utils.Logger;
  * @noinspection ALL
  */
 public class ActivityHook {
-    @SuppressLint("StaticFieldLeak")
-    private static Activity activity;
+    private static WeakReference<Activity> activityRef = new WeakReference<>(null);
 
     public static Activity getActivity() {
-        return activity;
+        return activityRef.get();
     }
 
     /**
@@ -28,8 +28,9 @@ public class ActivityHook {
      *               Check whether object can be cast as Activity for a safe hook.
      */
     public static void setActivity(@NonNull Object object) {
-        if (object instanceof Activity mActivity)
-            activity = mActivity;
+        if (object instanceof Activity mActivity) {
+            activityRef = new WeakReference<>(mActivity);
+        }
     }
 
     /**
@@ -58,12 +59,13 @@ public class ActivityHook {
 
 
             // Save intent data in settings activity.
-            Intent intent = activity.getIntent();
+            Activity mActivity = activityRef.get();
+            Intent intent = mActivity.getIntent();
             intent.setData(Uri.parse(dataString));
-            activity.setIntent(intent);
+            mActivity.setIntent(intent);
 
             // Starts a new PreferenceFragment to handle activities freely.
-            activity.getFragmentManager()
+            mActivity.getFragmentManager()
                     .beginTransaction()
                     .add(new ReVancedPreferenceFragment(), "")
                     .commit();

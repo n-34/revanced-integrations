@@ -2,6 +2,8 @@ package app.revanced.integrations.music.patches.video;
 
 import static app.revanced.integrations.shared.utils.StringRef.str;
 
+import androidx.annotation.NonNull;
+
 import java.util.Arrays;
 
 import app.revanced.integrations.music.settings.Settings;
@@ -13,7 +15,7 @@ public class CustomPlaybackSpeedPatch {
     /**
      * Maximum playback speed, exclusive value.  Custom speeds must be less than this value.
      */
-    private static final float MAXIMUM_PLAYBACK_SPEED = 3;
+    private static final float MAXIMUM_PLAYBACK_SPEED = 5;
 
     /**
      * Custom playback speeds.
@@ -45,12 +47,8 @@ public class CustomPlaybackSpeedPatch {
         return userChangedCustomPlaybackSpeed() ? 0 : original;
     }
 
-    private static void resetCustomSpeeds(boolean shouldWarning) {
-        if (shouldWarning) {
-            Utils.showToastShort(getWarningMessage());
-        }
-
-        Utils.showToastShort(str("revanced_custom_playback_speeds_invalid"));
+    private static void resetCustomSpeeds(@NonNull String toastMessage) {
+        Utils.showToastLong(toastMessage);
         Settings.CUSTOM_PLAYBACK_SPEEDS.resetToDefault();
     }
 
@@ -68,7 +66,7 @@ public class CustomPlaybackSpeedPatch {
                     throw new IllegalArgumentException();
                 }
                 if (speed > MAXIMUM_PLAYBACK_SPEED) {
-                    resetCustomSpeeds(true);
+                    resetCustomSpeeds(str("revanced_custom_playback_speeds_invalid", MAXIMUM_PLAYBACK_SPEED + ""));
                     loadCustomSpeeds();
                     return;
                 }
@@ -76,7 +74,7 @@ public class CustomPlaybackSpeedPatch {
             }
         } catch (Exception ex) {
             Logger.printInfo(() -> "parse error", ex);
-            resetCustomSpeeds(false);
+            resetCustomSpeeds(str("revanced_custom_playback_speeds_parse_exception"));
             loadCustomSpeeds();
         }
     }
@@ -90,10 +88,6 @@ public class CustomPlaybackSpeedPatch {
             if (arrayValue == value) return true;
         }
         return false;
-    }
-
-    public static String getWarningMessage() {
-        return str("revanced_custom_playback_speeds_warning", MAXIMUM_PLAYBACK_SPEED + "");
     }
 
 }

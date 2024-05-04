@@ -40,8 +40,8 @@ public class ActionBarPatch {
         );
     }
 
-    public static void hookDownloadButton(View view) {
-        if (!Settings.HOOK_ACTION_BUTTON_DOWNLOAD.get()) {
+    public static void inAppDownloadButtonOnClick(View view) {
+        if (!Settings.EXTERNAL_DOWNLOADER_ACTION_BUTTON.get()) {
             return;
         }
 

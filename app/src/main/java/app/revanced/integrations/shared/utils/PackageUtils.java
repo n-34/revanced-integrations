@@ -71,4 +71,14 @@ public class PackageUtils extends Utils {
         return context.getPackageManager();
     }
 
+    public static boolean isVersionToLessThan(@NonNull String compareVersion, @NonNull String targetVersion) {
+        try {
+            final int compareVersionNumber = Integer.parseInt(compareVersion.replaceAll("\\.", ""));
+            final int targetVersionNumber = Integer.parseInt(targetVersion.replaceAll("\\.", ""));
+            return compareVersionNumber < targetVersionNumber;
+        } catch (NumberFormatException ex) {
+            Logger.printException(() -> "Failed to compare version: " + compareVersion + ", " + targetVersion, ex);
+        }
+        return false;
+    }
 }

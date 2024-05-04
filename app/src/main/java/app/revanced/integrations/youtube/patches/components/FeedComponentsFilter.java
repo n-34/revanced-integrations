@@ -9,7 +9,6 @@ import app.revanced.integrations.shared.patches.components.StringFilterGroupList
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.StringTrieSearch;
 import app.revanced.integrations.youtube.settings.Settings;
-import app.revanced.integrations.youtube.shared.NavigationBar;
 import app.revanced.integrations.youtube.shared.RootView;
 
 @SuppressWarnings("unused")

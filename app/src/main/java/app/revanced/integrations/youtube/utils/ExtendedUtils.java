@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 
 import app.revanced.integrations.shared.settings.BooleanSetting;
 import app.revanced.integrations.shared.settings.Setting;
-import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.PackageUtils;
 import app.revanced.integrations.youtube.patches.video.ReloadVideoPatch;
 import app.revanced.integrations.youtube.patches.video.VideoQualityPatch;
@@ -71,17 +70,6 @@ public class ExtendedUtils extends PackageUtils {
             return false;
 
         return isVersionToLessThan(Settings.SPOOF_APP_VERSION_TARGET.get(), versionName);
-    }
-
-    private static boolean isVersionToLessThan(@NonNull String compareVersion, @NonNull String targetVersion) {
-        try {
-            final int compareVersionNumber = Integer.parseInt(compareVersion.replaceAll("\\.", ""));
-            final int targetVersionNumber = Integer.parseInt(targetVersion.replaceAll("\\.", ""));
-            return compareVersionNumber < targetVersionNumber;
-        } catch (NumberFormatException ex) {
-            Logger.printException(() -> "Failed to compare version: " + compareVersion + ", " + targetVersion, ex);
-        }
-        return false;
     }
 
     public static boolean getClientEnforcesVideoQualityLimits() {

@@ -1,13 +1,11 @@
-package app.revanced.integrations.music.patches.video;
+package app.revanced.integrations.music.shared;
 
 import static app.revanced.integrations.shared.utils.ResourceUtils.getString;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -23,11 +21,6 @@ public final class VideoInformation {
     private static final float DEFAULT_YOUTUBE_MUSIC_PLAYBACK_SPEED = 1.0f;
     private static final int DEFAULT_YOUTUBE_MUSIC_VIDEO_QUALITY = -2;
     private static final String DEFAULT_YOUTUBE_MUSIC_VIDEO_QUALITY_STRING = getString("quality_auto");
-    private static final String SEEK_METHOD_NAME = "seekTo";
-
-    private static WeakReference<Object> playerControllerRef;
-    private static Method seekMethod;
-
     @NonNull
     private static String videoId = "";
 
@@ -51,24 +44,6 @@ public final class VideoInformation {
      */
     @Nullable
     private static List<Integer> videoQualities;
-
-    /**
-     * Injection point.
-     *
-     * @param playerController player controller object.
-     */
-    public static void initialize(@NonNull Object playerController) {
-        try {
-            playerControllerRef = new WeakReference<>(Objects.requireNonNull(playerController));
-            videoTime = -1;
-            videoLength = 0;
-
-            seekMethod = playerController.getClass().getMethod(SEEK_METHOD_NAME, Long.TYPE);
-            seekMethod.setAccessible(true);
-        } catch (Exception ex) {
-            Logger.printException(() -> "Failed to initialize", ex);
-        }
-    }
 
     /**
      * Id of the current video playing.  Includes Shorts and YouTube Stories.
@@ -107,12 +82,7 @@ public final class VideoInformation {
         Utils.verifyOnMainThread();
         try {
             Logger.printDebug(() -> "Seeking to " + millisecond);
-            Object seekResultObject = seekMethod.invoke(playerControllerRef.get(), millisecond);
-
-            if (!(seekResultObject instanceof Boolean seekResult))
-                return false;
-
-            return seekResult;
+            return overrideVideoTime(millisecond);
         } catch (Exception ex) {
             Logger.printException(() -> "Failed to seek", ex);
             return false;
@@ -133,14 +103,6 @@ public final class VideoInformation {
      */
     public static void setPlaybackSpeed(float newlyLoadedPlaybackSpeed) {
         playbackSpeed = newlyLoadedPlaybackSpeed;
-    }
-
-    /**
-     * Overrides the current quality.
-     * Rest of the implementation added by patch.
-     */
-    public static void overrideVideoQuality(int qualityOverride) {
-        Logger.printDebug(() -> "Overriding video quality to: " + qualityOverride);
     }
 
     /**
@@ -180,7 +142,7 @@ public final class VideoInformation {
                 videoQuality = DEFAULT_YOUTUBE_MUSIC_VIDEO_QUALITY;
                 videoQualityString = DEFAULT_YOUTUBE_MUSIC_VIDEO_QUALITY_STRING;
             }
-        } catch (Exception ignored) {
+        } catch (NumberFormatException ignored) {
         }
     }
 
@@ -270,6 +232,24 @@ public final class VideoInformation {
      */
     public static void setVideoTime(final long currentPlaybackTime) {
         videoTime = currentPlaybackTime;
+    }
+
+    /**
+     * Overrides the current quality.
+     * Rest of the implementation added by patch.
+     */
+    public static void overrideVideoQuality(int qualityOverride) {
+        Logger.printDebug(() -> "Overriding video quality to: " + qualityOverride);
+    }
+
+    /**
+     * Overrides the current video time by seeking.
+     * Rest of the implementation added by patch.
+     */
+    public static boolean overrideVideoTime(final long seekTime) {
+        // These instructions are ignored by patch.
+        Logger.printDebug(() -> "Seeking to " + seekTime);
+        return false;
     }
 
 }

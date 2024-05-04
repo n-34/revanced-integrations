@@ -1,6 +1,5 @@
 package app.revanced.integrations.youtube.settings.preference;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
