@@ -322,6 +322,7 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting HIDE_TRANSCRIPT_SECTION = new BooleanSetting("revanced_hide_transcript_section", FALSE);
     public static final BooleanSetting DISABLE_VIDEO_DESCRIPTION_INTERACTION = new BooleanSetting("revanced_disable_video_description_interaction", FALSE, true);
     public static final BooleanSetting EXPAND_VIDEO_DESCRIPTION = new BooleanSetting("revanced_expand_video_description", FALSE, true);
+    public static final StringSetting EXPAND_VIDEO_DESCRIPTION_STRINGS = new StringSetting("revanced_expand_video_description_strings", str("revanced_expand_video_description_strings_default_value"), true, parent(EXPAND_VIDEO_DESCRIPTION));
 
 
     // PreferenceScreen: Shorts

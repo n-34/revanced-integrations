@@ -76,16 +76,12 @@ public class PlayerPatch {
      * view id R.id.content
      */
     private static final int contentId = ResourceUtils.getIdIdentifier("content");
-    /**
-     * engagementSubHeaderActive is updated every time the engagement panel is opened.
-     * <p>
-     * If engagementSubHeaderActive is true, the player's comments panel has been opened.
-     * If engagementSubHeaderActive is false, the video description panel has been opened, or the comments panel for Shorts or community posts has been opened.
-     */
-    private static boolean engagementSubHeaderActive = false;
+    private static final String descriptionString = Settings.EXPAND_VIDEO_DESCRIPTION_STRINGS.get();
 
-    public static void engagementPanelSubHeaderViewLoaded(@Nullable View engagementPanelView) {
-        engagementSubHeaderActive = engagementPanelView != null;
+    private static boolean isDescriptionPanel = false;
+
+    public static void setContentDescription(String contentDescription) {
+        isDescriptionPanel = contentDescription.equals(descriptionString);
     }
 
     /**
@@ -111,8 +107,9 @@ public class PlayerPatch {
                 if (contentView.getId() != contentId) {
                     return;
                 }
-                // Ignored when the player comments panel opens.
-                if (engagementSubHeaderActive) {
+                // This method is invoked whenever the Engagement panel is opened. (Description, Chapters, Comments, etc)
+                // Check the title of the Engagement panel to prevent unnecessary clicking.
+                if (!isDescriptionPanel) {
                     return;
                 }
                 // The first view group contains information such as the video's title, like count, and number of views.
