@@ -1,15 +1,19 @@
 package app.revanced.integrations.youtube.patches.components;
 
+import static app.revanced.integrations.youtube.shared.NavigationBar.NavigationButton;
+
 import androidx.annotation.Nullable;
+
+import org.apache.commons.lang3.StringUtils;
 
 import app.revanced.integrations.shared.patches.components.ByteArrayFilterGroup;
 import app.revanced.integrations.shared.patches.components.Filter;
 import app.revanced.integrations.shared.patches.components.StringFilterGroup;
 import app.revanced.integrations.shared.patches.components.StringFilterGroupList;
-import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.StringTrieSearch;
 import app.revanced.integrations.youtube.settings.Settings;
 import app.revanced.integrations.youtube.shared.RootView;
+import app.revanced.integrations.youtube.utils.ExtendedUtils;
 
 @SuppressWarnings("unused")
 public final class FeedComponentsFilter extends Filter {
@@ -55,6 +59,13 @@ public final class FeedComponentsFilter extends Filter {
 
         // Identifiers.
 
+        carouselShelf = new StringFilterGroup(
+                Settings.HIDE_CAROUSEL_SHELF,
+                "horizontal_shelf.eml",
+                "horizontal_tile_shelf.eml",
+                "horizontal_video_shelf.eml"
+        );
+
         final StringFilterGroup chipsShelf = new StringFilterGroup(
                 Settings.HIDE_CHIPS_SHELF,
                 "chips_shelf"
@@ -66,6 +77,7 @@ public final class FeedComponentsFilter extends Filter {
         );
 
         addIdentifierCallbacks(
+                carouselShelf,
                 chipsShelf,
                 feedSearchBar
         );
@@ -75,13 +87,6 @@ public final class FeedComponentsFilter extends Filter {
                 Settings.HIDE_ALBUM_CARDS,
                 "browsy_bar",
                 "official_card"
-        );
-
-        carouselShelf = new StringFilterGroup(
-                Settings.HIDE_CAROUSEL_SHELF,
-                "horizontal_shelf.eml",
-                "horizontal_tile_shelf.eml",
-                "horizontal_video_shelf.eml"
         );
 
         channelProfileButtonRule = new StringFilterGroup(
@@ -163,7 +168,6 @@ public final class FeedComponentsFilter extends Filter {
 
         addPathCallbacks(
                 albumCard,
-                carouselShelf,
                 channelProfileButtonRule,
                 channelMemberShelf,
                 channelProfileLinks,
@@ -207,17 +211,42 @@ public final class FeedComponentsFilter extends Filter {
                 && !mixPlaylistsContextExceptions.matches(conversionContext.toString());
     }
 
-    private static final String BROWSE_ID_LIBRARY = "FElibrary";
+    private static final String BROWSE_ID_DEFAULT = "FEwhat_to_watch";
+    private static final String BROWSE_ID_PLAYLIST = "VLPL";
+
+    private static boolean hideShelves() {
+        // If the player is opened while library is selected,
+        // then filter any recommendations below the player.
+        if (RootView.isPlayerActive()
+                // Or if the search is active while library is selected, then also filter.
+                || RootView.isSearchBarActive()) {
+            return true;
+        }
+
+        // In the old library tab, the library shelf is hidden for some reason.
+        // To solve this, check browserId in the library tab, check navigation button in the You tab.
+        if (ExtendedUtils.isYouTabUsed()) {
+            // Check navigation button last.
+            // Only filter if the library tab is not selected.
+            // This check is important as the shelf layout is used for the library tab playlists.
+            NavigationButton selectedNavButton = NavigationButton.getSelectedNavigationButton();
+            return selectedNavButton != null && !selectedNavButton.isLibraryOrYouTab();
+        } else {
+            // Check browseId last.
+            // Only filter in home feed, search results, playlist.
+            final String browseId = RootView.getBrowseId();
+            return browseId.isEmpty() || StringUtils.startsWithAny(browseId, BROWSE_ID_DEFAULT, BROWSE_ID_PLAYLIST);
+        }
+    }
 
     @Override
     public boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
                        StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
         if (matchedGroup == carouselShelf) {
-            // In the related video, the carousel shelf is not shown so player type check is ignored.
-            final String browseId = RootView.getBrowseId();
-            Logger.printDebug(() -> "Current browseId: " + browseId);
-            if (browseId.equals(BROWSE_ID_LIBRARY) && !RootView.isSearchBarActive())
-                return false;
+            if (hideShelves()) {
+                return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
+            }
+            return false;
         } else if (matchedGroup == channelProfileButtonRule) {
             if (browseStoreButton.check(protobufBufferArray).isFiltered()) {
                 return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);

@@ -2,6 +2,7 @@ package app.revanced.integrations.youtube.shared;
 
 import static app.revanced.integrations.youtube.shared.NavigationBar.NavigationButton.CREATE;
 
+import android.app.Activity;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -197,6 +198,14 @@ public final class NavigationBar {
         } catch (Exception ex) {
             Logger.printException(() -> "navigationTabSelected failure", ex);
         }
+    }
+
+    /**
+     * Injection point.
+     */
+    public static void onBackPressed(Activity activity) {
+        Logger.printDebug(() -> "Back button pressed");
+        createNavButtonLatch();
     }
 
     /** @noinspection EmptyMethod*/
