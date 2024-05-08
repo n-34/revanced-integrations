@@ -47,20 +47,8 @@ public class VideoUtils extends IntentUtils {
         );
     }
 
-    @TargetApi(26)
-    @SuppressLint("DefaultLocale")
     public static void copyTimeStamp() {
-        final long currentVideoTime = VideoInformation.getVideoTime();
-        final Duration duration = Duration.ofMillis(currentVideoTime);
-
-        final long h = duration.toHours();
-        final long m = duration.toMinutes() % 60;
-        final long s = duration.getSeconds() % 60;
-
-        final String timeStamp = h > 0
-                ? String.format("%02d:%02d:%02d", h, m, s)
-                : String.format("%02d:%02d", m, s);
-
+        final String timeStamp = getTimeStamp(VideoInformation.getVideoTime(), false);
         setClipboard(timeStamp, str("revanced_share_copy_timestamp_success", timeStamp));
     }
 
@@ -145,19 +133,50 @@ public class VideoUtils extends IntentUtils {
         }
     }
 
-    /**
-     * Rest of the implementation added by patch.
-     */
-    public static void showPlaybackSpeedFlyoutMenu() {
-        Logger.printDebug(() -> "Playback speed flyout menu opened");
+    public static String getFormattedTimeStamp(long videoTime) {
+        return "'" + videoTime +
+                "' (" +
+                getTimeStamp(videoTime, false) +
+                ")\n";
     }
 
-    /**
-     * Rest of the implementation added by patch.
-     */
-    public static void showVideoQualityFlyoutMenu() {
-        // These instructions are ignored by patch.
-        Log.d("Extended: VideoUtils", "Video quality flyout menu opened");
+    @TargetApi(26)
+    @SuppressLint("DefaultLocale")
+    public static String getTimeStamp(long time, boolean mills) {
+        final Duration duration = Duration.ofMillis(time);
+
+        final long hours = duration.toHours();
+        final long minutes = duration.toMinutes() % 60;
+        final long seconds = duration.getSeconds() % 60;
+        final long millis = duration.toMillis() % 1000;
+
+        if (mills) {
+            return String.format("%02d:%02d:%02d.%03d", hours, minutes, seconds, millis);
+        } else {
+            if (hours > 0) {
+                return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+            } else {
+                return String.format("%02d:%02d", minutes, seconds);
+            }
+        }
+    }
+
+    public static long getVideoTime(String str) {
+        if (str == null || str.isEmpty())
+            return 0;
+
+        String[] timeFormat = str.split(":");
+        String[] secondAndMills = timeFormat[2].split("\\.");
+
+        String hours = timeFormat[0];
+        String minutes = timeFormat[1];
+        String second = secondAndMills[0];
+        String mills = secondAndMills[1];
+
+        return Long.parseLong(hours) * 60 * 60 * 1000
+                + Long.parseLong(minutes) * 60 * 1000
+                + Long.parseLong(second) * 1000
+                + Long.parseLong(mills);
     }
 
     public static String getFormattedQualityString(@Nullable String prefix) {
@@ -182,5 +201,20 @@ public class VideoUtils extends IntentUtils {
      */
     public static boolean getExternalDownloaderLaunchedState(boolean original) {
         return !isExternalDownloaderLaunched && original;
+    }
+
+    /**
+     * Rest of the implementation added by patch.
+     */
+    public static void showPlaybackSpeedFlyoutMenu() {
+        Logger.printDebug(() -> "Playback speed flyout menu opened");
+    }
+
+    /**
+     * Rest of the implementation added by patch.
+     */
+    public static void showVideoQualityFlyoutMenu() {
+        // These instructions are ignored by patch.
+        Log.d("Extended: VideoUtils", "Video quality flyout menu opened");
     }
 }
