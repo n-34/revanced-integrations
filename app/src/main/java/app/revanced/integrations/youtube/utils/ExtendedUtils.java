@@ -2,6 +2,10 @@ package app.revanced.integrations.youtube.utils;
 
 import androidx.annotation.NonNull;
 
+import org.apache.commons.lang3.time.FastDateFormat;
+
+import java.util.TimeZone;
+
 import app.revanced.integrations.shared.settings.BooleanSetting;
 import app.revanced.integrations.shared.settings.Setting;
 import app.revanced.integrations.shared.utils.PackageUtils;
@@ -22,6 +26,14 @@ public class ExtendedUtils extends PackageUtils {
      * In old YouTube client, hiding carousel shelves via navigation tab buttons does not work as intended.
      */
     private static boolean youTabUsed = false;
+    private static final FastDateFormat fdf = FastDateFormat.getInstance("HH:mm:ss", TimeZone.getTimeZone("UTC"));
+
+    public static String getFormattedTimeStamp(long videoTime) {
+        return "'" + videoTime +
+                "' (" +
+                fdf.format(videoTime) +
+                ")\n";
+    }
 
     public static boolean isFullscreenHidden() {
         boolean isFullscreenHidden = isTablet() &&

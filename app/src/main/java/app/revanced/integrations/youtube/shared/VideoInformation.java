@@ -1,16 +1,14 @@
 package app.revanced.integrations.youtube.shared;
 
 import static app.revanced.integrations.shared.utils.ResourceUtils.getString;
+import static app.revanced.integrations.youtube.utils.ExtendedUtils.getFormattedTimeStamp;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import org.apache.commons.lang3.time.FastDateFormat;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TimeZone;
 
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.Utils;
@@ -29,7 +27,6 @@ public final class VideoInformation {
      */
     private static final String SHORTS_PLAYER_PARAMETERS = "8AEB";
 
-    private static final FastDateFormat fdf = FastDateFormat.getInstance("HH:mm:ss", TimeZone.getTimeZone("UTC"));
     @NonNull
     private static String channelId = "";
     @NonNull
@@ -74,6 +71,11 @@ public final class VideoInformation {
         videoTime = -1;
     }
 
+    @Deprecated
+    public static boolean seekTo(final long seekTime) {
+        return seekTo(seekTime, getVideoLength());
+    }
+
     /**
      * Seek on the current video.
      * Does not function for playback of Shorts.
@@ -84,12 +86,12 @@ public final class VideoInformation {
      * @param seekTime The seekTime to seek the video to.
      * @return true if the seek was successful.
      */
-    public static boolean seekTo(final long seekTime) {
+    public static boolean seekTo(final long seekTime, final long videoLength) {
         Utils.verifyOnMainThread();
         try {
-            final long adjustedSeekTime = getAdjustedSeekTime(seekTime);
+            final long adjustedSeekTime = getAdjustedSeekTime(seekTime, videoLength);
 
-            Logger.printDebug(() -> "Seeking to " + adjustedSeekTime);
+            Logger.printDebug(() -> "Seeking to " + getFormattedTimeStamp(adjustedSeekTime));
             return overrideVideoTime(adjustedSeekTime);
         } catch (Exception ex) {
             Logger.printException(() -> "Failed to seek", ex);
@@ -98,7 +100,7 @@ public final class VideoInformation {
     }
 
     // Prevent issues such as play/pause button or autoplay not working.
-    private static long getAdjustedSeekTime(final long seekTime) {
+    private static long getAdjustedSeekTime(final long seekTime, final long videoLength) {
         // If the user skips to a section that is 500 ms before the video length,
         // it will get stuck in a loop.
         if (videoLength - seekTime > 500) {
@@ -116,8 +118,13 @@ public final class VideoInformation {
         }
     }
 
+    @Deprecated
     public static void seekToRelative(long millisecondsRelative) {
-        seekTo(videoTime + millisecondsRelative);
+        seekToRelative(millisecondsRelative, getVideoLength());
+    }
+
+    public static void seekToRelative(long millisecondsRelative, final long videoLength) {
+        seekTo(videoTime + millisecondsRelative, videoLength);
     }
 
     /**
@@ -152,11 +159,8 @@ public final class VideoInformation {
                         newlyLoadedVideoId +
                         "'\nvideoTitle='" +
                         newlyLoadedVideoTitle +
-                        "'\nvideoLength='" +
-                        newlyLoadedVideoLength +
-                        "' ("+
-                        fdf.format(newlyLoadedVideoLength) +
-                        ")\n"+
+                        "'\nvideoLength=" +
+                        getFormattedTimeStamp(newlyLoadedVideoLength) +
                         "videoIsLiveStream='" +
                         newlyLoadedLiveStreamValue +
                         "'"

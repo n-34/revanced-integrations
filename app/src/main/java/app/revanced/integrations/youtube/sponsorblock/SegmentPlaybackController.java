@@ -567,7 +567,7 @@ public class SegmentPlaybackController {
             }
 
             // If the seek is successful, then the seek causes a recursive call back into this class.
-            final boolean seekSuccessful = VideoInformation.seekTo(segmentToSkip.end);
+            final boolean seekSuccessful = VideoInformation.seekTo(segmentToSkip.end, getVideoLength());
             if (!seekSuccessful) {
                 // can happen when switching videos and is normal
                 Logger.printDebug(() -> "Could not skip segment (seek unsuccessful): " + segmentToSkip);

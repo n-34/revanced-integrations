@@ -368,7 +368,7 @@ public class SponsorBlockUtils {
                 SegmentPlaybackController.addUnsubmittedSegment(
                         new SponsorSegment(SegmentCategory.UNSUBMITTED, null,
                                 newSponsorSegmentStartMillis, newSponsorSegmentEndMillis, false));
-                VideoInformation.seekTo(newSponsorSegmentStartMillis - 2500);
+                VideoInformation.seekTo(newSponsorSegmentStartMillis - 2500, SegmentPlaybackController.getVideoLength());
             }
         } catch (Exception ex) {
             Logger.printException(() -> "onPreviewClicked failure", ex);
