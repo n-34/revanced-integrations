@@ -215,11 +215,9 @@ public final class FeedComponentsFilter extends Filter {
     private static final String BROWSE_ID_PLAYLIST = "VLPL";
 
     private static boolean hideShelves() {
-        // If the player is opened while library is selected,
-        // then filter any recommendations below the player.
-        if (RootView.isPlayerActive()
-                // Or if the search is active while library is selected, then also filter.
-                || RootView.isSearchBarActive()) {
+        // If the search is active while library is selected, then filter.
+        // Carousel shelf is not visible within the player, therefore does not check the player type.
+        if (RootView.isSearchBarActive()) {
             return true;
         }
 
