@@ -4,7 +4,6 @@ import androidx.annotation.Nullable;
 
 import app.revanced.integrations.shared.patches.components.Filter;
 import app.revanced.integrations.shared.patches.components.StringFilterGroup;
-import app.revanced.integrations.shared.utils.StringTrieSearch;
 import app.revanced.integrations.youtube.settings.Settings;
 
 @SuppressWarnings("unused")

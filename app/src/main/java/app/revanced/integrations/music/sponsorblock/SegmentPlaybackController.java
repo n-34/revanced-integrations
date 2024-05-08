@@ -12,8 +12,8 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Objects;
 
-import app.revanced.integrations.music.shared.VideoInformation;
 import app.revanced.integrations.music.settings.Settings;
+import app.revanced.integrations.music.shared.VideoInformation;
 import app.revanced.integrations.music.sponsorblock.objects.CategoryBehaviour;
 import app.revanced.integrations.music.sponsorblock.objects.SponsorSegment;
 import app.revanced.integrations.music.sponsorblock.requests.SBRequester;

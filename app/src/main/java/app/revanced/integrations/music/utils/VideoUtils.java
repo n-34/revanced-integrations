@@ -9,8 +9,8 @@ import android.media.AudioManager;
 
 import androidx.annotation.NonNull;
 
-import app.revanced.integrations.music.shared.VideoInformation;
 import app.revanced.integrations.music.settings.Settings;
+import app.revanced.integrations.music.shared.VideoInformation;
 import app.revanced.integrations.shared.settings.StringSetting;
 import app.revanced.integrations.shared.utils.IntentUtils;
 import app.revanced.integrations.shared.utils.Logger;

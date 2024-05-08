@@ -2,7 +2,6 @@ package app.revanced.integrations.music.patches.general;
 
 import static app.revanced.integrations.music.utils.ExtendedUtils.isSpoofingToLessThan;
 import static app.revanced.integrations.shared.utils.Utils.hideViewBy0dpUnderCondition;
-import static app.revanced.integrations.shared.utils.Utils.hideViewUnderCondition;
 
 import android.app.AlertDialog;
 import android.view.View;
