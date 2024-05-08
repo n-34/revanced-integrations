@@ -9,19 +9,10 @@ import app.revanced.integrations.youtube.settings.Settings;
 
 @SuppressWarnings("unused")
 public final class DescriptionsFilter extends Filter {
-    private final StringTrieSearch exceptions = new StringTrieSearch();
     private final StringFilterGroup chapterSection;
     private final StringFilterGroup shoppingLinks;
 
     public DescriptionsFilter() {
-        exceptions.addPatterns(
-                "compact_channel",
-                "description",
-                "grid_video",
-                "inline_expander",
-                "metadata"
-        );
-
         final StringFilterGroup infoCardsSection = new StringFilterGroup(
                 Settings.HIDE_INFO_CARDS_SECTION,
                 "infocards_section.eml"
@@ -60,7 +51,8 @@ public final class DescriptionsFilter extends Filter {
 
         shoppingLinks = new StringFilterGroup(
                 Settings.HIDE_SHOPPING_LINKS,
-                "expandable_list."
+                "expandable_list.",
+                "shopping_description_shelf"
         );
 
 
@@ -73,10 +65,6 @@ public final class DescriptionsFilter extends Filter {
     @Override
     public boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
                        StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
-        if (exceptions.matches(path)) {
-            return false;
-        }
-
         // Check for the index because of likelihood of false positives.
         if (matchedGroup == chapterSection || matchedGroup == shoppingLinks) {
             if (contentIndex != 0) {
