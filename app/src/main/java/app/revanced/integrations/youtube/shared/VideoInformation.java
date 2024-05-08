@@ -361,9 +361,9 @@ public final class VideoInformation {
      * <p>
      * Value will lag behind the actual playback time by a variable amount based on the playback speed.
      * <p>
-     * If playback speed is 2.0x, this value may be up to 200ms behind the actual playback time.
-     * If playback speed is 1.0x, this value may be up to 100ms behind the actual playback time.
-     * If playback speed is 0.5x, this value may be up to 50ms behind the actual playback time.
+     * If playback speed is 2.0x, this value may be up to 2000ms behind the actual playback time.
+     * If playback speed is 1.0x, this value may be up to 1000ms behind the actual playback time.
+     * If playback speed is 0.5x, this value may be up to 500ms behind the actual playback time.
      * Etc.
      *
      * @return The time of the video in milliseconds. -1 if not set yet.
