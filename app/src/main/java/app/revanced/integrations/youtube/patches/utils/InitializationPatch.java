@@ -31,7 +31,6 @@ public class InitializationPatch {
         ExtendedUtils.setApplicationLabel();
         ExtendedUtils.setSmallestScreenWidthDp();
         ExtendedUtils.setVersionName();
-        ExtendedUtils.setClientEnforcesVideoQualityLimits();
         ExtendedUtils.setPlayerFlyoutMenuAdditionalSettings();
     }
 }
