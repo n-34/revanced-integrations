@@ -8,3 +8,4 @@ ReVanced Extended Integrations containing classes to be merged by ReVanced Patch
 - Usage on Linux: ```adb logcat | grep --line-buffered "Extended" > log.txt```
   
 This will write the log to a file called log.txt which you can view then.
+ 
